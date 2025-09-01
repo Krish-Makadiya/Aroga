@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-light-bg: #f4f4f9;
+    --color-light-surface: #ffffff;
+    --color-light-primary-text: #1e293b;
+    --color-light-secondary-text: #64748b;
+    --color-light-primary: #2d5ded;
+    --color-light-secondary: #7c4dff;
+    --color-light-fail: #ef4444;
+    --color-light-success: #22c55e;
+    --color-light-primary-hover: #1d4ed8;
+    --color-light-secondary-hover: #6d3aff;
+    --color-light-fail-hover: #dc2626;
+    --color-light-success-hover: #16a34a;
+
+    --color-dark-bg: #181818;
+    --color-dark-surface: #262626;
+    --color-dark-primary-text: #EDEDED; 
+    --color-dark-secondary-text: #A3A3A3;
+    --color-dark-primary: #6B8EFF;
+    --color-dark-secondary: #9D7AFF;
+    --color-dark-fail: #FF6B6B;
+    --color-dark-success: #4ADE80;
+    --color-dark-primary-hover: #8ba3ff;
+    --color-dark-secondary-hover: #b794ff;
+    --color-dark-fail-hover: #ff5555;
+    --color-dark-success-hover: #4ade80;
+
+    /* Scrollbar Variables */
+    --scrollbar-thumb: var(--color-light-surface);
+    --scrollbar-thumb-hover: var(--color-light-primary);
+}
+
+
+* {
+  font-family: 'poppins', sans-serif;
+}

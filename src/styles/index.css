@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Titan+One&display=swap');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-light-bg: #f5f7f2;
+    --color-light-surface: #ffffff;
+    --color-light-primary-text: #1e293b;
+    --color-light-secondary-text: #64748b;
+    --color-light-primary: #32cd32;
+    --color-light-secondary: #4338ca;
+    --color-light-secondary-hover: #312e81;
+    --color-light-fail: #ef4444;
+    --color-light-success: #22c55e;
+    --color-light-primary-hover: #28a428;
+    --color-light-fail-hover: #dc2626;
+    --color-light-success-hover: #16a34a;
+
+    --color-dark-bg: #101010;
+    --color-dark-surface: #1f2937;
+    --color-dark-primary-text: #ededed;
+    --color-dark-secondary-text: #9ca3af;
+    --color-dark-primary: #84cc16;
+    --color-dark-secondary: #a78bfa;
+    --color-dark-fail: #f87171;
+    --color-dark-success: #4ade80;
+    --color-dark-primary-hover: #65a30d;
+    --color-dark-secondary-hover: #8b5cf6;
+    --color-dark-fail-hover: #ef4444;
+    --color-dark-success-hover: #22c55e;
+
+    /* Scrollbar Variables */
+    --scrollbar-thumb: var(--color-light-surface);
+    --scrollbar-thumb-hover: var(--color-light-primary);
+}
+
+* {
+    font-family: "poppins", sans-serif;
+}
+
+@theme inline {
+  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
+    var(--delay, 0ms);
+ 
+  @keyframes cell-ripple {
+    0% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0.4;
+    }
+  }
+}

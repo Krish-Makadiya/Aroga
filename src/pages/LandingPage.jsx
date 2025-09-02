@@ -2,10 +2,14 @@ import { ArrowRight } from "lucide-react";
 import Navbar from "../components/LandingPage/Navbar";
 import { BackgroundRippleEffect } from "../components/UI/BackgroundRippleEffect";
 import { ContainerScroll } from "../components/UI/ContainerScroll";
+import FeatureSection from "../components/LandingPage/FeatureSection";
+import TestimonialSection from "../components/LandingPage/TestimonialSection";
+import WhyChooseUsSection from "../components/LandingPage/WhyChooseUsSection";
+import PricingSection from "../components/LandingPage/PricingSection";
 
 function LandingPage() {
     return (
-        <div className="overflow-hidden">
+        <div className="overflow-hidden relative">
             <Navbar />
             <div className="absolute inset-0 -z-20 h-full">
                 <BackgroundRippleEffect />
@@ -29,14 +33,14 @@ function LandingPage() {
                     </button>
                 </div>
             </div>
-            <div className="flex flex-col overflow-hidden bg-dark-bg">
+            <div className="flex flex-col overflow-hidden bg-ligh-bg dark:bg-dark-bg">
                 <ContainerScroll
                     titleComponent={
                         <>
                             <h1 className="text-3xl font-semibold text-neutral-700 ">
                                 Unleash the power of <br />
                                 <span className="text-[4rem] font-bold leading-none">
-                                    Backend Development
+                                    AI-driven Healthcare
                                 </span>
                             </h1>
                         </>
@@ -51,6 +55,14 @@ function LandingPage() {
                     />
                 </ContainerScroll>
             </div>
+
+            <FeatureSection />
+
+            <TestimonialSection />
+
+            <WhyChooseUsSection/>
+
+            <PricingSection />
         </div>
     );
 }

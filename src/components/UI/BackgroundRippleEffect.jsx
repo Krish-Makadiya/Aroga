@@ -3,9 +3,9 @@ import { cn } from "../../config/utils";
 import { div } from "motion/react-client";
 
 export const BackgroundRippleEffect = ({
-    rows = 12,
+    rows = 14,
     cols = 30,
-    cellSize = 50,
+    cellSize = 60,
 }) => {
     const [clickedCell, setClickedCell] = useState(null);
     const [rippleKey, setRippleKey] = useState(0);

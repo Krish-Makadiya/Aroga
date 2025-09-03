@@ -34,12 +34,14 @@ export default function FeatureSection() {
         <div className="bg-ligh-bg">
             <div className="mx-auto max-w-2xl grid-cols-1 items-center px-4 py-24 sm:px-6 sm:py-32 lg:max-w-7xl  flex gap-20">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-light-primary-text dark:text-dark-primary-text sm:text-4xl">
-                        Our Features
-                    </h2>
-                    <p className="mt-4 text-light-secondary-text dark:text-dark-secondary-text">
-                        Discover the unique features that set our product apart.
-                    </p>
+                    <div className="max-w-5xl">
+                        <h2 className="text-base/7 font-semibold text-light-primary dark:text-dark-primary">
+                            Features
+                        </h2>
+                        <p className="mt-2 max-w-2xl text-4xl font-semibold tracking-tight text-balance text-light-primary-text dark:text-dark-primary-text sm:text-5xl">
+                            Discover the unique features that set our product apart.
+                        </p>
+                    </div>
 
                     <dl className="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-y-16 lg:gap-x-8">
                         {features.map((feature) => (

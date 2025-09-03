@@ -6,6 +6,9 @@ import FeatureSection from "../components/LandingPage/FeatureSection";
 import TestimonialSection from "../components/LandingPage/TestimonialSection";
 import WhyChooseUsSection from "../components/LandingPage/WhyChooseUsSection";
 import PricingSection from "../components/LandingPage/PricingSection";
+import FAQSection from "../components/LandingPage/FAQSection";
+import ContactSection from "../components/LandingPage/ContactSection";
+import Footer from "../components/LandingPage/Footer";
 
 function LandingPage() {
     return (
@@ -16,10 +19,10 @@ function LandingPage() {
             </div>
             <div className="text-light-primary-text w-screen h-screen flex flex-col gap-6 items-center justify-center">
                 <div className="flex flex-col items-center justify-center font-semibold leading-16">
-                    <p className="text-[60px] font-bold flex z-10 dark:text-dark-primary-text text-light-primary-text">
+                    <p className="text-[60px] font-bold flex dark:text-dark-primary-text text-light-primary-text">
                         Connect, Diagnose, Treat
                     </p>
-                    <p className="text-light-secondary/50 dark:text-dark-secondary/50 text-[60px] font-extrabold sub-heading">
+                    <p className="text-light-primary/50 dark:text-dark-primary/50 text-[60px] font-extrabold sub-heading">
                         All in One App.
                     </p>
                 </div>
@@ -27,7 +30,7 @@ function LandingPage() {
                     <p className="dark:text-dark-secondary-text text-light-secondary-text">
                         Check symptoms, consult doctors—one tap.
                     </p>
-                    <button className="bg-light-secondary dark:bg-dark-secondary text-light-bg py-3 px-4 rounded flex gap-1">
+                    <button className="bg-light-primary dark:bg-dark-primary text-light-bg py-3 px-4 rounded flex gap-1">
                         <p>Get Started</p>
                         <ArrowRight />
                     </button>
@@ -39,7 +42,7 @@ function LandingPage() {
                         <>
                             <h1 className="text-3xl font-semibold text-neutral-700 ">
                                 Unleash the power of <br />
-                                <span className="text-[4rem] font-bold leading-none">
+                                <span className="text-[4rem] font-bold leading-none text-light-primary/80 dark:text-dark-primary/80">
                                     AI-driven Healthcare
                                 </span>
                             </h1>
@@ -60,9 +63,15 @@ function LandingPage() {
 
             <TestimonialSection />
 
-            <WhyChooseUsSection/>
+            <WhyChooseUsSection />
 
             <PricingSection />
+
+            <FAQSection />
+
+            <ContactSection />
+
+            <Footer />
         </div>
     );
 }

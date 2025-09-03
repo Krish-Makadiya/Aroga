@@ -1,13 +1,10 @@
 export default function TestimonialSection() {
     return (
-        <section className="relative overflow-hidden bg-light-bg dark:bg-dark-bg px-6 py-16 sm:py-20 lg:px-8">
-            <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,var(--color-dark-bg),transparent)] opacity-10 dark:opacity-20" />
+        <section className="relative overflow-hidden bg-light-primary/80 dark:bg-dark-primary/80 px-6 py-12 sm:py-16 lg:px-8">
             <div className="mx-auto max-w-2xl lg:max-w-4xl">
-                <img
-                    alt=""
-                    src="https://tailwindcss.com/plus-assets/img/logos/workcation-logo-indigo-400.svg"
-                    className="mx-auto h-12"
-                />
+                <p className="mx-auto mt-2 max-w-lg text-center text-4xl font-semibold tracking-tight text-balance text-light-primary-text dark:text-dark-primary-text sm:text-5xl">
+                    ResQ
+                </p>
                 <figure className="mt-10">
                     <blockquote className="text-center text-xl/8 font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] sm:text-2xl/9">
                         <p>
@@ -25,7 +22,7 @@ export default function TestimonialSection() {
                             className="mx-auto size-10 rounded-full"
                         />
                         <div className="mt-4 flex items-center justify-center space-x-3 text-base">
-                            <div className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <div className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 Judith Black
                             </div>
                             <svg
@@ -33,10 +30,10 @@ export default function TestimonialSection() {
                                 height={3}
                                 viewBox="0 0 2 2"
                                 aria-hidden="true"
-                                className="fill-[var(--color-light-secondary-text)] dark:fill-[var(--color-dark-secondary-text)]">
+                                className="fill-light-secondary-text dark:fill-dark-secondary-text">
                                 <circle r={1} cx={1} cy={1} />
                             </svg>
-                            <div className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                            <div className="text-light-primary-text dark:text-dark-primary-text">
                                 ResQ User
                             </div>
                         </div>

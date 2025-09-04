@@ -3,12 +3,12 @@ export default function TestimonialSection() {
         <section className="relative overflow-hidden bg-light-primary/80 dark:bg-dark-primary/80 px-6 py-12 sm:py-16 lg:px-8">
             <div className="mx-auto max-w-2xl lg:max-w-4xl">
                 <p className="mx-auto mt-2 max-w-lg text-center text-4xl font-semibold tracking-tight text-balance text-light-primary-text dark:text-dark-primary-text sm:text-5xl">
-                    ResQ
+                    Arogya
                 </p>
                 <figure className="mt-10">
                     <blockquote className="text-center text-xl/8 font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] sm:text-2xl/9">
                         <p>
-                            “ResQ made it so easy to get medical advice and
+                            “Arogya made it so easy to get medical advice and
                             prescriptions from home. The AI symptom checker is
                             incredibly accurate and the doctors are always
                             available. Highly recommended for anyone looking for
@@ -34,7 +34,7 @@ export default function TestimonialSection() {
                                 <circle r={1} cx={1} cy={1} />
                             </svg>
                             <div className="text-light-primary-text dark:text-dark-primary-text">
-                                ResQ User
+                                Arogya User
                             </div>
                         </div>
                     </figcaption>

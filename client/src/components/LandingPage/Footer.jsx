@@ -10,11 +10,11 @@ export default function Footer() {
                     <a href="/" className="flex items-center gap-2">
                         <img
                             src={"https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"}
-                            alt="ResQ Logo"
+                            alt="Arogya Logo"
                             className="h-10 w-10"
                         />
                         <span className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
-                            ResQ
+                            Arogya
                         </span>
                     </a>
                     <p className="text-light-secondary-text dark:text-dark-secondary-text text-sm max-w-xs text-center md:text-left">
@@ -76,7 +76,7 @@ export default function Footer() {
                         </span>
                     </a>
                     <span className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
-                        &copy; {new Date().getFullYear()} ResQ. All rights
+                        &copy; {new Date().getFullYear()} Arogya. All rights
                         reserved.
                     </span>
                 </div>

@@ -6,7 +6,7 @@ const faqs = [
         answer: "Simply sign in, choose your preferred doctor or specialty, and select an available time slot to book your consultation.",
     },
     {
-        question: "Is my medical data secure on ResQ?",
+        question: "Is my medical data secure on Arogya?",
         answer: "Yes, all your health records and personal data are encrypted and stored securely, accessible only by you and your authorized doctors.",
     },
     {

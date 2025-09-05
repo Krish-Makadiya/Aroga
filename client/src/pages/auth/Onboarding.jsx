@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import OnboardingForm from "../components/OnboardingForm";
+import OnboardingForm from "../../components/auth/OnboardingForm";
 
 export default function Onboarding() {
     const { isLoaded, isSignedIn } = useUser();
@@ -12,5 +12,9 @@ export default function Onboarding() {
         return null;
     }
 
-    return <OnboardingForm />;
+    return (
+        <div className="bg-light-bg dark:bg-dark-bg w-full min-h-screen">
+            <OnboardingForm />
+        </div>
+    );
 }

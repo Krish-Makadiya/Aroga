@@ -23,6 +23,7 @@ import {
     PlayCircle,
     Moon,
     Sun,
+    LayoutDashboard,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeProvider";
 import {
@@ -32,7 +33,10 @@ import {
     SignUpButton,
     useAuth,
     UserButton,
+    useUser,
 } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
+import { div } from "motion/react-client";
 
 const products = [
     {
@@ -74,8 +78,34 @@ const callsToAction = [
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { theme, setTheme } = useTheme();
+    const navigate = useNavigate();
 
     const { isSignedIn } = useAuth();
+    const { user, isLoaded } = useUser();
+
+    // Function to get dashboard route based on user role
+    const getDashboardRoute = () => {
+        if (!isLoaded || !user) return "/dashboard";
+
+        const userRole = user.unsafeMetadata?.role;
+        if (!userRole) return "/dashboard";
+
+        switch (userRole) {
+            case "Patient":
+                return "/dashboard/patient";
+            case "Doctor":
+                return "/dashboard/doctor";
+            case "Admin":
+                return "/dashboard/admin";
+            default:
+                return "/dashboard";
+        }
+    };
+
+    const handleDashboardClick = () => {
+        const route = getDashboardRoute();
+        navigate(route);
+    };
 
     return (
         <header className="absolute w-screen z-50">
@@ -174,12 +204,20 @@ export default function Navbar() {
                 <div className="hidden lg:flex lg:flex-1 gap-5 lg:justify-end items-center">
                     <div className="flex gap-8">
                         {isSignedIn ? (
-                            <UserButton />
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={handleDashboardClick}
+                                    className="flex items-center gap-2 text-sm/6 font-semibold text-light-primary-text dark:text-dark-primary-text cursor-pointer">
+                                    Dashboard
+                                </button>
+                                <UserButton />
+                            </div>
                         ) : (
                             <SignUpButton
                                 className="inline-block rounded-lg px-3 py-2.5 text-sm/6 bg-gradient-to-r dark:from-[#f4f4f9] dark:to-[#ffffff] from-[#181818] to-[#262626] dark:text-black text-white font-semibold"
                                 mode="modal"
-                                navigate="/sign-up" fallbackRedirectUrl="/sign-in">
+                                navigate="/sign-up"
+                                fallbackRedirectUrl="/sign-in">
                                 Login
                             </SignUpButton>
                         )}
@@ -275,11 +313,23 @@ export default function Navbar() {
                                         </div>
                                     )}
                                 </button>
-                                <a
-                                    href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text hover:bg-light-surface dark:hover:bg-dark-surface cursor-pointer">
-                                    Log in
-                                </a>
+                                {isSignedIn ? (
+                                    <button
+                                        onClick={() => {
+                                            handleDashboardClick();
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className="-mx-3 flex items-center gap-2 rounded-lg px-3 py-2.5 text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text hover:bg-light-surface dark:hover:bg-dark-surface cursor-pointer">
+                                        <LayoutDashboard className="size-5" />
+                                        Dashboard
+                                    </button>
+                                ) : (
+                                    <a
+                                        href="#"
+                                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text hover:bg-light-surface dark:hover:bg-dark-surface cursor-pointer">
+                                        Log in
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>

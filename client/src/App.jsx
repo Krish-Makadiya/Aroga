@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import SignInPage from "./pages/auth/SignInPage";
-import Onboarding from "./pages/Onboarding";
+import Onboarding from "./pages/auth/Onboarding";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleRedirect from "./components/auth/RoleRedirect";
 import PatientDashboard from "./pages/dashboards/PatientDashboard";

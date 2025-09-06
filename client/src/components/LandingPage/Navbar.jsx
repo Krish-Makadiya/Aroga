@@ -92,7 +92,7 @@ export default function Navbar() {
 
         switch (userRole) {
             case "Patient":
-                return "/dashboard/patient";
+                return "/patient/dashboard";
             case "Doctor":
                 return "/dashboard/doctor";
             case "Admin":

@@ -13,7 +13,7 @@ export default function Onboarding() {
     }
 
     return (
-        <div className="bg-light-bg dark:bg-dark-bg w-full min-h-screen">
+        <div className="bg-light-bg dark:bg-dark-bg w-full min-h-screen relative">
             <OnboardingForm />
         </div>
     );

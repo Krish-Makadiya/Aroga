@@ -1,7 +1,8 @@
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { Shield, Stethoscope, User, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ROLES = ["Patient", "Doctor", "Admin"];
 
@@ -10,6 +11,7 @@ export default function OnboardingForm() {
     const navigate = useNavigate();
     const [role, setRole] = useState("");
     const [saving, setSaving] = useState(false);
+    const { getToken } = useAuth();
 
     const [patient, setPatient] = useState({
         fullName: "",
@@ -24,6 +26,7 @@ export default function OnboardingForm() {
         emergencyContactName: "",
         emergencyContactPhone: "",
         medicalHistory: "",
+        clerkUserId: user.id,
         telemedicineConsent: true,
     });
 
@@ -62,15 +65,34 @@ export default function OnboardingForm() {
 
         setSaving(true);
         try {
-            const formData = {
-                role,
-                ...(role === "Patient" && patient),
-                ...(role === "Doctor" && doctor),
-                ...(role === "Admin" && admin),
-            };
+            let backendUrl = "";
+            let backendBody = {};
 
-            console.log("Form submission data:", formData);
+            if (role === "Patient") {
+                backendUrl = "http://localhost:5000/api/patient/create-patient";
+                backendBody = patient;
+            } else if (role === "Doctor") {
+                backendUrl = "http://localhost:5000/api/doctor/create-doctor";
+                backendBody = doctor;
+            } else if (role === "Admin") {
+                backendUrl = "http://localhost:5000/api/admin/create-admin";
+                backendBody = admin;
+            }
 
+            const token = await getToken();
+
+            if (backendUrl) {
+                console.log(backendBody);
+                const response = await axios.post(backendUrl, backendBody, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                console.log("Backend response:", response.data);
+            }
+
+            // Update Clerk metadata as before
             if (user) {
                 await user.update({
                     unsafeMetadata: {
@@ -86,7 +108,12 @@ export default function OnboardingForm() {
 
             navigate(`/dashboard/${role.toLowerCase()}`);
         } catch (error) {
-            console.error("Error submitting form:", error);
+            // Axios error handling
+            if (error.response) {
+                console.error("Backend error:", error.response.data);
+            } else {
+                console.error("Error submitting form:", error.message);
+            }
         } finally {
             setSaving(false);
         }
@@ -94,16 +121,7 @@ export default function OnboardingForm() {
 
     // Show loading state while Clerk is loading
     if (!isLoaded) {
-        return (
-            <div className="max-w-4xl mx-auto py-8">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-light-primary dark:border-dark-primary mx-auto"></div>
-                    <p className="mt-4 text-light-secondary-text dark:text-dark-secondary-text">
-                        Loading...
-                    </p>
-                </div>
-            </div>
-        );
+        return <Loader />;
     }
 
     // Show message if user is not authenticated

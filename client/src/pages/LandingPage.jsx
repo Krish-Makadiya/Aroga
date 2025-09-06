@@ -1,16 +1,23 @@
+import { useUser } from "@clerk/clerk-react";
 import { ArrowRight } from "lucide-react";
-import Navbar from "../components/LandingPage/Navbar";
-import { BackgroundRippleEffect } from "../components/UI/BackgroundRippleEffect";
-import { ContainerScroll } from "../components/UI/ContainerScroll";
+import ContactSection from "../components/LandingPage/ContactSection";
+import FAQSection from "../components/LandingPage/FAQSection";
 import FeatureSection from "../components/LandingPage/FeatureSection";
+import Footer from "../components/LandingPage/Footer";
+import Navbar from "../components/LandingPage/Navbar";
+import PricingSection from "../components/LandingPage/PricingSection";
 import TestimonialSection from "../components/LandingPage/TestimonialSection";
 import WhyChooseUsSection from "../components/LandingPage/WhyChooseUsSection";
-import PricingSection from "../components/LandingPage/PricingSection";
-import FAQSection from "../components/LandingPage/FAQSection";
-import ContactSection from "../components/LandingPage/ContactSection";
-import Footer from "../components/LandingPage/Footer";
+import Loader from "../components/main/Loader";
+import { BackgroundRippleEffect } from "../components/UI/BackgroundRippleEffect";
+import { ContainerScroll } from "../components/UI/ContainerScroll";
+
 
 function LandingPage() {
+    const { isLoaded } = useUser();
+
+    if (!isLoaded) return <Loader />;
+
     return (
         <div className="overflow-hidden relative">
             <Navbar />

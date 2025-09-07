@@ -1,14 +1,16 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone } from "lucide-react";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone, Pill, Venus } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleRedirect from "./components/auth/RoleRedirect";
-import PatientDashboard from "./pages/dashboards/PatientDashboard/PatientDashboard";
-import DoctorDashboard from "./pages/dashboards/DoctorDashboard";
+import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashboard";
+import DoctorDashboard from "./pages/doctorPages/doctorDashboard/DoctorDashboard";
 import AdminDashboard from "./pages/dashboards/AdminDashboard";
+import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
+import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
 
-const tabs = [
+const patientTabs = [
     {
         id: 1,
         name: "Dashboard",
@@ -18,8 +20,23 @@ const tabs = [
     {
         id: 2,
         name: "Symptoms Checker",
-        icon: LayoutDashboard,
+        icon: Pill,
         path: "/patient/symptom-checker",
+    },
+    {
+        id: 3,
+        name: "Women’s Health",
+        icon: Venus,
+        path: "/patient/womens-health",
+    },
+];
+
+const doctorTabs = [
+    {
+        id: 1,
+        name: "Dashboard",
+        icon: LayoutDashboard,
+        path: "/patient/dashboard",
     },
 ];
 
@@ -45,7 +62,7 @@ function App() {
                     path="/patient/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <PatientDashboard tabs={tabs}/>
+                            <PatientDashboard tabs={patientTabs}/>
                         </ProtectedRoute>
                     }
                 />
@@ -53,21 +70,31 @@ function App() {
                     path="/patient/symptom-checker"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <PatientDashboard tabs={tabs}/>
+                            <SymptomChecker tabs={patientTabs}/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/patient/womens-health"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <WomensHealth tabs={patientTabs}/>
                         </ProtectedRoute>
                     }
                 />
 
                 
-                {/* <Route
-                    path="/dashboard/doctor"
+                <Route
+                    path="/doctor/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
-                            <DoctorDashboard />
+                            <DoctorDashboard tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
                 />
-                <Route
+
+
+                {/*<Route
                     path="/dashboard/admin"
                     element={
                         <ProtectedRoute requiredRole="Admin">

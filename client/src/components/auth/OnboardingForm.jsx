@@ -106,9 +106,8 @@ export default function OnboardingForm() {
                 console.log("User metadata updated successfully");
             }
 
-            navigate(`/dashboard/${role.toLowerCase()}`);
+            navigate(`/${role.toLowerCase()}/dashboard`);
         } catch (error) {
-            // Axios error handling
             if (error.response) {
                 console.error("Backend error:", error.response.data);
             } else {

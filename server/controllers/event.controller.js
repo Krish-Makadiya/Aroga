@@ -5,11 +5,9 @@ const Patient = require('../schema/patient.schema');
 exports.addEvent = async (req, res) => {
     try {
         const { patientId } = req.params;
-        console.log(req.body);
         const eventData = { ...req.body, patientId };
 
         const event = await Event.create(eventData);
-        console.log(event);
 
         res.status(201).json(event);
     } catch (err) {

@@ -7,7 +7,6 @@ import {
     Calendar as CalendarIcon,
     CheckCircle,
     ChevronRight,
-    Edit3,
     FileText as FileTextIcon,
     Heart,
     Pill,
@@ -15,9 +14,11 @@ import {
     Settings,
     Stethoscope,
     TrendingUp,
-    User,
+    User
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import Calendar from "../../../components/Dashboard/Calendar";
+import Loader from "../../../components/main/Loader";
 
 const PatientDashboardContent = () => {
     const [userData, setUserData] = useState(null);
@@ -25,94 +26,6 @@ const PatientDashboardContent = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const { user } = useUser();
     const { getToken } = useAuth();
-
-    // Mock data based on your JSON structure
-    const mockData = {
-        dashboard: {
-            header: {
-                greeting: "Good morning, Krish!",
-                subtext: "Here's your health overview today",
-                profile: {
-                    name: "Krish Makadiya",
-                    email: "krishmakadiya2005@gmail.com",
-                    image: "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18zMktFdXVCTHhvTVFYM1B1a3c5N1A1UnYzSnAifQ",
-                },
-            },
-            sidebar: [
-                "Dashboard",
-                "My Appointments",
-                "Medical History",
-                "Prescriptions",
-                "Reports",
-                "Emergency Contacts",
-                "Settings",
-                "Log out",
-            ],
-            sections: {
-                personalInfo: {
-                    title: "Personal Information",
-                    details: {
-                        "Full Name": "Krish Makadiya",
-                        "Date of Birth": "2005-10-23",
-                        Age: 19,
-                        Gender: "Male",
-                        Phone: "8263081960",
-                        "Email Verified": true,
-                        Address:
-                            "Rajarampuri 9th lane Bus route road opposite to DivyaNX, Kolhapur",
-                        District: "Kolhapur",
-                    },
-                },
-                medicalInfo: {
-                    title: "Medical Details",
-                    details: {
-                        "Medical History": "None",
-                        "Govt. ID Type": "Aadhar",
-                        "Govt. ID Number": "280231129031",
-                        "Telemedicine Consent": true,
-                    },
-                },
-                emergencyInfo: {
-                    title: "Emergency Contact",
-                    details: {
-                        Name: "Krish Makadiya",
-                        Phone: "8263081960",
-                    },
-                },
-                accountInfo: {
-                    title: "Account Information",
-                    details: {
-                        "Patient ID": "68bc276faa64c10c851ef1dd",
-                        "Clerk User ID": "user_32KEuxEFjPgluWlDrIbMeYunE5C",
-                        "Auth Provider": "Google OAuth",
-                        "Last Sign-In": "2025-09-06T12:18:09.425Z",
-                        "Account Created": "2025-09-06T12:22:07.263Z",
-                        "Last Updated": "2025-09-06T12:22:07.263Z",
-                        "Two Factor Enabled": false,
-                        "Password Enabled": false,
-                    },
-                },
-                appointments: {
-                    title: "My Appointments",
-                    list: [],
-                },
-            },
-            widgets: {
-                nextAppointment: {
-                    title: "Next Appointment",
-                    data: null,
-                },
-                reminders: {
-                    title: "Health Reminders",
-                    items: [
-                        "Drink 8 glasses of water daily",
-                        "Get at least 7 hours of sleep",
-                        "Take regular breaks if working long hours",
-                    ],
-                },
-            },
-        },
-    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -135,8 +48,6 @@ const PatientDashboardContent = () => {
                     "Error fetching user data:",
                     error.response?.data || error.message
                 );
-                // Use mock data if API fails
-                setUserData(mockData);
             } finally {
                 setLoading(false);
             }
@@ -160,19 +71,6 @@ const PatientDashboardContent = () => {
         return "Good evening";
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--color-light-primary)] dark:border-[var(--color-dark-primary)] border-t-transparent mx-auto mb-4"></div>
-                    <p className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] text-lg">
-                        Loading your dashboard...
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
     const calculateAge = (dob) => {
         if (!dob) return "";
         const birthDate = new Date(dob);
@@ -185,13 +83,13 @@ const PatientDashboardContent = () => {
         return age;
     };
 
-    const data = userData?.dashboard || mockData.dashboard;
+    if (loading) return <Loader />;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)]">
-            <div className="max-w-8xl mx-auto p-6">
+            <div className="max-w-8xl mx-auto">
                 {/* Enhanced Header with Gradient */}
-                <div className="relative mb-8 overflow-hidden rounded-3xl dark:bg-dark-bg bg-light-surface p-8 text-light-primary-text dark:text-dark-primary-text">
+                <div className="relative mb-4 overflow-hidden rounded-3xl dark:bg-dark-bg bg-light-surface p-8 text-light-primary-text dark:text-dark-primary-text">
                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex items-center space-x-6 mb-6 lg:mb-0">
                             <div className="relative">
@@ -241,7 +139,7 @@ const PatientDashboardContent = () => {
                 </div>
 
                 {/* Main Dashboard Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 mb-4">
                     {/* Personal Information Card */}
                     <div className="lg:col-span-2 dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-200">
                         <div className="flex items-center justify-between mb-6">
@@ -366,25 +264,12 @@ const PatientDashboardContent = () => {
                             <Bell className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
                             Health Reminders
                         </h3>
-                        <div className="space-y-3">
-                            {data.widgets.reminders.items.map(
-                                (reminder, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-start space-x-3 p-3 rounded-xl bg-gradient-to-r from-[var(--color-light-primary)]/5 to-[var(--color-light-primary)]/10 dark:from-[var(--color-dark-primary)]/5 dark:to-[var(--color-dark-primary)]/10">
-                                        <div className="w-2 h-2 bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] rounded-full mt-2 flex-shrink-0"></div>
-                                        <p className="text-sm text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] leading-relaxed">
-                                            {reminder}
-                                        </p>
-                                    </div>
-                                )
-                            )}
-                        </div>
+                        <div className="space-y-3"></div>
                     </div>
                 </div>
 
                 {/* Secondary Information Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                     {/* Medical Details */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
                         <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
@@ -473,7 +358,7 @@ const PatientDashboardContent = () => {
                                     User ID:
                                 </p>
                                 <p className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] truncate">
-                                {user.id}
+                                    {user.id}
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
@@ -481,30 +366,15 @@ const PatientDashboardContent = () => {
                                     Account Created:
                                 </p>
                                 <p className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] truncate">
-                                {formatDate(userData.createdAt)}
+                                    {formatDate(userData.createdAt)}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Appointments Section */}
-                <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] flex items-center">
-                            <CalendarIcon className="w-6 h-6 mr-3 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
-                            {data.sections.appointments.title}
-                        </h3>
-                        <button className="px-4 py-2 bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white rounded-xl hover:bg-[var(--color-light-primary-dark)] dark:hover:bg-[var(--color-dark-primary-dark)] transition-colors flex items-center">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Book Appointment
-                        </button>
-                    </div>
-
-        <div>
-            
-                    </div>
-                </div>
+                {/* Professional Event Calendar */}
+                <Calendar patientId={userData._id} />
             </div>
         </div>
     );

@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Patient = require("../schema/patient.schema");
-const { createPatient, getAllPatients, getPatientByClerkId } = require("../controllers/patient.controller");
+const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents } = require("../controllers/patient.controller");
 
 // Create a new patient (inline validation)
 router.post("/create-patient", createPatient);
@@ -12,5 +12,8 @@ router.get("/all-patients", getAllPatients);
 
 // Get a patient by Clerk user ID
 router.get("/get-patient/:clerkUserId", getPatientByClerkId);
+
+router.get('/:patientId', getPatientWithEvents);
+
 
 module.exports = router;

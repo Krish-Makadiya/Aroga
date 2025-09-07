@@ -204,3 +204,14 @@ exports.getPatientByClerkId = async (req, res) => {
         res.status(500).json({ error: "Server error", details: error.message });
     }
 };
+
+exports.getPatientWithEvents = async (req, res) => {
+    try {
+        const { patientId } = req.params;
+        const patient = await Patient.findById(patientId).populate('events');
+        if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        res.json(patient);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};

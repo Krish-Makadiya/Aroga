@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { ArrowRight } from "lucide-react";
 import ContactSection from "../components/LandingPage/ContactSection";
 import FAQSection from "../components/LandingPage/FAQSection";
@@ -11,10 +11,27 @@ import WhyChooseUsSection from "../components/LandingPage/WhyChooseUsSection";
 import Loader from "../components/main/Loader";
 import { BackgroundRippleEffect } from "../components/UI/BackgroundRippleEffect";
 import { ContainerScroll } from "../components/UI/ContainerScroll";
+import { useEffect } from "react";
 
 
 function LandingPage() {
     const { isLoaded } = useUser();
+    const { getToken } = useAuth();
+
+    useEffect(() => {
+        const fetchSessionToken = async () => {
+            if (isLoaded) { // Ensure Clerk user data is loaded before attempting to get a token
+                try {
+                    const token = await getToken();
+                    console.log(token); 
+                } catch (error) {
+                    console.error("Error fetching Clerk session token:", error);
+                }
+            }
+        };
+
+        fetchSessionToken();
+    }, [isLoaded, getToken]); // Dependencies: re-run if isLoaded changes or getToken reference changes
 
     if (!isLoaded) return <Loader />;
 

@@ -26,8 +26,7 @@ const patientSchema = new mongoose.Schema(
             required: [true, "Gender is required"],
             enum: {
                 values: ["male", "female", "other"],
-                message:
-                    "Gender must be one of: Male, Female, Other",
+                message: "Gender must be one of: Male, Female, Other",
             },
         },
 
@@ -142,7 +141,7 @@ const patientSchema = new mongoose.Schema(
         },
     },
     {
-        timestamps: true, 
+        timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true },
     }

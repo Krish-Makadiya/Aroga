@@ -44,11 +44,13 @@ const DoctorDashboardContent = () => {
                     `http://localhost:5000/api/doctor/get-doctor/${user.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            console.log(res.data.data)
+            console.log(res.data.data);
             setDoctorData(res.data.data);
             } catch (error) {
             console.log(error);
-        }
+            } finally {
+                setLoading(false);
+            }
     }
 
     const getGreeting = () => {

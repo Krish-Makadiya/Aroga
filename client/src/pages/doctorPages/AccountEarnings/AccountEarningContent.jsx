@@ -65,15 +65,30 @@ const AccountEarningContent = () => {
         }));
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setIsLoading(true);
-
-        setTimeout(() => {
-            console.log("Saving Complete Doctor Profile:", formData);
-            setIsLoading(false);
-            setIsEditing(false);
+        try {
+            const token = await getToken();
+            console.log("FORMDATA: ", formData);
+            const res = await axios.post(
+                "http://localhost:5000/api/doctor/profile",
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            console.log("Doctor profile saved:", res.data);
             alert("Profile updated successfully!");
-        }, 1000);
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error saving doctor profile:", error);
+            alert("Failed to save profile. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleEdit = () => {
@@ -106,7 +121,7 @@ const AccountEarningContent = () => {
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     disabled={disabled || !isEditing}
-                    className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
+                    className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50  dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
                 />
             </div>
         </div>
@@ -132,7 +147,7 @@ const AccountEarningContent = () => {
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     disabled={!isEditing}
-                    className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
+                    className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-3 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
                 />
             </div>
         </div>
@@ -155,7 +170,7 @@ const AccountEarningContent = () => {
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     disabled={disabled || !isEditing}
-                    className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:cursor-not-allowed">
+                    className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed">
                     {options.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.label}
@@ -321,8 +336,8 @@ const AccountEarningContent = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <div className="max-w-4xl mx-auto py-8">
+        <div className="min-h-screen">
+            <div className="max-w-5xl mx-auto py-4">
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div>
                         <h1 className="text-4xl font-bold text-light-primary-text dark:text-dark-primary-text">
@@ -459,16 +474,18 @@ const AccountEarningContent = () => {
                                 placeholder="Enter your email address"
                                 required
                             />
-                            {formData.languages > 0 && (
-                                <InputField
-                                    label="Languages (comma separated)"
-                                    value={formData.languages.join(", ")}
-                                    onChange={(value) =>
-                                        handleArrayChange("languages", value)
-                                    }
-                                    placeholder="e.g., English, Hindi, Gujarati"
-                                />
-                            )}
+                            {/* <InputField
+                                label="Languages (comma separated)"
+                                value={
+                                    formData.languages
+                                        ? formData.languages.join(", ")
+                                        : []
+                                }
+                                onChange={(value) =>
+                                    handleArrayChange("languages", value)
+                                }
+                                placeholder="e.g., English, Hindi, Gujarati"
+                            /> */}
 
                             <TextAreaField
                                 label="Professional Bio"
@@ -558,6 +575,8 @@ const AccountEarningContent = () => {
                                     )
                                 }
                             />
+
+                            
                         </div>
                     </div>
 
@@ -570,210 +589,117 @@ const AccountEarningContent = () => {
                             Set up your payment methods and banking information
                         </p>
 
-                        {formData.bankAccount && (
-                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                <InputField
-                                    label="Account Number"
-                                    value={
-                                        formData.bankAccount.accountNumber
-                                            ? formData.bankAccount.accountNumber
-                                            : ""
-                                    }
-                                    onChange={(value) =>
-                                        handleInputChange(
-                                            "bankAccount.accountNumber",
-                                            value
-                                        )
-                                    }
-                                    placeholder="Enter your account number"
-                                    required
-                                />
-
-                                <InputField
-                                    label="IFSC Code"
-                                    value={
-                                        formData.bankAccount.ifscCode || null
-                                    }
-                                    onChange={(value) =>
-                                        handleInputChange(
-                                            "bankAccount.ifscCode",
-                                            value
-                                        )
-                                    }
-                                    placeholder="e.g., SBIN0001234"
-                                    required
-                                />
-
-                                <InputField
-                                    label="Bank Name"
-                                    value={
-                                        formData.bankAccount.bankName || null
-                                    }
-                                    onChange={(value) =>
-                                        handleInputChange(
-                                            "bankAccount.bankName",
-                                            value
-                                        )
-                                    }
-                                    placeholder="Enter bank name"
-                                    required
-                                />
-
-                                <InputField
-                                    label="Account Holder Name"
-                                    value={
-                                        formData.bankAccount
-                                            .accountHolderName || null
-                                    }
-                                    onChange={(value) =>
-                                        handleInputChange(
-                                            "bankAccount.accountHolderName",
-                                            value
-                                        )
-                                    }
-                                    placeholder="Enter account holder name"
-                                    required
-                                />
-
-                                <InputField
-                                    label="Branch Name"
-                                    value={formData.bankAccount.branchName}
-                                    onChange={(value) =>
-                                        handleInputChange(
-                                            "bankAccount.branchName",
-                                            value
-                                        )
-                                    }
-                                    placeholder="Enter branch name"
-                                />
-
-                                <InputField
-                                    label="UPI ID"
-                                    value={formData.upiId}
-                                    onChange={(value) =>
-                                        handleInputChange("upiId", value)
-                                    }
-                                    placeholder="e.g., yourname@paytm"
-                                />
-
-                                <SelectField
-                                    label="Preferred Payment Method"
-                                    value={formData.paymentMethod}
-                                    onChange={(value) =>
-                                        handleInputChange(
-                                            "paymentMethod",
-                                            value
-                                        )
-                                    }
-                                    options={[
-                                        {
-                                            value: "bank_transfer",
-                                            label: "Bank Transfer",
-                                        },
-                                        { value: "upi", label: "UPI" },
-                                        {
-                                            value: "wallet",
-                                            label: "Digital Wallet",
-                                        },
-                                    ]}
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Payout Preferences Section */}
-                    <div className="border-b border-light-secondary-text/20 dark:border-dark-secondary-text/20 py-8">
-                        <h2 className="text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text">
-                            Payout Preferences
-                        </h2>
-                        <p className="mt-1 text-sm/6 text-light-secondary-text dark:text-dark-secondary-text">
-                            Configure how and when you receive payments
-                        </p>
-
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <SelectField
-                                label="Payout Frequency"
-                                value={formData.payoutFrequency}
+                            <InputField
+                                label="Account Number"
+                                value={
+                                    formData.bankAccount
+                                        ? formData.bankAccount.accountNumber
+                                        : ""
+                                }
                                 onChange={(value) =>
-                                    handleInputChange("payoutFrequency", value)
+                                    handleInputChange(
+                                        "bankAccount.accountNumber",
+                                        value
+                                    )
+                                }
+                                placeholder="Enter your account number"
+                                required
+                            />
+
+                            <InputField
+                                label="IFSC Code"
+                                value={
+                                    formData.bankAccount
+                                        ? formData.bankAccount.ifscCode
+                                        : ""
+                                }
+                                onChange={(value) =>
+                                    handleInputChange(
+                                        "bankAccount.ifscCode",
+                                        value
+                                    )
+                                }
+                                placeholder="e.g., SBIN0001234"
+                                required
+                            />
+
+                            <InputField
+                                label="Bank Name"
+                                value={
+                                    formData.bankAccount
+                                        ? formData.bankAccount.bankName
+                                        : ""
+                                }
+                                onChange={(value) =>
+                                    handleInputChange(
+                                        "bankAccount.bankName",
+                                        value
+                                    )
+                                }
+                                placeholder="Enter bank name"
+                                required
+                            />
+
+                            <InputField
+                                label="Account Holder Name"
+                                value={
+                                    formData.bankAccount
+                                        ? formData.bankAccount.accountHolderName
+                                        : ""
+                                }
+                                onChange={(value) =>
+                                    handleInputChange(
+                                        "bankAccount.accountHolderName",
+                                        value
+                                    )
+                                }
+                                placeholder="Enter account holder name"
+                                required
+                            />
+
+                            <InputField
+                                label="Branch Name"
+                                value={
+                                    formData.bankAccount
+                                        ? formData.bankAccount.branchName
+                                        : ""
+                                }
+                                onChange={(value) =>
+                                    handleInputChange(
+                                        "bankAccount.branchName",
+                                        value
+                                    )
+                                }
+                                placeholder="Enter branch name"
+                            />
+
+                            <InputField
+                                label="UPI ID"
+                                value={formData.upiId}
+                                onChange={(value) =>
+                                    handleInputChange("upiId", value)
+                                }
+                                placeholder="e.g., yourname@paytm"
+                            />
+
+                            <SelectField
+                                label="Preferred Payment Method"
+                                value={formData.paymentMethod}
+                                onChange={(value) =>
+                                    handleInputChange("paymentMethod", value)
                                 }
                                 options={[
-                                    { value: "weekly", label: "Weekly" },
-                                    { value: "bi-weekly", label: "Bi-weekly" },
-                                    { value: "monthly", label: "Monthly" },
+                                    {
+                                        value: "bank_transfer",
+                                        label: "Bank Transfer",
+                                    },
+                                    { value: "upi", label: "UPI" },
+                                    {
+                                        value: "wallet",
+                                        label: "Digital Wallet",
+                                    },
                                 ]}
-                            />
-
-                            <InputField
-                                label="Minimum Payout Amount (₹)"
-                                type="number"
-                                value={formData.minimumPayoutAmount}
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "minimumPayoutAmount",
-                                        parseInt(value) || 0
-                                    )
-                                }
-                                placeholder="Enter minimum payout amount"
-                            />
-
-                            <InputField
-                                label="Preferred Payout Day"
-                                type="number"
-                                value={formData.preferredPayoutDay}
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "preferredPayoutDay",
-                                        parseInt(value) || 1
-                                    )
-                                }
-                                placeholder="Day of month (1-31)"
-                            />
-
-                            <CheckboxField
-                                label="Enable Auto Payout"
-                                checked={formData.autoPayout}
-                                onChange={(value) =>
-                                    handleInputChange("autoPayout", value)
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    {/* Tax Information Section */}
-                    <div className="border-b border-light-secondary-text/20 dark:border-dark-secondary-text/20 py-8">
-                        <h2 className="text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text">
-                            Tax Information
-                        </h2>
-                        <p className="mt-1 text-sm/6 text-light-secondary-text dark:text-dark-secondary-text">
-                            Provide tax details for compliance
-                        </p>
-
-                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InputField
-                                label="PAN Number"
-                                value={formData.panNumber}
-                                onChange={(value) =>
-                                    handleInputChange("panNumber", value)
-                                }
-                                placeholder="e.g., ABCDE1234F"
-                            />
-
-                            <InputField
-                                label="GST Number"
-                                value={formData.gstNumber}
-                                onChange={(value) =>
-                                    handleInputChange("gstNumber", value)
-                                }
-                                placeholder="e.g., 22ABCDE1234F1Z5"
-                            />
-
-                            <CheckboxField
-                                label="Tax Exempt"
-                                checked={formData.taxExempt}
-                                onChange={(value) =>
-                                    handleInputChange("taxExempt", value)
-                                }
                             />
                         </div>
                     </div>

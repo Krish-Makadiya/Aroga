@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
 import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
+import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 
 const patientTabs = [
     {
@@ -29,6 +30,12 @@ const patientTabs = [
         name: "Women’s Health",
         icon: Venus,
         path: "/patient/womens-health",
+    },
+    {
+        id: 4,
+        name: "Get Appointment",
+        icon: Venus,
+        path: "/patient/get-appointment",
     },
 ];
 
@@ -86,6 +93,14 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Patient">
                             <WomensHealth tabs={patientTabs}/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/patient/get-appointment"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <GetAppointment tabs={patientTabs}/>
                         </ProtectedRoute>
                     }
                 />

@@ -27,14 +27,15 @@ const Calendar = ({ patientId }) => {
     const [editingEvent, setEditingEvent] = useState(null);
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            const response = await axios.get(
-                `http://localhost:5000/api/event/patients/${patientId}/events`
-            );
-            setEvents(response.data);
-        };
         fetchEvents();
     }, [events]);
+    
+    const fetchEvents = async () => {
+        const response = await axios.get(
+            `http://localhost:5000/api/event/patients/${patientId}/events`
+        );
+        setEvents(response.data);
+    };
 
     // Calendar helper functions
     const getDaysInMonth = (date) => {
@@ -141,12 +142,12 @@ const Calendar = ({ patientId }) => {
                         error: <b>Could not update event.</b>,
                     }
                 );
-                setEvents(
-                    events.map((event) =>
+            setEvents(
+                events.map((event) =>
                         event._id === editingEvent._id ? newEvent : event
-                    )
-                );
-                setEditingEvent(null);
+                )
+            );
+            setEditingEvent(null);
             } catch (error) {
                 console.log(error);
             }

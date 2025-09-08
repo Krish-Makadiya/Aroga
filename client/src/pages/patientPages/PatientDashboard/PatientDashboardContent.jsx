@@ -14,7 +14,7 @@ import {
     Settings,
     Stethoscope,
     TrendingUp,
-    User
+    User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Calendar from "../../../components/Dashboard/Calendar";
@@ -28,33 +28,33 @@ const PatientDashboardContent = () => {
     const { getToken } = useAuth();
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            if (!user) return;
-            try {
-                setLoading(true);
-                const token = await getToken();
-                const response = await axios.get(
-                    `http://localhost:5000/api/patient/get-patient/${user.id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                setUserData(response.data);
-                console.log("Fetched user data:", response.data);
-            } catch (error) {
-                console.error(
-                    "Error fetching user data:",
-                    error.response?.data || error.message
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchUserData();
     }, [user, getToken]);
+
+    const fetchUserData = async () => {
+        if (!user) return;
+        try {
+            setLoading(true);
+            const token = await getToken();
+            const response = await axios.get(
+                `http://localhost:5000/api/patient/get-patient/${user.id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setUserData(response.data);
+            console.log("Fetched user data:", response.data);
+        } catch (error) {
+            console.error(
+                "Error fetching user data:",
+                error.response?.data || error.message
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString("en-US", {

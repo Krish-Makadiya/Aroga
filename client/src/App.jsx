@@ -1,14 +1,15 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone, Pill, Venus } from "lucide-react";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Venus } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleRedirect from "./components/auth/RoleRedirect";
 import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashboard";
-import DoctorDashboard from "./pages/doctorPages/doctorDashboard/DoctorDashboard";
+import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
 import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
 import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
+import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 
 const patientTabs = [
     {
@@ -36,7 +37,13 @@ const doctorTabs = [
         id: 1,
         name: "Dashboard",
         icon: LayoutDashboard,
-        path: "/patient/dashboard",
+        path: "/doctor/dashboard",
+    },
+    {
+        id: 2,
+        name: "Account & Earning",
+        icon: DollarSign,
+        path: "/doctor/account-earning",
     },
 ];
 
@@ -83,12 +90,20 @@ function App() {
                     }
                 />
 
-                
+                {/* TODO: DOCTORS */}
                 <Route
                     path="/doctor/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <DoctorDashboard tabs={doctorTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/doctor/account-earning"
+                    element={
+                        <ProtectedRoute requiredRole="Doctor">
+                            <AccountEarning tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
                 />

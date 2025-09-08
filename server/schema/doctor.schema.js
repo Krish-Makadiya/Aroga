@@ -195,20 +195,17 @@ const doctorSchema = new mongoose.Schema(
         // Address Information
         address: {
             type: String,
-            required: [true, "Address is required"],
             trim: true,
             maxlength: [200, "Address cannot exceed 200 characters"],
         },
 
         district: {
             type: String,
-            required: [true, "District is required"],
             trim: true,
             maxlength: [50, "District name cannot exceed 50 characters"],
         },
         state: {
             type: String,
-            required: [true, "State is required"],
             trim: true,
             maxlength: [50, "State name cannot exceed 50 characters"],
         },
@@ -225,6 +222,64 @@ const doctorSchema = new mongoose.Schema(
                 type: Number,
                 default: 0,
                 min: [0, "Rating count cannot be negative"],
+            },
+        },
+
+        bankAccount: {
+            accountNumber: {
+                type: String,
+                required: false,
+                trim: true,
+                maxlength: [20, "Account number cannot exceed 20 characters"],
+            },
+            ifscCode: {
+                type: String,
+                required: false,
+                trim: true,
+                uppercase: true,
+                validate: {
+                    validator: function (value) {
+                        return /^[A-Z]{4}0[A-Z0-9]{6}$/.test(value);
+                    },
+                    message: "Invalid IFSC code format",
+                },
+            },
+            bankName: {
+                type: String,
+                required: false,
+                trim: true,
+                maxlength: [100, "Bank name cannot exceed 100 characters"],
+            },
+            accountHolderName: {
+                type: String,
+                required: false,
+                trim: true,
+                maxlength: [
+                    100,
+                    "Account holder name cannot exceed 100 characters",
+                ],
+            },
+            branchName: {
+                type: String,
+                required: false,
+                trim: true,
+                maxlength: [100, "Branch name cannot exceed 100 characters"],
+            },
+        },
+
+        upiId: {
+            type: String,
+            required: false,
+            trim: true,
+            validate: {
+                validator: function (value) {
+                    return (
+                        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+                            value
+                        ) || /^[a-zA-Z0-9._-]+$/.test(value)
+                    );
+                },
+                message: "Invalid UPI ID format",
             },
         },
 

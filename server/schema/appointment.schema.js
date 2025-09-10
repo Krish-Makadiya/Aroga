@@ -28,11 +28,8 @@ const appointmentSchema = new mongoose.Schema(
             enum: [
                 "pending",
                 "confirmed",
-                "in_progress",
                 "completed",
                 "cancelled",
-                "no_show",
-                "rescheduled",
             ],
             default: "pending",
             index: true,
@@ -43,10 +40,10 @@ const appointmentSchema = new mongoose.Schema(
             trim: true,
             default: "",
         },
-
-        price: {
-            amount: { type: Number, required: true, min: 0 },
-            currency: { type: String, default: "INR" },
+        amount: {
+            type: Number,
+            required: true,
+            min: 0,
         },
         payment: {
             status: {

@@ -1,4 +1,4 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Venus } from "lucide-react";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
@@ -11,6 +11,7 @@ import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
 import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
+import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 
 const patientTabs = [
     {
@@ -34,7 +35,7 @@ const patientTabs = [
     {
         id: 4,
         name: "Get Appointment",
-        icon: Venus,
+        icon: Stethoscope,
         path: "/patient/get-appointment",
     },
 ];
@@ -51,6 +52,12 @@ const doctorTabs = [
         name: "Account & Earning",
         icon: DollarSign,
         path: "/doctor/account-earning",
+    },
+    {
+        id: 3,
+        name: "My Appointment",
+        icon: Stethoscope,
+        path: "/doctor/my-appointments",
     },
 ];
 
@@ -119,6 +126,14 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <AccountEarning tabs={doctorTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/doctor/my-appointments"
+                    element={
+                        <ProtectedRoute requiredRole="Doctor">
+                            <MyAppointments tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
                 />

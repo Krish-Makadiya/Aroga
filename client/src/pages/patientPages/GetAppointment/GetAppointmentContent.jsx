@@ -25,6 +25,7 @@ const GetAppointmentContent = () => {
     const { user } = useUser();
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
+    const [selectedTime, setSelectedTime] = useState("");
 
     useEffect(() => {
         if (!user) return;
@@ -55,17 +56,15 @@ const GetAppointmentContent = () => {
         };
     }, [user, getToken]);
 
-    const validateAppointmentDate = (inputValue) => {
-        if (!inputValue)
-            return { ok: false, msg: "Please select a date and time." };
-
+    const validateAppointmentDate = (date, time) => {
+        if (!date || !time)
+            return { ok: false, msg: "Please select both date and time." };
+        const inputValue = `${date}T${time}`;
         const d = new Date(inputValue);
         if (isNaN(d.getTime()))
             return { ok: false, msg: "Invalid date/time selected." };
-
         const now = new Date();
         const oneHourMs = 60 * 60 * 1000;
-
         if (d.getTime() < now.getTime()) {
             return { ok: false, msg: "Selected time is in the past." };
         }
@@ -75,7 +74,6 @@ const GetAppointmentContent = () => {
                 msg: "Please choose a time at least 1 hour from now.",
             };
         }
-
         const mins = d.getMinutes();
         if (!(mins === 0 || mins === 15 || mins === 30 || mins === 45)) {
             return {
@@ -83,24 +81,33 @@ const GetAppointmentContent = () => {
                 msg: "Please select a 30-minute slot (:00, :15, :30, or :45).",
             };
         }
-        return { ok: true, date: d };
+        return { ok: true, date: d, inputValue };
     };
 
-    const handleBook = (doctor) => {
-        const v = validateAppointmentDate(selectedDate);
+    const handleBook = async (doctor) => {
+        const v = validateAppointmentDate(selectedDate, selectedTime);
         if (!v.ok) {
             toast.error(v.msg);
             return;
         }
 
-        // proceed
-        console.log("Book appointment:", {
-            doctorId: doctor._id,
-            doctorName: doctor.fullName,
-            scheduledAt: selectedDate, // keep local string for backend or convert as needed
-            price: doctor.consultationFee ?? 0,
-        });
-        toast.success("Slot looks good. Proceeding to book…");
+        try {
+            console.log(doctor, v.inputValue);
+            const res = await axios.post(
+                "http://localhost:5000/api/appointment/create-appointment",
+                {
+                    doctorId: doctor._id,
+                    patientClerkId: user.id,
+                    scheduledAt: v.inputValue, // ISO string
+                    amount: doctor.consultationFee ?? 0,
+                }
+            );
+
+            console.log("Book appointment:", res.data);
+            toast.success("Slot looks good. Proceeding to book…");
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     if (loading) {
@@ -195,16 +202,30 @@ const GetAppointmentContent = () => {
                             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="datetime-local"
-                                        step="1800" // 30 minutes
+                                        type="date"
                                         value={
                                             selectedDoctor?._id === doc._id
                                                 ? selectedDate
                                                 : ""
                                         }
-                                        onChange={(e) =>
-                                            setSelectedDate(e.target.value)
+                                        onChange={(e) => {
+                                            setSelectedDoctor(doc);
+                                            setSelectedDate(e.target.value);
+                                        }}
+                                        className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                    />
+                                    <input
+                                        type="time"
+                                        step="1800"
+                                        value={
+                                            selectedDoctor?._id === doc._id
+                                                ? selectedTime
+                                                : ""
                                         }
+                                        onChange={(e) => {
+                                            setSelectedDoctor(doc);
+                                            setSelectedTime(e.target.value);
+                                        }}
                                         className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
                                     />
                                 </div>

@@ -121,9 +121,6 @@ const NewAppointments = () => {
         (appt) => appt.status === "pending"
     );
 
-    console.log("All appointments:", appointments);
-    console.log("Pending appointments:", pendingAppointments);
-
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold text-light-primary-text dark:text-dark-primary-text mb-4">
@@ -186,7 +183,7 @@ const NewAppointments = () => {
                                                     day: "numeric",
                                                 })}
                                             </p>
-                                            <p className="text-light-secondary-text dark:text-dark-secondary-text">
+                                            <p className="text-light-primary-text dark:text-dark-primary-text">
                                                 {new Date(
                                                     appointment.scheduledAt
                                                 ).toLocaleTimeString("en-US", {

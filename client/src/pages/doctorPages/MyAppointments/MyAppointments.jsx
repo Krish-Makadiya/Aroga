@@ -10,50 +10,8 @@ import CompletedAppointments from "./CompletedAppointments";
 const MyAppointments = ({ tabs }) => {
     const location = useLocation();
     const [activeTab, setActiveTab] = useState("upcoming-appointments");
-    const { user } = useUser();
-    const { getToken } = useAuth();
-    const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    useEffect(() => {
-        if (!user) return;
-        let mounted = true;
-        (async () => {
-            try {
-                setLoading(true);
-                const token = await getToken();
-                const res = await axios.get(
-                    `http://localhost:5000/api/appointment/doctor/${user.id}`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                if (!mounted) return;
-                setAppointments(res.data?.data || []);
-            } catch (err) {
-                setError("Failed to load appointments");
-                console.error(err?.response?.data || err);
-            } finally {
-                if (mounted) setLoading(false);
-            }
-        })();
-        return () => {
-            mounted = false;
-        };
-    }, [user, getToken]);
-
-    // Filtering logic
-    const pendingAppointments = appointments.filter(
-        (appt) => appt.status === "pending"
-    );
-    console.log(pendingAppointments);
-    const upcomingAppointments = appointments.filter(
-        (appt) => appt.status === "confirmed"
-    );
-    console.log(upcomingAppointments);
-    const completedAppointments = appointments.filter(
-        (appt) => appt.status === "completed" || appt.status === "cancelled"
-    );
-    console.log(completedAppointments);
 
     return (
         <div className="flex relative">
@@ -97,9 +55,9 @@ const MyAppointments = ({ tabs }) => {
                     <div className="p-6 text-red-600 dark:text-red-400">{error}</div>
                 ) : (
                     <>
-                        {activeTab === "new-appointments" && <NewAppointments appointments={pendingAppointments} />}
-                        {activeTab === "upcoming-appointments" && <UpcomingAppointments appointments={upcomingAppointments} />}
-                        {activeTab === "completed-appointments" && <CompletedAppointments appointments={completedAppointments} />}
+                        {activeTab === "new-appointments" && <NewAppointments />}
+                        {activeTab === "upcoming-appointments" && <UpcomingAppointments />}
+                        {activeTab === "completed-appointments" && <CompletedAppointments />}
                     </>
                 )}
             </div>

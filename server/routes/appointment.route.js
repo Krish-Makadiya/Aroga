@@ -86,13 +86,11 @@ router.get("/patient/:clerkUserId", async (req, res) => {
         return res.status(200).json({ success: true, data: appointments });
     } catch (error) {
         console.error("Get patient appointments error:", error);
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Failed to fetch appointments",
-                error: error.message,
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch appointments",
+            error: error.message,
+        });
     }
 });
 
@@ -101,27 +99,28 @@ router.get("/doctor/:clerkUserId", async (req, res) => {
     try {
         const { clerkUserId } = req.params;
         if (!clerkUserId) {
-            return res.status(400).json({ success: false, message: "Missing clerkUserId" });
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing clerkUserId" });
         }
 
         // Find doctor by clerkUserId
         const doctor = await Doctor.findOne({ clerkUserId });
         if (!doctor) {
-            return res.status(404).json({ success: false, message: "Doctor not found" });
+            return res
+                .status(404)
+                .json({ success: false, message: "Doctor not found" });
         }
 
         // Find all appointments for this doctor
         const appointments = await Appointment.find({ doctorId: doctor.id })
-        .populate(
-            "patientId",
-            "fullName email phone district state"
-        )
-        .populate(
-            "doctorId",
-            "fullName qualifications specialty consultationFee experience verificationStatus languages bio district state rating email phone"
-        )
-        .sort({ scheduledAt: -1 });
-        
+            .populate("patientId", "fullName email phone district state")
+            .populate(
+                "doctorId",
+                "fullName qualifications specialty consultationFee experience verificationStatus languages bio district state rating email phone"
+            )
+            .sort({ scheduledAt: -1 });
+
         return res.status(200).json({ success: true, data: appointments });
     } catch (error) {
         console.error("Get doctor appointments error:", error);
@@ -133,5 +132,56 @@ router.get("/doctor/:clerkUserId", async (req, res) => {
     }
 });
 
+// PUT /api/appointment/:id/status - update appointment status (confirm/cancel)
+router.put("/:id/status", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // Validate status
+        const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+        if (!status || !validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid status. Must be one of: pending, confirmed, completed, cancelled"
+            });
+        }
+
+        // Check if appointment exists
+        const existingAppointment = await Appointment.findById(id);
+        if (!existingAppointment) {
+            return res.status(404).json({
+                success: false,
+                message: "Appointment not found"
+            });
+        }
+
+        // Update appointment status
+        const appointment = await Appointment.findByIdAndUpdate(
+            id,
+            { 
+                status,
+                updatedAt: new Date()
+            },
+            { new: true }
+        ).populate("patientId", "fullName email phone")
+         .populate("doctorId", "fullName email phone");
+
+        console.log(`Appointment ${id} status updated to: ${status}`);
+
+        return res.status(200).json({ 
+            success: true, 
+            message: `Appointment ${status} successfully`,
+            data: appointment 
+        });
+    } catch (error) {
+        console.error("Update appointment status error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update appointment status",
+            error: error.message,
+        });
+    }
+});
 
 module.exports = router;

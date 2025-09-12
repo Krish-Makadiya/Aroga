@@ -39,7 +39,11 @@ const PatientCompletedAppointments = () => {
                 if (!mounted) return;
                 // Fix: always set to array of completed appointments
                 const completed = Array.isArray(res.data?.data)
-                    ? res.data.data.filter((appt) => appt.status === "completed")
+                    ? res.data.data.filter(
+                        (appt) =>
+                            appt.status === "completed" ||
+                            appt.status === "cancelled"
+                    )
                     : [];
                 setAppointments(completed);
             } catch (err) {
@@ -49,22 +53,28 @@ const PatientCompletedAppointments = () => {
                 if (mounted) setLoading(false);
             }
         })();
-        return () => { mounted = false; };
+        return () => {
+            mounted = false;
+        };
     }, [user, getToken]);
 
     if (loading) {
         return <div className="p-6">Loading completed appointments…</div>;
     }
     if (error) {
-        return <div className="p-6 text-red-600 dark:text-red-400">{error}</div>;
+        return (
+            <div className="p-6 text-red-600 dark:text-red-400">{error}</div>
+        );
     }
     if (appointments.length === 0) {
-        return <div className="p-6 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">No completed appointments found.</div>;
+        return (
+            <div className="p-6 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                No completed appointments found.
+            </div>
+        );
     }
 
-    return (
-        <AppointmentsList appointments={appointments}/>
-    );
+    return <AppointmentsList appointments={appointments} />;
 };
 
 export default PatientCompletedAppointments;

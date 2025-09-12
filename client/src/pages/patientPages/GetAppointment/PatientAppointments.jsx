@@ -38,7 +38,10 @@ const PatientAppointments = () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 if (!mounted) return;
-                setAppointments(res.data?.data || []);
+                const completed = Array.isArray(res.data?.data)
+                    ? res.data.data.filter((appt) => appt.status === "confirmed")
+                    : [];
+                setAppointments(completed);
             } catch (err) {
                 setError("Failed to load appointments");
                 console.error(err?.response?.data || err);

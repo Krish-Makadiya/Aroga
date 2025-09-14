@@ -1,4 +1,4 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus } from "lucide-react";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
@@ -12,6 +12,7 @@ import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
+import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 
 const patientTabs = [
     {
@@ -58,6 +59,12 @@ const doctorTabs = [
         name: "My Appointment",
         icon: Stethoscope,
         path: "/doctor/my-appointments",
+    },
+    {
+        id: 4,
+        name: "Articles",
+        icon: File,
+        path: "/doctor/articles",
     },
 ];
 
@@ -134,6 +141,14 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <MyAppointments tabs={doctorTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/doctor/articles"
+                    element={
+                        <ProtectedRoute requiredRole="Doctor">
+                            <DoctorArticles tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
                 />

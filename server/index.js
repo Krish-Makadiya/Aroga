@@ -8,6 +8,7 @@ const doctorRoute = require("./routes/doctor.route");
 const eventRoute = require("./routes/event.route");
 const aiRoutes = require("./routes/ai.route");
 const appointmentRoute = require("./routes/appointment.route");
+const articleRoute = require("./routes/articles.route");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -23,6 +24,7 @@ app.use("/api/doctor", doctorRoute);
 app.use("/api/event", eventRoute);
 app.use("/api/appointment", appointmentRoute);
 app.use("/api/ai", aiRoutes);
+app.use("/api/articles", articleRoute);
 
 app.get("/", (req, res) => {
     res.send("API is running!");

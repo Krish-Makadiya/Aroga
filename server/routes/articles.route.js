@@ -7,7 +7,7 @@ const Doctor = require("../schema/doctor.schema");
 router.post("/", async (req, res) => {
     try {
         const {
-            authorId, // Doctor's ObjectId
+            authorClerkId, // Doctor's ObjectId
             title,
             subtitle = "",
             content,
@@ -16,15 +16,15 @@ router.post("/", async (req, res) => {
         } = req.body;
 
         // Validation - Check required fields
-        if (!authorId || !title || !content || !category) {
+        if (!authorClerkId || !title || !content || !category) {
             return res.status(400).json({
                 success: false,
-                message: "Missing required fields: authorId, title, content, category"
+                message: "Missing required fields: authorClerkId, title, content, category"
             });
         }
 
         // Verify doctor exists
-        const doctor = await Doctor.findById(authorId);
+        const doctor = await Doctor.findOne({clerkUserId: authorClerkId});
         if (!doctor) {
             return res.status(404).json({
                 success: false,
@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
 
         // Create article using the create method
         const article = await Article.create({
-            authorId,
+            authorId: doctor.id,
             authorAvatar: doctor.avatar || "",
             title,
             subtitle,
@@ -113,6 +113,76 @@ router.get("/:clerkUserId", async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to fetch doctor articles",
+            error: error.message
+        });
+    }
+});
+
+// GET /api/articles/all - Get all articles from database
+router.get("/all", async (req, res) => {
+    try {
+        const articles = await Article.find({})
+            .populate("authorId", "fullName qualification specialty avatar")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                articles
+            }
+        });
+
+    } catch (error) {
+        console.error("Get all articles error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch articles",
+            error: error.message
+        });
+    }
+});
+
+// GET /api/articles/exclude/:clerkUserId - Get all articles except from a specific doctor
+router.get("/exclude/:clerkUserId", async (req, res) => {
+    try {
+        const { clerkUserId } = req.params;
+
+        // Find doctor by clerkUserId to get their ObjectId
+        const doctor = await Doctor.findOne({ clerkUserId });
+        if (!doctor) {
+            return res.status(404).json({
+                success: false,
+                message: "Doctor not found"
+            });
+        }
+
+        // Build filter object - exclude articles from this doctor
+        const filter = {
+            authorId: { $ne: doctor._id } // Exclude articles from this doctor
+        };
+        
+        // Get all articles without pagination
+        const articles = await Article.find(filter)
+            .populate("authorId", "fullName qualification specialty avatar")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                articles,
+                excludedDoctor: {
+                    _id: doctor._id,
+                    fullName: doctor.fullName,
+                    clerkUserId: doctor.clerkUserId
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Get articles excluding doctor error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch articles",
             error: error.message
         });
     }

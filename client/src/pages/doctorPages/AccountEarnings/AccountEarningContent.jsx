@@ -12,7 +12,37 @@ const AccountEarningContent = () => {
     const { user } = useUser();
     const { getToken } = useAuth();
 
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({
+        fullName: '',
+        specialty: '',
+        qualifications: '',
+        registrationNumber: '',
+        experience: '',
+        affiliation: '',
+        phone: '',
+        email: '',
+        bio: '',
+        address: '',
+        district: '',
+        state: '',
+        consultationFee: '',
+        telemedicineConsent: false,
+        upiId: '',
+        paymentMethod: 'bank_transfer',
+        bankAccountNumber: '',
+        bankIfscCode: '',
+        bankName: '',
+        bankAccountHolderName: '',
+        bankBranchName: ''
+    });
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
 
     useEffect(() => {
         getDoctorInfo();
@@ -30,40 +60,35 @@ const AccountEarningContent = () => {
                 }
             );
             console.log(res.data.data);
-            setFormData(res.data.data);
+            const doctorData = res.data.data;
+            setFormData({
+                fullName: doctorData.fullName || '',
+                specialty: doctorData.specialty || '',
+                qualifications: doctorData.qualifications || '',
+                registrationNumber: doctorData.registrationNumber || '',
+                experience: doctorData.experience || '',
+                affiliation: doctorData.affiliation || '',
+                phone: doctorData.phone || '',
+                email: doctorData.email || '',
+                bio: doctorData.bio || '',
+                address: doctorData.address || '',
+                district: doctorData.district || '',
+                state: doctorData.state || '',
+                consultationFee: doctorData.consultationFee || '',
+                telemedicineConsent: doctorData.telemedicineConsent || false,
+                upiId: doctorData.upiId || '',
+                paymentMethod: doctorData.paymentMethod || 'bank_transfer',
+                bankAccountNumber: doctorData.bankAccount?.accountNumber || '',
+                bankIfscCode: doctorData.bankAccount?.ifscCode || '',
+                bankName: doctorData.bankAccount?.bankName || '',
+                bankAccountHolderName: doctorData.bankAccount?.accountHolderName || '',
+                bankBranchName: doctorData.bankAccount?.branchName || ''
+            });
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleInputChange = (field, value) => {
-        if (field.includes(".")) {
-            const [parent, child] = field.split(".");
-            setFormData((prev) => ({
-                ...prev,
-                [parent]: {
-                    ...prev[parent],
-                    [child]: value,
-                },
-            }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                [field]: value,
-            }));
-        }
-    };
-
-    const handleArrayChange = (field, value) => {
-        const newArray = value
-            .split(",")
-            .map((item) => item.trim())
-            .filter((item) => item);
-        setFormData((prev) => ({
-            ...prev,
-            [field]: newArray,
-        }));
-    };
 
     const handleSave = async () => {
         setIsLoading(true);
@@ -72,7 +97,16 @@ const AccountEarningContent = () => {
             console.log("FORMDATA: ", formData);
             const res = await axios.post(
                 "http://localhost:5000/api/doctor/profile",
-                formData,
+                {
+                    ...formData,
+                    bankAccount: {
+                        accountNumber: formData.bankAccountNumber,
+                        ifscCode: formData.bankIfscCode,
+                        bankName: formData.bankName,
+                        accountHolderName: formData.bankAccountHolderName,
+                        branchName: formData.bankBranchName
+                    }
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -117,7 +151,7 @@ const AccountEarningContent = () => {
             <div className="mt-2">
                 <input
                     type={type}
-                    value={value}
+                    value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     disabled={disabled || !isEditing}
@@ -143,7 +177,7 @@ const AccountEarningContent = () => {
             <div className="mt-2">
                 <textarea
                     rows={rows}
-                    value={value}
+                    value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     disabled={!isEditing}
@@ -167,7 +201,7 @@ const AccountEarningContent = () => {
             </label>
             <div className="mt-2">
                 <select
-                    value={value}
+                    value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
                     disabled={disabled || !isEditing}
                     className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed">
@@ -194,7 +228,7 @@ const AccountEarningContent = () => {
                     <div className="group grid size-4 grid-cols-1">
                         <input
                             type="checkbox"
-                            checked={checked}
+                            checked={checked || false}
                             onChange={(e) => onChange(e.target.checked)}
                             disabled={disabled || !isEditing}
                             className="col-start-1 row-start-1 appearance-none rounded-sm border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-surface/50 dark:bg-dark-surface/50 checked:border-light-primary dark:checked:border-dark-primary checked:bg-light-primary dark:checked:bg-dark-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary dark:focus-visible:outline-dark-primary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -389,91 +423,141 @@ const AccountEarningContent = () => {
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InputField
-                                label="Full Name"
-                                value={formData.fullName}
-                                onChange={(value) =>
-                                    handleInputChange("fullName", value)
-                                }
-                                placeholder="Enter your full name"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Full Name <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="fullName"
+                                        value={formData.fullName}
+                                        onChange={handleChange}
+                                        placeholder="Enter your full name"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Medical Specialty"
-                                value={formData.specialty}
-                                onChange={(value) =>
-                                    handleInputChange("specialty", value)
-                                }
-                                placeholder="e.g., Cardiology, Neurology"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Medical Specialty <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="specialty"
+                                        value={formData.specialty}
+                                        onChange={handleChange}
+                                        placeholder="e.g., Cardiology, Neurology"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Qualifications"
-                                value={formData.qualifications}
-                                onChange={(value) =>
-                                    handleInputChange("qualifications", value)
-                                }
-                                placeholder="e.g., MBBS, MD, etc."
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Qualifications <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="qualifications"
+                                        value={formData.qualifications}
+                                        onChange={handleChange}
+                                        placeholder="e.g., MBBS, MD, etc."
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Registration Number"
-                                value={formData.registrationNumber}
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "registrationNumber",
-                                        value
-                                    )
-                                }
-                                placeholder="Medical registration number"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Registration Number <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="registrationNumber"
+                                        value={formData.registrationNumber}
+                                        onChange={handleChange}
+                                        placeholder="Medical registration number"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Years of Experience"
-                                type="number"
-                                value={formData.experience}
-                                onChange={(value) =>
-                                    handleInputChange("experience", value)
-                                }
-                                placeholder="Years of experience"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Years of Experience <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="number"
+                                        name="experience"
+                                        value={formData.experience}
+                                        onChange={handleChange}
+                                        placeholder="Years of experience"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Hospital/Affiliation"
-                                value={formData.affiliation}
-                                onChange={(value) =>
-                                    handleInputChange("affiliation", value)
-                                }
-                                placeholder="Current hospital or clinic"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Hospital/Affiliation <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="affiliation"
+                                        value={formData.affiliation}
+                                        onChange={handleChange}
+                                        placeholder="Current hospital or clinic"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Contact Number"
-                                type="tel"
-                                value={formData.phone}
-                                onChange={(value) =>
-                                    handleInputChange("phone", value)
-                                }
-                                placeholder="Enter your contact number"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Contact Number <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        placeholder="Enter your contact number"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Email Address"
-                                type="email"
-                                value={formData.email}
-                                onChange={(value) =>
-                                    handleInputChange("email", value)
-                                }
-                                placeholder="Enter your email address"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Email Address <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="Enter your email address"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
                             {/* <InputField
                                 label="Languages (comma separated)"
                                 value={
@@ -487,15 +571,22 @@ const AccountEarningContent = () => {
                                 placeholder="e.g., English, Hindi, Gujarati"
                             /> */}
 
-                            <TextAreaField
-                                label="Professional Bio"
-                                value={formData.bio}
-                                onChange={(value) =>
-                                    handleInputChange("bio", value)
-                                }
-                                placeholder="Brief description of your expertise and experience"
-                                rows={3}
-                            />
+                            <div className="col-span-full">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Professional Bio
+                                </label>
+                                <div className="mt-2">
+                                    <textarea
+                                        rows={3}
+                                        name="bio"
+                                        value={formData.bio}
+                                        onChange={handleChange}
+                                        placeholder="Brief description of your expertise and experience"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-3 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -509,35 +600,56 @@ const AccountEarningContent = () => {
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <TextAreaField
-                                label="Address"
-                                value={formData.address}
-                                onChange={(value) =>
-                                    handleInputChange("address", value)
-                                }
-                                placeholder="Enter your complete address"
-                                required
-                            />
+                            <div className="col-span-full">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Address <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <textarea
+                                        rows={3}
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        placeholder="Enter your complete address"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-3 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="District"
-                                value={formData.district}
-                                onChange={(value) =>
-                                    handleInputChange("district", value)
-                                }
-                                placeholder="Enter your district"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    District <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="district"
+                                        value={formData.district}
+                                        onChange={handleChange}
+                                        placeholder="Enter your district"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="State"
-                                value={formData.state}
-                                onChange={(value) =>
-                                    handleInputChange("state", value)
-                                }
-                                placeholder="Enter your state"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    State <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="state"
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        placeholder="Enter your state"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -551,30 +663,54 @@ const AccountEarningContent = () => {
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InputField
-                                label="Consultation Fee (₹)"
-                                type="number"
-                                value={formData.consultationFee}
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "consultationFee",
-                                        parseInt(value) || 0
-                                    )
-                                }
-                                placeholder="Enter your consultation fee"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Consultation Fee (₹) <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="number"
+                                        name="consultationFee"
+                                        value={formData.consultationFee}
+                                        onChange={handleChange}
+                                        placeholder="Enter your consultation fee"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <CheckboxField
-                                label="I consent to telemedicine consultations"
-                                checked={formData.telemedicineConsent}
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "telemedicineConsent",
-                                        value
-                                    )
-                                }
-                            />
+                            <div className="col-span-full">
+                                <div className="flex flex-col justify-center">
+                                    <div className="flex h-6 shrink-0 gap-2 items-center">
+                                        <div className="group grid size-4 grid-cols-1">
+                                            <input
+                                                type="checkbox"
+                                                name="telemedicineConsent"
+                                                checked={formData.telemedicineConsent}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="col-start-1 row-start-1 appearance-none rounded-sm border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-surface/50 dark:bg-dark-surface/50 checked:border-light-primary dark:checked:border-dark-primary checked:bg-light-primary dark:checked:bg-dark-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary dark:focus-visible:outline-dark-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                                            />
+                                            <svg
+                                                fill="none"
+                                                viewBox="0 0 14 14"
+                                                className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-light-primary-text dark:stroke-dark-primary-text">
+                                                <path
+                                                    d="M3 8L6 11L11 3.5"
+                                                    strokeWidth={2}
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    className="opacity-0 group-has-checked:opacity-100"
+                                                />
+                                            </svg>
+                                        </div>
+                                        <label className="font-medium text-light-primary-text dark:text-dark-primary-text">
+                                            I consent to telemedicine consultations
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 
                             
                         </div>
@@ -590,117 +726,125 @@ const AccountEarningContent = () => {
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InputField
-                                label="Account Number"
-                                value={
-                                    formData.bankAccount
-                                        ? formData.bankAccount.accountNumber
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "bankAccount.accountNumber",
-                                        value
-                                    )
-                                }
-                                placeholder="Enter your account number"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Account Number <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="bankAccountNumber"
+                                        value={formData.bankAccountNumber}
+                                        onChange={handleChange}
+                                        placeholder="Enter your account number"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="IFSC Code"
-                                value={
-                                    formData.bankAccount
-                                        ? formData.bankAccount.ifscCode
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "bankAccount.ifscCode",
-                                        value
-                                    )
-                                }
-                                placeholder="e.g., SBIN0001234"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    IFSC Code <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="bankIfscCode"
+                                        value={formData.bankIfscCode}
+                                        onChange={handleChange}
+                                        placeholder="e.g., SBIN0001234"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Bank Name"
-                                value={
-                                    formData.bankAccount
-                                        ? formData.bankAccount.bankName
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "bankAccount.bankName",
-                                        value
-                                    )
-                                }
-                                placeholder="Enter bank name"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Bank Name <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="bankName"
+                                        value={formData.bankName}
+                                        onChange={handleChange}
+                                        placeholder="Enter bank name"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Account Holder Name"
-                                value={
-                                    formData.bankAccount
-                                        ? formData.bankAccount.accountHolderName
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "bankAccount.accountHolderName",
-                                        value
-                                    )
-                                }
-                                placeholder="Enter account holder name"
-                                required
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Account Holder Name <span className="text-red-500">*</span>
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="bankAccountHolderName"
+                                        value={formData.bankAccountHolderName}
+                                        onChange={handleChange}
+                                        placeholder="Enter account holder name"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="Branch Name"
-                                value={
-                                    formData.bankAccount
-                                        ? formData.bankAccount.branchName
-                                        : ""
-                                }
-                                onChange={(value) =>
-                                    handleInputChange(
-                                        "bankAccount.branchName",
-                                        value
-                                    )
-                                }
-                                placeholder="Enter branch name"
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Branch Name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="bankBranchName"
+                                        value={formData.bankBranchName}
+                                        onChange={handleChange}
+                                        placeholder="Enter branch name"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <InputField
-                                label="UPI ID"
-                                value={formData.upiId}
-                                onChange={(value) =>
-                                    handleInputChange("upiId", value)
-                                }
-                                placeholder="e.g., yourname@paytm"
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    UPI ID
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="upiId"
+                                        value={formData.upiId}
+                                        onChange={handleChange}
+                                        placeholder="e.g., yourname@paytm"
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-2 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
-                            <SelectField
-                                label="Preferred Payment Method"
-                                value={formData.paymentMethod}
-                                onChange={(value) =>
-                                    handleInputChange("paymentMethod", value)
-                                }
-                                options={[
-                                    {
-                                        value: "bank_transfer",
-                                        label: "Bank Transfer",
-                                    },
-                                    { value: "upi", label: "UPI" },
-                                    {
-                                        value: "wallet",
-                                        label: "Digital Wallet",
-                                    },
-                                ]}
-                            />
+                            <div className="sm:col-span-3">
+                                <label className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Preferred Payment Method
+                                </label>
+                                <div className="mt-2">
+                                    <select
+                                        name="paymentMethod"
+                                        value={formData.paymentMethod}
+                                        onChange={handleChange}
+                                        disabled={!isEditing}
+                                        className="block w-full rounded-md bg-light-surface dark:bg-dark-bg px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6 disabled:bg-light-surface/50 dark:disabled:bg-dark-bg/50 disabled:cursor-not-allowed">
+                                        <option value="bank_transfer">Bank Transfer</option>
+                                        <option value="upi">UPI</option>
+                                        <option value="wallet">Digital Wallet</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

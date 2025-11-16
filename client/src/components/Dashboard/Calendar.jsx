@@ -28,11 +28,11 @@ const Calendar = ({ patientId }) => {
 
     useEffect(() => {
         fetchEvents();
-    }, [events]);
+    }, [patientId]);
     
     const fetchEvents = async () => {
         const response = await axios.get(
-            `http://localhost:5000/api/event/patients/${patientId}/events`
+            `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events`
         );
         setEvents(response.data);
     };
@@ -133,7 +133,7 @@ const Calendar = ({ patientId }) => {
             try {
                 await toast.promise(
                     axios.put(
-                        `http://localhost:5000/api/event/patients/${patientId}/events/${editingEvent._id}`,
+                        `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events/${editingEvent._id}`,
                         newEvent
                     ),
                     {
@@ -155,7 +155,7 @@ const Calendar = ({ patientId }) => {
             try {
                 await toast.promise(
                     axios.post(
-                        `http://localhost:5000/api/event/patients/${patientId}/events`,
+                        `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events`,
                         newEvent
                     ),
                     {
@@ -190,7 +190,7 @@ const Calendar = ({ patientId }) => {
         try {
             await toast.promise(
                 axios.delete(
-                    `http://localhost:5000/api/event/patients/${patientId}/events/${eventId}`
+                    `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events/${eventId}`
                 ),
                 {
                     loading: "Deleting event...",

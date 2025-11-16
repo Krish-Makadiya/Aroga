@@ -1,10 +1,10 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { Shield, Stethoscope, User, UserCircle } from "lucide-react";
+import { Shield, Stethoscope, User, UserCircle, Building2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const ROLES = ["Patient", "Doctor", "Admin"];
+const ROLES = ["Patient", "Doctor", "Pharmacy", "Admin"];
 
 export default function OnboardingForm() {
     const { user, isLoaded } = useUser();
@@ -44,6 +44,23 @@ export default function OnboardingForm() {
         telemedicineConsent: true,
     });
 
+    const [pharmacy, setPharmacy] = useState({
+        pharmacyName: "",
+        ownerName: "",
+        licenseNumber: "",
+        phone: "",
+        email: "",
+        alternatePhone: "",
+        address: "",
+        district: "",
+        state: "",
+        pincode: "",
+        registrationType: "",
+        gstNumber: "",
+        description: "",
+        clerkUserId: user.id,
+    });
+
     const [admin, setAdmin] = useState({
         userId: "",
         password: "",
@@ -74,6 +91,9 @@ export default function OnboardingForm() {
             } else if (role === "Doctor") {
                 backendUrl = "http://localhost:5000/api/doctor/create-doctor";
                 backendBody = doctor;
+            } else if (role === "Pharmacy") {
+                backendUrl = "http://localhost:5000/api/pharmacy/create-pharmacy";
+                backendBody = pharmacy;
             } else if (role === "Admin") {
                 backendUrl = "http://localhost:5000/api/admin/create-admin";
                 backendBody = admin;
@@ -100,6 +120,7 @@ export default function OnboardingForm() {
                         onboardingCompleted: true,
                         ...(role === "Patient" && { patientData: patient }),
                         ...(role === "Doctor" && { doctorData: doctor }),
+                        ...(role === "Pharmacy" && { pharmacyData: pharmacy }),
                         ...(role === "Admin" && { adminData: admin }),
                     },
                 });
@@ -153,7 +174,7 @@ export default function OnboardingForm() {
                     Select Your Role
                 </p>
 
-                <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
                     {ROLES.map((roleOption) => {
                         const isSelected = role === roleOption;
                         const getIcon = () => {
@@ -162,6 +183,8 @@ export default function OnboardingForm() {
                                     return <User className="w-8 h-8" />;
                                 case "Doctor":
                                     return <Stethoscope className="w-8 h-8" />;
+                                case "Pharmacy":
+                                    return <Building2 className="w-8 h-8" />;
                                 case "Admin":
                                     return <Shield className="w-8 h-8" />;
                                 default:
@@ -175,6 +198,8 @@ export default function OnboardingForm() {
                                     return "Access medical services, book appointments, and manage your health records";
                                 case "Doctor":
                                     return "Provide medical consultations, manage patients, and access medical tools";
+                                case "Pharmacy":
+                                    return "Manage pharmacy operations, list medicines, and serve customers";
                                 case "Admin":
                                     return "Manage system settings, users, and oversee platform operations";
                                 default:
@@ -932,6 +957,349 @@ export default function OnboardingForm() {
                                             )}
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {role === "Pharmacy" && (
+                <div className="space-y-12">
+                    <div className="border-b border-light-secondary-text/20 dark:border-dark-secondary-text/20 py-8">
+                        <h2 className="text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text">
+                            Pharmacy Information
+                        </h2>
+                        <p className="mt-1 text-sm/6 text-light-secondary-text dark:text-dark-secondary-text">
+                            Please provide your pharmacy and business details.
+                        </p>
+
+                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-pharmacyName"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Pharmacy Name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-pharmacyName"
+                                        name="pharmacy-pharmacyName"
+                                        type="text"
+                                        value={pharmacy.pharmacyName}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                pharmacyName: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter pharmacy name"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-ownerName"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Owner Name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-ownerName"
+                                        name="pharmacy-ownerName"
+                                        type="text"
+                                        value={pharmacy.ownerName}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                ownerName: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter owner name"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-licenseNumber"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    License Number
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-licenseNumber"
+                                        name="pharmacy-licenseNumber"
+                                        type="text"
+                                        value={pharmacy.licenseNumber}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                licenseNumber: e.target.value.toUpperCase(),
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter license number"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-registrationType"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Registration Type
+                                </label>
+                                <div className="mt-2">
+                                    <select
+                                        id="pharmacy-registrationType"
+                                        name="pharmacy-registrationType"
+                                        value={pharmacy.registrationType}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                registrationType: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        required>
+                                        <option value="">Select Registration Type</option>
+                                        <option value="Sole Proprietorship">Sole Proprietorship</option>
+                                        <option value="Partnership">Partnership</option>
+                                        <option value="Private Limited">Private Limited</option>
+                                        <option value="Public Limited">Public Limited</option>
+                                        <option value="LLP">LLP</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-phone"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Phone Number
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-phone"
+                                        name="pharmacy-phone"
+                                        type="tel"
+                                        value={pharmacy.phone}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                phone: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter phone number"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-email"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Email Address
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-email"
+                                        name="pharmacy-email"
+                                        type="email"
+                                        value={pharmacy.email}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                email: e.target.value.toLowerCase(),
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter email address"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-alternatePhone"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Alternate Phone (Optional)
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-alternatePhone"
+                                        name="pharmacy-alternatePhone"
+                                        type="tel"
+                                        value={pharmacy.alternatePhone}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                alternatePhone: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter alternate phone number"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label
+                                    htmlFor="pharmacy-gstNumber"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    GST Number (Optional)
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-gstNumber"
+                                        name="pharmacy-gstNumber"
+                                        type="text"
+                                        value={pharmacy.gstNumber}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                gstNumber: e.target.value.toUpperCase(),
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter GST number"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-span-full">
+                                <label
+                                    htmlFor="pharmacy-address"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Address
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-address"
+                                        name="pharmacy-address"
+                                        type="text"
+                                        value={pharmacy.address}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                address: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter full address"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label
+                                    htmlFor="pharmacy-district"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    District
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-district"
+                                        name="pharmacy-district"
+                                        type="text"
+                                        value={pharmacy.district}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                district: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter district"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label
+                                    htmlFor="pharmacy-state"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    State
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-state"
+                                        name="pharmacy-state"
+                                        type="text"
+                                        value={pharmacy.state}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                state: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter state"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label
+                                    htmlFor="pharmacy-pincode"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Pincode
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="pharmacy-pincode"
+                                        name="pharmacy-pincode"
+                                        type="text"
+                                        value={pharmacy.pincode}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                pincode: e.target.value.replace(/\D/g, '').slice(0, 6),
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Enter 6-digit pincode"
+                                        maxLength={6}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-span-full">
+                                <label
+                                    htmlFor="pharmacy-description"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Description (Optional)
+                                </label>
+                                <div className="mt-2">
+                                    <textarea
+                                        id="pharmacy-description"
+                                        name="pharmacy-description"
+                                        rows={4}
+                                        value={pharmacy.description}
+                                        onChange={(e) =>
+                                            setPharmacy({
+                                                ...pharmacy,
+                                                description: e.target.value,
+                                            })
+                                        }
+                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
+                                        placeholder="Provide a brief description about your pharmacy"
+                                    />
                                 </div>
                             </div>
                         </div>

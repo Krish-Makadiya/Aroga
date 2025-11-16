@@ -13,6 +13,7 @@ import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
+import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 
 const patientTabs = [
     {
@@ -68,6 +69,16 @@ const doctorTabs = [
     },
 ];
 
+const pharmacyTabs = [
+    {
+        id: 1,
+        name: "Dashboard",
+        icon: LayoutDashboard,
+        path: "/pharmacy/dashboard",
+    },
+];
+
+
 function App() {
     return (
         <BrowserRouter>
@@ -86,6 +97,8 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                {/* TODO: PATIENTS */}
                 <Route
                     path="/patient/dashboard"
                     element={
@@ -149,6 +162,16 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <DoctorArticles tabs={doctorTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* TODO: PHARMACIES */}
+                <Route
+                    path="/pharmacy/dashboard"
+                    element={
+                        <ProtectedRoute requiredRole="Pharmacy">
+                            <PharmacyDashboard tabs={pharmacyTabs} />
                         </ProtectedRoute>
                     }
                 />

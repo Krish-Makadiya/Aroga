@@ -44,7 +44,7 @@ function LandingPage() {
             </div>
             <div className="text-light-primary-text w-screen h-screen flex flex-col gap-6 items-center justify-center">
                 <div className="flex flex-col items-center justify-center font-semibold leading-16">
-                    <p className="text-[60px] font-bold flex dark:text-dark-primary-text text-light-primary-text">
+                    <p className="text-[60px] text-center font-bold flex dark:text-dark-primary-text text-light-primary-text">
                         Connect, Diagnose, Treat
                     </p>
                     <p className="text-light-primary/50 dark:text-dark-primary/50 text-[60px] font-extrabold sub-heading">
@@ -74,7 +74,7 @@ function LandingPage() {
                         </>
                     }>
                     <img
-                        src={`/Dino.PNG`}
+                        src={`/patientDashboard.png`}
                         alt="hero"
                         height={720}
                         width={1400}

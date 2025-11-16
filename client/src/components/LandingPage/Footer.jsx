@@ -18,8 +18,7 @@ export default function Footer() {
                         </span>
                     </a>
                     <p className="text-light-secondary-text dark:text-dark-secondary-text text-sm max-w-xs text-center md:text-left">
-                        Practice. Improve. Get Hired. Your all-in-one interview
-                        prep platform.
+                        Your Health, Our Priority - Empowering Wellness with AI.
                     </p>
                 </div>
                 {/* Links */}

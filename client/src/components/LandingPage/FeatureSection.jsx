@@ -61,7 +61,7 @@ export default function FeatureSection() {
                 <div className="flex items-center justify-center">
                     <div className="bg-light-surface dark:bg-dark-surface rounded-[2rem] p-4 shadow-lg border border-gray-200 dark:border-gray-700 w-[360px] h-[650px] flex items-center justify-center">
                         <img
-                            src="/Dino.PNG" // Replace with your actual prototype image path
+                            src="/mobileImage.jpeg" // Replace with your actual prototype image path
                             alt="App Prototype"
                             className="rounded-[1.4rem] w-[350px] h-[620px] object-cover"
                             draggable={false}

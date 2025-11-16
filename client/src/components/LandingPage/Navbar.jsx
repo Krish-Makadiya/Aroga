@@ -88,6 +88,7 @@ export default function Navbar() {
         if (!isLoaded || !user) return "/dashboard";
 
         const userRole = user.unsafeMetadata?.role;
+        console.log(userRole);
         if (!userRole) return "/dashboard";
 
         switch (userRole) {
@@ -97,6 +98,8 @@ export default function Navbar() {
                 return "/doctor/dashboard";
             case "Admin":
                 return "/dashboard/admin";
+            case "Pharmacy":
+                return "/pharmacy/dashboard";
             default:
                 return "/dashboard";
         }
@@ -295,7 +298,7 @@ export default function Navbar() {
                                     Company
                                 </a>
                             </div>
-                            <div className="py-6">
+                            <div className="py-6 flex flex-col gap-2">
                                 <button
                                     onClick={() =>
                                         setTheme(
@@ -324,11 +327,13 @@ export default function Navbar() {
                                         Dashboard
                                     </button>
                                 ) : (
-                                    <a
-                                        href="#"
-                                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-light-primary-text dark:text-dark-primary-text hover:bg-light-surface dark:hover:bg-dark-surface cursor-pointer">
-                                        Log in
-                                    </a>
+                                    <SignUpButton
+                                        className="inline-block rounded-lg px-3 py-2.5 text-sm/6 bg-gradient-to-r dark:from-[#f4f4f9] dark:to-[#ffffff] from-[#181818] to-[#262626] dark:text-black text-white font-semibold"
+                                        mode="modal"
+                                        navigate="/sign-up"
+                                        fallbackRedirectUrl="/sign-in">
+                                        Login
+                                    </SignUpButton>
                                 )}
                             </div>
                         </div>

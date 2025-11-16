@@ -5,6 +5,7 @@ const { clerkMiddleware } = require("@clerk/express");
 const connectDB = require("./config/mongoDB");
 const patientRoute = require("./routes/patient.route");
 const doctorRoute = require("./routes/doctor.route");
+const pharmacyRoute = require("./routes/pharmacy.route");
 const eventRoute = require("./routes/event.route");
 const aiRoutes = require("./routes/ai.route");
 const appointmentRoute = require("./routes/appointment.route");
@@ -20,6 +21,7 @@ app.use(clerkMiddleware());
 
 app.use("/api/patient", patientRoute);
 app.use("/api/doctor", doctorRoute);
+app.use("/api/pharmacy", pharmacyRoute);
 
 app.use("/api/event", eventRoute);
 app.use("/api/appointment", appointmentRoute);

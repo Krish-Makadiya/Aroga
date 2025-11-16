@@ -23,7 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-node_modules
-.env
-
-/server/.env
+*.env

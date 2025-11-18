@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import axios from "axios";
+import { Eye } from "lucide-react";
+import PatientDetailsDialog from "../../../components/Doctor/PatientDetailsDialog";
 
 const NewAppointments = () => {
     const { user } = useUser();
@@ -9,6 +11,8 @@ const NewAppointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -82,34 +86,13 @@ const NewAppointments = () => {
     };
 
     const handleViewDetails = (appointment) => {
-        console.log("Viewing appointment details:", {
-            appointmentId: appointment._id,
-            patientId: appointment.patientId?._id,
-            patientName: appointment.patientId?.fullName,
-            doctorId: appointment.doctorId?._id,
-            doctorName: appointment.doctorId?.fullName,
-            scheduledAt: appointment.scheduledAt,
-            status: appointment.status,
-            amount: appointment.amount,
-            meetingLink: appointment.meetingLink,
-            paymentStatus: appointment.payment?.status,
-            paymentMethod: appointment.payment?.method,
-            rating: appointment.rating,
-            review: appointment.review,
-            createdAt: appointment.createdAt,
-            updatedAt: appointment.updatedAt,
-        });
+        setSelectedAppointment(appointment);
+        setIsDetailsOpen(true);
+    };
 
-        // You could open a modal or navigate to a details page here
-        alert(
-            `Appointment Details:\n\nPatient: ${
-                appointment.patientId?.fullName
-            }\nScheduled: ${new Date(
-                appointment.scheduledAt
-            ).toLocaleString()}\nStatus: ${appointment.status}\nAmount: ₹${
-                appointment.amount
-            }\n\nCheck console for full details.`
-        );
+    const closeDetailsModal = () => {
+        setIsDetailsOpen(false);
+        setSelectedAppointment(null);
     };
 
     if (loading) {
@@ -276,24 +259,7 @@ const NewAppointments = () => {
                                             handleViewDetails(appointment)
                                         }
                                         className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                            />
-                                        </svg>
+                                        <Eye />
                                         View Details
                                     </button>
                                 </div>
@@ -302,6 +268,13 @@ const NewAppointments = () => {
                     ))}
                 </div>
             )}
+
+            {/* Appointment Details Modal */}
+            <PatientDetailsDialog
+                appointment={selectedAppointment}
+                isOpen={isDetailsOpen}
+                onClose={closeDetailsModal}
+            />
         </div>
     );
 };

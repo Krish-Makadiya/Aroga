@@ -14,6 +14,7 @@ import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
+import VideoAppointment from "./components/Doctor/VideoAppointment"
 
 const patientTabs = [
     {
@@ -155,6 +156,13 @@ function App() {
                         <ProtectedRoute requiredRole="Doctor">
                             <MyAppointments tabs={doctorTabs} />
                         </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/video-appointment"
+                    element={
+                        <VideoAppointment/>
                     }
                 />
                 <Route

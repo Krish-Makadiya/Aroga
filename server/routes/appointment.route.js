@@ -162,7 +162,7 @@ router.get("/doctor/:clerkUserId", async (req, res) => {
 
         // Find all appointments for this doctor
         const appointments = await Appointment.find({ doctorId: doctor.id })
-            .populate("patientId", "fullName email phone district state")
+            .populate("patientId", "fullName email phone district state dob gender address govIdType govIdNumber emergencyContactName emergencyContactPhone medicalHistory telemedicineConsent clerkUserId")
             .populate(
                 "doctorId",
                 "fullName qualifications specialty consultationFee experience verificationStatus languages bio district state rating email phone"
@@ -234,6 +234,52 @@ router.put("/:id/status", async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to update appointment status",
+            error: error.message,
+        });
+    }
+});
+
+// PUT /api/appointment/:id/meeting-link - update meeting link
+router.put("/:id/meeting-link", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { meetingLink } = req.body;
+
+        if (!meetingLink) {
+            return res.status(400).json({
+                success: false,
+                message: "meetingLink is required",
+            });
+        }
+
+        // Check if appointment exists
+        const existingAppointment = await Appointment.findById(id);
+        if (!existingAppointment) {
+            return res.status(404).json({
+                success: false,
+                message: "Appointment not found",
+            });
+        }
+
+        // Update meeting link
+        const appointment = await Appointment.findByIdAndUpdate(
+            id,
+            {
+                meetingLink,
+            },
+            { new: true }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Meeting link updated successfully",
+            data: appointment,
+        });
+    } catch (error) {
+        console.error("Update meeting link error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update meeting link",
             error: error.message,
         });
     }

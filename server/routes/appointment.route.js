@@ -11,17 +11,32 @@ router.post("/create-appointment", async (req, res) => {
     try {
         const {
             doctorId, // ObjectId (Patient)
-            patientClerkId, // ObjectId (Doctor)
+            patientId, // ObjectId (Doctor)
             scheduledAt, // ISO datetime string
             amount, // { amount, currency }
+            appointmentType = "offline",
+            meetingLink = "",
+            symptoms = [],
+            prescription = [],
+            reports = "",
+            aiSummary = "",
         } = req.body;
 
+        console.log(doctorId, patientId, scheduledAt, amount);
         // Required checks
-        if (!patientClerkId || !doctorId || !scheduledAt || !amount) {
+        if (!patientId || !doctorId || !scheduledAt || !amount) {
             return res.status(400).json({
                 success: false,
                 message:
-                    "Missing required fields: patientClerkId, doctorId, scheduledAt, amount",
+                    "Missing required fields: patientId, doctorId, scheduledAt, amount",
+            });
+        }
+
+        const validAppointmentTypes = ["online", "offline"];
+        if (!validAppointmentTypes.includes(appointmentType)) {
+            return res.status(400).json({
+                success: false,
+                message: "appointmentType must be either 'online' or 'offline'",
             });
         }
 
@@ -33,13 +48,31 @@ router.post("/create-appointment", async (req, res) => {
             });
         }
 
-        const patient = await Patient.findOne({ clerkUserId: patientClerkId });
+        const patient = await Patient.findOne({ clerkUserId: patientId });
+        if (!patient) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Patient not found" });
+        }
+
+        const normalizedSymptoms = Array.isArray(symptoms)
+            ? symptoms.filter(Boolean)
+            : [];
+        const normalizedPrescription = Array.isArray(prescription)
+            ? prescription
+            : [];
 
         const appointment = await Appointment.create({
             patientId: patient.id,
             doctorId,
             scheduledAt: when,
             amount: amount,
+            appointmentType,
+            meetingLink,
+            symptoms: normalizedSymptoms,
+            prescription: normalizedPrescription,
+            reports,
+            aiSummary,
         });
         console.log("3");
 
@@ -88,7 +121,7 @@ router.get("/patient/:clerkUserId", async (req, res) => {
                 .status(404)
                 .json({ success: false, message: "Patient not found" });
         }
-
+    
         // Find all appointments for this patient
         const appointments = await Appointment.find({ patientId: patient._id })
             .populate(

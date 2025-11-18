@@ -10,6 +10,7 @@ const eventRoute = require("./routes/event.route");
 const aiRoutes = require("./routes/ai.route");
 const appointmentRoute = require("./routes/appointment.route");
 const articleRoute = require("./routes/articles.route");
+const paymentRoute = require("./routes/payment.routes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -22,6 +23,8 @@ app.use(clerkMiddleware());
 app.use("/api/patient", patientRoute);
 app.use("/api/doctor", doctorRoute);
 app.use("/api/pharmacy", pharmacyRoute);
+
+app.use("/api/payment", paymentRoute);
 
 app.use("/api/event", eventRoute);
 app.use("/api/appointment", appointmentRoute);

@@ -12,9 +12,7 @@ const appointmentRoute = require("./routes/appointment.route");
 const articleRoute = require("./routes/articles.route");
 const paymentRoute = require("./routes/payment.routes");
 const groqHealthRoute = require("./routes/groqHealthRoute");
-
-
-
+const webhookRoute = require("./routes/webhook.route");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,6 +28,7 @@ app.use("/api/doctor", doctorRoute);
 app.use("/api/pharmacy", pharmacyRoute);
 
 app.use("/api/payment", paymentRoute);
+app.use("/api/webhook", webhookRoute);
 
 app.use("/api/event", eventRoute);
 app.use("/api/appointment", appointmentRoute);

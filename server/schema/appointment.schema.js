@@ -41,6 +41,22 @@ const appointmentSchema = new mongoose.Schema(
             trim: true,
             default: "",
         },
+        roomStartedAt: {
+            type: Date,
+            default: null,
+        },
+        roomEndedAt: {
+            type: Date,
+            default: null,
+        },
+        patientJoinedAt: {
+            type: Date,
+            default: null,
+        },
+        patientLeftAt: {
+            type: Date,
+            default: null,
+        },
         symptoms: {
             type: [
                 {

@@ -71,8 +71,6 @@ const PatientAppointments = () => {
         );
     }
 
-    console.log(appointments);
-
     return (
         <AppointmentsList appointments={appointments}/>
     );

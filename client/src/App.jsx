@@ -1,4 +1,4 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus } from "lucide-react";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Megaphone } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
@@ -8,12 +8,14 @@ import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashb
 import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
 import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
+import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
 import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
+import PostDetail from "./pages/community/PostDetail";
 
 const patientTabs = [
     {
@@ -40,6 +42,12 @@ const patientTabs = [
         icon: Stethoscope,
         path: "/patient/get-appointment",
     },
+    {
+        id: 5,
+        name: "Community Health",
+        icon: Megaphone,
+        path: "/patient/community",
+    },
 ];
 
 const doctorTabs = [
@@ -63,7 +71,7 @@ const doctorTabs = [
     },
     {
         id: 4,
-        name: "Articles",
+        name: "Community Health",
         icon: File,
         path: "/doctor/articles",
     },
@@ -128,6 +136,22 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Patient">
                             <GetAppointment tabs={patientTabs}/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/patient/community"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <PatientCommunity tabs={patientTabs}/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/community/post/:id"
+                    element={
+                        <ProtectedRoute>
+                            <PostDetail />
                         </ProtectedRoute>
                     }
                 />

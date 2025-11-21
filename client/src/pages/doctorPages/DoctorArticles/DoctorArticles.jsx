@@ -29,7 +29,7 @@ const DoctorArticles = ({ tabs }) => {
                                 }`}
                             onClick={() => setActiveTab("all-articles")}
                         >
-                            All Articles
+                            All Posts
                         </button>
                         <button
                             className={`px-4 py-2 font-semibold rounded-t-lg transition-colors duration-200 focus:outline-none ${activeTab === "my-articles"
@@ -38,7 +38,7 @@ const DoctorArticles = ({ tabs }) => {
                                 }`}
                             onClick={() => setActiveTab("my-articles")}
                         >
-                            My Articles
+                            My Posts
                         </button>
                     </div>
                     <CreateArticleButton onArticleCreated={handleArticleCreated} />

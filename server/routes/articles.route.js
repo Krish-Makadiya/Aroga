@@ -1,355 +1,51 @@
 const express = require("express");
+const {
+  createArticle,
+  getArticlesByDoctor,
+  getAllArticles,
+  getArticlesExcludingDoctor,
+  getArticleById,
+  updateArticle,
+  publishArticle,
+  deleteArticle,
+  addLike,
+  removeLike
+} = require("../controllers/article.controller");
+
 const router = express.Router();
-const Article = require("../schema/articles.schema");
-const Doctor = require("../schema/doctor.schema");
 
-// POST /api/articles - Create new article
-router.post("/", async (req, res) => {
-    try {
-        const {
-            authorClerkId, // Doctor's ObjectId
-            title,
-            subtitle = "",
-            content,
-            category,
-            isPinned = false,
-        } = req.body;
+// --------------------------------------------------
+// Article Routes
+// --------------------------------------------------
 
-        // Validation - Check required fields
-        if (!authorClerkId || !title || !content || !category) {
-            return res.status(400).json({
-                success: false,
-                message: "Missing required fields: authorClerkId, title, content, category"
-            });
-        }
+// Create new article
+router.post("/", createArticle);
 
-        // Verify doctor exists
-        const doctor = await Doctor.findOne({clerkUserId: authorClerkId});
-        if (!doctor) {
-            return res.status(404).json({
-                success: false,
-                message: "Doctor not found"
-            });
-        }
+// Get all articles (all doctors)
+router.get("/all", getAllArticles);
 
-        // Check for duplicate slug (auto-generated from title)
-        const baseSlug = title
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-")
-            .trim("-");
+// Get all articles by a specific doctor (via clerkUserId)
+router.get("/doctor/:clerkUserId", getArticlesByDoctor);
 
-        let slug = baseSlug;
-        let counter = 1;
-        while (await Article.findOne({ slug })) {
-            slug = `${baseSlug}-${counter}`;
-            counter++;
-        }
+// Get all articles except from a specific doctor
+router.get("/exclude/:clerkUserId", getArticlesExcludingDoctor);
 
-        // Create article using the create method
-        const article = await Article.create({
-            authorId: doctor.id,
-            authorAvatar: doctor.avatar || "",
-            title,
-            subtitle,
-            content,
-            category,
-            slug,
-            status: "draft", // Always start as draft
-            isPinned,
-        });
+// Get single article by ID
+router.get("/:id", getArticleById);
 
-        return res.status(201).json({
-            success: true,
-            message: "Article created successfully",
-            data: article
-        });
+// Update article
+router.put("/:id", updateArticle);
 
-    } catch (error) {
-        console.error("Create article error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to create article",
-            error: error.message
-        });
-    }
-});
+// Publish article (set publishedAt)
+router.put("/:id/publish", publishArticle);
 
-// GET /api/articles/doctor/:clerkUserId - Get all articles by doctor using clerk user ID
-router.get("/:clerkUserId", async (req, res) => {
-    try {
-        const { clerkUserId } = req.params;
+// Delete article
+router.delete("/:id", deleteArticle);
 
-        // Find doctor by clerkUserId
-        const doctor = await Doctor.findOne({ clerkUserId });
-        if (!doctor) {
-            return res.status(404).json({
-                success: false,
-                message: "Doctor not found"
-            });
-        }
+// Like article
+router.put("/:id/like", addLike);
 
-        // Get articles with pagination
-        const articles = await Article.find({authorId: doctor.id})
-            .populate("authorId", "fullName qualification specialty avatar")
-            .sort({ createdAt: -1 }) // Latest first
-
-        return res.status(200).json({
-            success: true,
-            data: {
-                articles,
-                doctor: {
-                    _id: doctor._id,
-                    fullName: doctor.fullName,
-                    qualification: doctor.qualification,
-                    specialty: doctor.specialty
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error("Get doctor articles error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to fetch doctor articles",
-            error: error.message
-        });
-    }
-});
-
-// GET /api/articles/all - Get all articles from database
-router.get("/all", async (req, res) => {
-    try {
-        const articles = await Article.find({})
-            .populate("authorId", "fullName qualification specialty avatar")
-            .sort({ createdAt: -1 });
-
-        return res.status(200).json({
-            success: true,
-            data: {
-                articles
-            }
-        });
-
-    } catch (error) {
-        console.error("Get all articles error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to fetch articles",
-            error: error.message
-        });
-    }
-});
-
-// GET /api/articles/exclude/:clerkUserId - Get all articles except from a specific doctor
-router.get("/exclude/:clerkUserId", async (req, res) => {
-    try {
-        const { clerkUserId } = req.params;
-
-        // Find doctor by clerkUserId to get their ObjectId
-        const doctor = await Doctor.findOne({ clerkUserId });
-        if (!doctor) {
-            return res.status(404).json({
-                success: false,
-                message: "Doctor not found"
-            });
-        }
-
-        // Build filter object - exclude articles from this doctor
-        const filter = {
-            authorId: { $ne: doctor._id } // Exclude articles from this doctor
-        };
-        
-        // Get all articles without pagination
-        const articles = await Article.find(filter)
-            .populate("authorId", "fullName qualification specialty avatar")
-            .sort({ createdAt: -1 });
-
-        return res.status(200).json({
-            success: true,
-            data: {
-                articles,
-                excludedDoctor: {
-                    _id: doctor._id,
-                    fullName: doctor.fullName,
-                    clerkUserId: doctor.clerkUserId
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error("Get articles excluding doctor error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to fetch articles",
-            error: error.message
-        });
-    }
-});
-
-// GET /api/articles/:id - Get single article by ID
-router.get("/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const article = await Article.findById(id)
-            .populate("authorId", "fullName qualification specialty avatar")
-            .populate("relatedArticles", "title slug publishedAt");
-
-        if (!article) {
-            return res.status(404).json({
-                success: false,
-                message: "Article not found"
-            });
-        }
-
-        // Increment view count if article is published
-        if (article.status === "published") {
-            article.views += 1;
-            await article.save();
-        }
-
-        return res.status(200).json({
-            success: true,
-            data: article
-        });
-
-    } catch (error) {
-        console.error("Get article error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to fetch article",
-            error: error.message
-        });
-    }
-});
-
-// PUT /api/articles/:id - Update article
-router.put("/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const updateData = req.body;
-
-        // Remove fields that shouldn't be updated directly
-        delete updateData.authorId;
-        delete updateData.views;
-        delete updateData.likes;
-        delete updateData.comments;
-        delete updateData.bookmarks;
-        delete updateData.publishedAt;
-
-        const article = await Article.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true, runValidators: true }
-        );
-
-        if (!article) {
-            return res.status(404).json({
-                success: false,
-                message: "Article not found"
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Article updated successfully",
-            data: article
-        });
-
-    } catch (error) {
-        console.error("Update article error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to update article",
-            error: error.message
-        });
-    }
-});
-
-// PUT /api/articles/:id/status - Update article status
-router.put("/:id/status", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status, rejectionReason = "" } = req.body;
-
-        const validStatuses = ["draft", "review", "published", "rejected"];
-        if (!status || !validStatuses.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid status. Must be one of: draft, review, published, rejected"
-            });
-        }
-
-        const updateData = { status };
-        
-        // Set publishedAt when status changes to published
-        if (status === "published") {
-            updateData.publishedAt = new Date();
-        }
-        
-        // Add rejection reason if status is rejected
-        if (status === "rejected") {
-            updateData.rejectionReason = rejectionReason;
-        }
-
-        const article = await Article.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true }
-        );
-
-        if (!article) {
-            return res.status(404).json({
-                success: false,
-                message: "Article not found"
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: `Article ${status} successfully`,
-            data: article
-        });
-
-    } catch (error) {
-        console.error("Update article status error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to update article status",
-            error: error.message
-        });
-    }
-});
-
-// DELETE /api/articles/:id - Delete article
-router.delete("/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const article = await Article.findByIdAndDelete(id);
-
-        if (!article) {
-            return res.status(404).json({
-                success: false,
-                message: "Article not found"
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Article deleted successfully"
-        });
-
-    } catch (error) {
-        console.error("Delete article error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to delete article",
-            error: error.message
-        });
-    }
-});
+// Unlike article
+router.put("/:id/unlike", removeLike);
 
 module.exports = router;

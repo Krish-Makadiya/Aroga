@@ -41,6 +41,9 @@ export default function VideoAppointment() {
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
     const [loadingDetails, setLoadingDetails] = useState(true);
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [viewingUrl, setViewingUrl] = useState(null);
+    const [viewingType, setViewingType] = useState(null); // 'pdf' | 'image' | 'unknown'
 
     // Use appointment ID as roomID for ZegoCloud
     const roomID = selectedAppointment?._id || appointmentIdFromUrl;
@@ -212,6 +215,25 @@ export default function VideoAppointment() {
                         className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed">
                         Add Prescription
                     </button>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    let url = selectedAppointment?.cloudinaryFileUrl;
+                                    const lower = url.toLowerCase();
+                                    if (lower.endsWith('.pdf')) setViewingType('pdf');
+                                    else if (lower.match(/\.(jpg|jpeg|png|gif|webp)$/)) setViewingType('image');
+                                    else setViewingType('unknown');
+
+                                    setViewingUrl(url);
+                                    setViewerOpen(true);
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            }}
+                            disabled={actionDisabled}
+                            className="bg-white/90 text-gray-800 px-4 py-2 rounded-md shadow border border-gray-200 backdrop-blur disabled:opacity-60 disabled:cursor-not-allowed hover:bg-white transition">
+                            View Report
+                        </button>
                 </div>
             )}
 
@@ -246,6 +268,48 @@ export default function VideoAppointment() {
                     />
                 </>
             )}
+            {/* Report Viewer Modal */}
+            {viewerOpen && viewingUrl && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                    <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 shadow-lg">
+                        <div className="flex items-start justify-between mb-3">
+                            <h4 className="text-lg font-semibold">Report Preview</h4>
+                            <button
+                                onClick={() => {
+                                    setViewerOpen(false);
+                                    setViewingUrl(null);
+                                    setViewingType(null);
+                                }}
+                                className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                                Close
+                            </button>
+                        </div>
+                        <div className="w-full">
+                            {viewingType === 'image' && (
+                                <img
+                                    src={viewingUrl}
+                                    alt="report"
+                                    className="w-full object-contain max-h-[70vh]"
+                                />
+                            )}
+                            {viewingType !== 'image' && (
+                                <div>
+                                    <p className="mb-2">File preview not available.</p>
+                                    <a
+                                        href={viewingUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-blue-600 underline">
+                                        Open in a new tab
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            
         </div>
     );
 }

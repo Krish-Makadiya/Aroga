@@ -31,6 +31,12 @@ const AppointmentsList = ({ appointments }) => {
     const [processingPaymentId, setProcessingPaymentId] = useState(null);
 
     const { user } = useUser();
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [viewingUrl, setViewingUrl] = useState(null);
+    const [viewingType, setViewingType] = useState(null); // 'pdf' | 'image' | 'unknown'
+    const [prescriptionOpen, setPrescriptionOpen] = useState(false);
+    const [prescriptionItems, setPrescriptionItems] = useState([]);
+    const [prescriptionMeta, setPrescriptionMeta] = useState({ doctorName: '', date: '' });
 
     // Inline rating form state
     const [formRating, setFormRating] = useState({}); // appointmentId -> rating (1-5)
@@ -208,6 +214,53 @@ const AppointmentsList = ({ appointments }) => {
                                 </div>
                             </div>
                         </div>
+                        {/* Report Viewer Modal */}
+                        {viewerOpen && viewingUrl && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                                <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 shadow-lg">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <h4 className="text-lg font-semibold">Report Preview</h4>
+                                        <button
+                                            onClick={() => {
+                                                setViewerOpen(false);
+                                                setViewingUrl(null);
+                                                setViewingType(null);
+                                            }}
+                                            className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                                            Close
+                                        </button>
+                                    </div>
+                                    <div className="w-full">
+                                        {viewingType === 'pdf' && (
+                                            <iframe
+                                                title="report-pdf"
+                                                src={viewingUrl}
+                                                className="w-full h-[70vh]"
+                                            />
+                                        )}
+                                        {viewingType === 'image' && (
+                                            <img
+                                                src={viewingUrl}
+                                                alt="report"
+                                                className="w-full object-contain max-h-[70vh]"
+                                            />
+                                        )}
+                                        {viewingType === 'unknown' && (
+                                            <div>
+                                                <p className="mb-2">File preview not available.</p>
+                                                <a
+                                                    href={viewingUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-blue-600 underline">
+                                                    Open in a new tab
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <hr className="my-1 border-[var(--color-light-secondary-text)]/10 dark:border-[var(--color-dark-secondary-text)]/10" />
                         {/* Appointment Info */}
                         <div className="flex flex-wrap justify-between items-center gap-4">
@@ -524,7 +577,56 @@ const AppointmentsList = ({ appointments }) => {
                                                 : "Pay Now"}
                                         </button>
                                     )}
-                                {appt.payment?.status === "paid" && (
+
+                                <div>
+                                    {appt.cloudinaryFileUrl && (
+                                        <button
+                                            onClick={async () => {
+                                                try {
+                                                    // If URL is already present, use it; otherwise fetch appointment
+                                                    let url = appt.cloudinaryFileUrl;
+                                                    if (!url) {
+                                                        const resp = await axios.get(
+                                                            `http://localhost:5000/api/appointment/${appt._id}`
+                                                        );
+                                                        url = resp.data?.data?.cloudinaryFileUrl;
+                                                    }
+                                                    if (!url) {
+                                                        toast.error("No report file available for this appointment.");
+                                                        return;
+                                                    }
+
+                                                    // Guess type by file extension
+                                                    const lower = url.toLowerCase();
+                                                    if (lower.endsWith('.pdf')) setViewingType('pdf');
+                                                    else if (lower.match(/\.(jpg|jpeg|png|gif|webp)$/)) setViewingType('image');
+                                                    else setViewingType('unknown');
+
+                                                    setViewingUrl(url);
+                                                    setViewerOpen(true);
+                                                } catch (err) {
+                                                    console.error(err);
+                                                    toast.error('Failed to load report');
+                                                }
+                                            }}
+                                            className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10">
+                                            <FileText className="w-4 h-4" />
+                                            View Report
+                                        </button>
+                                    )}
+                                    {appt.prescription && appt.prescription.length > 0 && (
+                                        <button
+                                            onClick={() => {
+                                                setPrescriptionItems(appt.prescription || []);
+                                                setPrescriptionMeta({ doctorName: doc?.fullName || '', date: appt.createdAt || appt.scheduledAt });
+                                                setPrescriptionOpen(true);
+                                            }}
+                                            className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 ml-2">
+                                            View Prescription
+                                        </button>
+                                    )}
+                                </div>
+                                {appt.payment?.status === "paid" && appt.status !== "cancelled" && appt.status !== "completed" && (
                                     <span className="flex items-center gap-1 text-sm px-3 py-2 rounded-md bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-semibold">
                                         <CheckCircle2 className="w-4 h-4 text-green-500" />
                                         Paid
@@ -546,6 +648,49 @@ const AppointmentsList = ({ appointments }) => {
                                 setOpen={setOpen}
                                 doctor={selectedDoctor}
                             />
+                        )}
+                        {/* Prescription Modal */}
+                        {prescriptionOpen && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                                <div className="w-full max-w-3xl max-h-[85vh] overflow-auto rounded-2xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 shadow-lg">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div>
+                                            <h4 className="text-lg font-semibold">Prescription</h4>
+                                            <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">Prescribed by {prescriptionMeta.doctorName || 'Doctor'} {prescriptionMeta.date ? `on ${new Date(prescriptionMeta.date).toLocaleString()}` : ''}</p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => setPrescriptionOpen(false)}
+                                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800">
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {prescriptionItems && prescriptionItems.length > 0 ? (
+                                            prescriptionItems.map((item, idx) => (
+                                                <div key={idx} className="border rounded-lg p-3 bg-white dark:bg-gray-900">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1">
+                                                            <div className="text-md font-semibold">{item.medicine || 'Unknown medicine'}</div>
+                                                            {item.notes && (
+                                                                <div className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] mt-1">{item.notes}</div>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-right text-sm">
+                                                            <div className="font-medium">{item.dosage || '-'}</div>
+                                                            <div className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">{item.frequency || '-'}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">No prescriptions available.</div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 );

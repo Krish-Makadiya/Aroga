@@ -87,6 +87,11 @@ const appointmentSchema = new mongoose.Schema(
             maxlength: 2000,
             default: "",
         },
+        cloudinaryFileUrl: {
+            type: String,
+            trim: true,
+            default: "",
+        },
         amount: {
             type: Number,
             required: true,

@@ -7,104 +7,131 @@ const Patient = require("../schema/patient.schema");
 const Doctor = require("../schema/doctor.schema");
 const Event = require("../schema/event.schema");
 const Rating = require("../schema/rating.schema");
+const cloudinary = require("../config/cloudinary");
+
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 
 // POST /api/appointment - create with minimal fields
-router.post("/create-appointment", async (req, res) => {
-    try {
-        const {
-            doctorId, // ObjectId (Patient)
-            patientId, // ObjectId (Doctor)
-            scheduledAt, // ISO datetime string
-            amount, // { amount, currency }
-            appointmentType = "offline",
-            meetingLink = "",
-            symptoms = [],
-            prescription = [],
-            reports = "",
-            aiSummary = "",
-        } = req.body;
+router.post(
+    "/create-appointment",
+    upload.single("reportFile"),
+    async (req, res) => {
+        try {
+            const {
+                doctorId,
+                patientId,
+                scheduledAt,
+                amount,
+                appointmentType = "offline",
+                meetingLink = "",
+                symptoms = [],
+                prescription = [],
+                reports = "",
+                reportFile,
+                aiSummary = "",
+            } = req.body;
+            // const file = req.file;
 
-        console.log(doctorId, patientId, scheduledAt, amount);
-        // Required checks
-        if (!patientId || !doctorId || !scheduledAt || !amount) {
-            return res.status(400).json({
+            if (!patientId || !doctorId || !scheduledAt || !amount) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Missing required fields: patientId, doctorId, scheduledAt, amount",
+                });
+            }
+
+            const validAppointmentTypes = ["online", "offline"];
+            if (!validAppointmentTypes.includes(appointmentType)) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "appointmentType must be either 'online' or 'offline'",
+                });
+            }
+
+            const when = new Date(scheduledAt);
+            if (isNaN(when.getTime())) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid scheduledAt datetime",
+                });
+            }
+
+            const patient = await Patient.findOne({ clerkUserId: patientId });
+            if (!patient) {
+                return res
+                    .status(404)
+                    .json({ success: false, message: "Patient not found" });
+            }
+
+            const normalizedSymptoms = Array.isArray(symptoms)
+                ? symptoms.filter(Boolean)
+                : [];
+            const normalizedPrescription = Array.isArray(prescription)
+                ? prescription
+                : [];
+
+            let reportFileUrl = "";
+            if (req.file) {
+                const uploadResult = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            resource_type: "auto",
+                            folder: "appointment_reports",
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    stream.end(req.file.buffer);
+                });
+                reportFileUrl = uploadResult.secure_url;
+            }
+
+            const appointment = await Appointment.create({
+                patientId: patient.id,
+                doctorId,
+                scheduledAt: when,
+                amount: amount,
+                appointmentType,
+                meetingLink,
+                symptoms: normalizedSymptoms,
+                prescription: normalizedPrescription,
+                reports,
+                aiSummary,
+                cloudinaryFileUrl: reportFileUrl,
+            });
+
+            // Create corresponding event
+            const event = await Event.create({
+                patientId: patient.id,
+                doctorId,
+                title: "Appointment",
+                description: "Scheduled medical appointment.",
+                date: when.toISOString().split("T")[0], // Format: YYYY-MM-DD
+                time: when.toTimeString().split(" ")[0].substring(0, 5), // Format: HH:MM
+                type: "appointment",
+            });
+
+            return res.status(201).json({
+                success: true,
+                data: {
+                    appointment,
+                    event,
+                },
+            });
+        } catch (error) {
+            console.error("Create appointment error:", error);
+            return res.status(500).json({
                 success: false,
-                message:
-                    "Missing required fields: patientId, doctorId, scheduledAt, amount",
+                message: "Failed to create appointment",
+                error: error.message,
             });
         }
-
-        const validAppointmentTypes = ["online", "offline"];
-        if (!validAppointmentTypes.includes(appointmentType)) {
-            return res.status(400).json({
-                success: false,
-                message: "appointmentType must be either 'online' or 'offline'",
-            });
-        }
-
-        const when = new Date(scheduledAt);
-        if (isNaN(when.getTime())) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid scheduledAt datetime",
-            });
-        }
-
-        const patient = await Patient.findOne({ clerkUserId: patientId });
-        if (!patient) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Patient not found" });
-        }
-
-        const normalizedSymptoms = Array.isArray(symptoms)
-            ? symptoms.filter(Boolean)
-            : [];
-        const normalizedPrescription = Array.isArray(prescription)
-            ? prescription
-            : [];
-
-        const appointment = await Appointment.create({
-            patientId: patient.id,
-            doctorId,
-            scheduledAt: when,
-            amount: amount,
-            appointmentType,
-            meetingLink,
-            symptoms: normalizedSymptoms,
-            prescription: normalizedPrescription,
-            reports,
-            aiSummary,
-        });
-        console.log("3");
-
-        // Create corresponding event
-        const event = await Event.create({
-            patientId: patient.id,
-            doctorId,
-            title: "Appointment",
-            description: "Scheduled medical appointment.",
-            date: when.toISOString().split("T")[0], // Format: YYYY-MM-DD
-            time: when.toTimeString().split(" ")[0].substring(0, 5), // Format: HH:MM
-            type: "appointment",
-        });
-
-        return res.status(201).json({
-            success: true,
-            data: {
-                appointment,
-                event,
-            },
-        });
-    } catch (error) {
-        console.error("Create appointment error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to create appointment",
-            error: error.message,
-        });
     }
-});
+);
 
 // GET /api/appointment/patient/:clerkUserId - get all appointments for a patient
 router.get("/patient/:clerkUserId", async (req, res) => {
@@ -487,23 +514,30 @@ router.post("/:appointmentId/rating", async (req, res) => {
             { new: true, upsert: true, setDefaultsOnInsert: true }
         );
         // Also update the ratingId field in the related appointment
-        await Appointment.findByIdAndUpdate(appointmentId, { ratingId: record._id });
+        await Appointment.findByIdAndUpdate(appointmentId, {
+            ratingId: record._id,
+        });
 
         if (doctorId && rating) {
             const doc = await Doctor.findById(doctorId);
             if (doc) {
                 let prevAvg = doc.rating?.average || 0;
                 let prevCount = doc.rating?.count || 0;
-                let newAvg = ((prevAvg * prevCount) + Number(rating)) / (prevCount + 1);
+                let newAvg =
+                    (prevAvg * prevCount + Number(rating)) / (prevCount + 1);
                 let newCount = prevCount + 1;
-                await Doctor.findByIdAndUpdate(
-                    doctorId,
-                    { $set: { 'rating.average': newAvg, 'rating.count': newCount } }
-                );
+                await Doctor.findByIdAndUpdate(doctorId, {
+                    $set: {
+                        "rating.average": newAvg,
+                        "rating.count": newCount,
+                    },
+                });
             }
         }
 
-        return res.status(200).json({ success: true, data: record, message: "Rating saved" });
+        return res
+            .status(200)
+            .json({ success: true, data: record, message: "Rating saved" });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }

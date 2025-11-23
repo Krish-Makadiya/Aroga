@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '@clerk/clerk-react';
@@ -42,33 +43,65 @@ export default function PostCard({
   onDelete,
 }) {
   const meta = typeMeta(post.type);
-  const { getToken } = useAuth();
+  const { userId, getToken } = useAuth();
   const [likeCount, setLikeCount] = useState(typeof post.likes === 'number' ? post.likes : 0);
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
+  const clickLockRef = useRef(false);
+
+  useEffect(() => {
+    let initialLiked = false;
+    if (typeof post.isLiked === 'boolean') {
+      initialLiked = post.isLiked;
+    } else if (Array.isArray(post.likedBy) && userId) {
+      initialLiked = post.likedBy.some((entry) => {
+        const val = typeof entry === 'object' && entry !== null ? (entry._id || entry.id || entry) : entry;
+        return String(val) === String(userId);
+      });
+    }
+    setLiked(initialLiked);
+    setLikeCount(typeof post.likes === 'number' ? post.likes : 0);
+  }, [post._id, post.likes, post.isLiked, post.likedBy, userId]);
 
   const handleThumbToggle = async () => {
-    if (likeLoading) return;
+    if (likeLoading || clickLockRef.current) return;
+    clickLockRef.current = true;
+    const previousLiked = liked;
+    const previousCount = likeCount;
     try {
       setLikeLoading(true);
       const token = await getToken();
-      if (!liked) {
-        const res = await axios.put(`http://localhost:5000/api/articles/${post._id}/like`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      // If no token, do not proceed
+      if (!token) {
+        return;
+      }
+      // optimistic update after confirming we can call API
+      setLiked(!previousLiked);
+      setLikeCount(previousLiked ? Math.max(0, previousCount - 1) : previousCount + 1);
+
+      if (!previousLiked) {
+        const res = await axios.put(
+          `http://localhost:5000/api/articles/${post._id}/like`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         const newLikes = res?.data?.likes;
-        setLikeCount(typeof newLikes === 'number' ? newLikes : likeCount + 1);
-        setLiked(true);
+        if (typeof newLikes === 'number') setLikeCount(newLikes);
       } else {
-        const res = await axios.put(`http://localhost:5000/api/articles/${post._id}/unlike`, {}, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await axios.put(
+          `http://localhost:5000/api/articles/${post._id}/unlike`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         const newLikes = res?.data?.likes;
-        setLikeCount(typeof newLikes === 'number' ? newLikes : Math.max(0, likeCount - 1));
-        setLiked(false);
+        if (typeof newLikes === 'number') setLikeCount(newLikes);
       }
     } catch (e) {
-      // optimistic fallback
-      setLikeCount((c) => Math.max(0, c + (liked ? -1 : 1)));
-      setLiked((v) => !v);
+      setLiked(previousLiked);
+      setLikeCount(previousCount);
     } finally {
       setLikeLoading(false);
+      clickLockRef.current = false;
     }
   };
 
@@ -158,6 +191,7 @@ export default function PostCard({
                 : 'text-gray-600 dark:text-gray-300 hover:text-light-primary dark:hover:text-dark-primary'
             }`}
             aria-label={liked ? 'Unlike' : 'Like'}
+            aria-pressed={liked}
             title={liked ? 'Unlike' : 'Like'}
           >
             <ThumbsUp className="w-4 h-4" fill={liked ? 'currentColor' : 'none'} />

@@ -228,8 +228,10 @@ const GetAppointmentContent = () => {
                 formData,
                 token
                     ? {
-                          headers: { Authorization: `Bearer ${token}` },
-                          headers: { "Content-Type": "multipart/form-data" },
+                          headers: {
+                              Authorization: `Bearer ${token}`,
+                              "Content-Type": "multipart/form-data",
+                          },
                       }
                     : undefined
             );

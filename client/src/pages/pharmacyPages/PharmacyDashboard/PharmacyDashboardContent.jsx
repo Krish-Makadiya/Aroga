@@ -20,6 +20,8 @@ import React, { useEffect, useState } from "react";
 import Loader from "../../../components/main/Loader";
 import InventoryManagement from "../../../components/pharmcy/InventoryManagement";
 import LeafletMap from "../../../components/pharmcy/LeafletMap";
+import BillHistory from "../../../components/pharmcy/BillHistory";
+import CreateBill from "../../../components/pharmcy/CreateBill";
 
 const PharmacyDashboardContent = () => {
     const [pharmacyData, setPharmacyData] = useState(null);
@@ -271,6 +273,30 @@ const PharmacyDashboardContent = () => {
         );
     }
 
+    if (view === "create-bill") {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)]">
+                <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h1 className="text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            Create Bill
+                        </h1>
+                        <button
+                            onClick={() => navigate("/pharmacy/dashboard")}
+                            className="px-4 py-2 rounded-md text-sm bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white hover:opacity-90"
+                        >
+                            Back to Dashboard
+                        </button>
+                    </div>
+
+                    <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md">
+                        <CreateBill ownerId={pharmacyData._id} pharmacyName={pharmacyData.pharmacyName} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     // Dedicated Inventory view (opened from Quick Actions)
     if (view === "inventory") {
         return (
@@ -290,6 +316,30 @@ const PharmacyDashboardContent = () => {
 
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md">
                         <InventoryManagement ownerId={pharmacyData._id} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (view === "bills") {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)]">
+                <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h1 className="text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            Bill History
+                        </h1>
+                        <button
+                            onClick={() => navigate("/pharmacy/dashboard")}
+                            className="px-4 py-2 rounded-md text-sm bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white hover:opacity-90"
+                        >
+                            Back to Dashboard
+                        </button>
+                    </div>
+
+                    <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md">
+                        <BillHistory ownerId={pharmacyData._id} />
                     </div>
                 </div>
             </div>
@@ -515,6 +565,12 @@ const PharmacyDashboardContent = () => {
                                         action: () => navigate("/pharmacy/dashboard?view=inventory")
                                     },
                                     {
+                                        icon: FileTextIcon,
+                                        label: "Create Bill",
+                                        color: "bg-indigo-500",
+                                        action: () => navigate("/pharmacy/dashboard?view=create-bill")
+                                    },
+                                    {
                                         icon: MapPin,
                                         label: "Manage Location",
                                         color: "bg-green-500",
@@ -522,13 +578,9 @@ const PharmacyDashboardContent = () => {
                                     },
                                     {
                                         icon: FileTextIcon,
-                                        label: "View Orders",
+                                        label: "Bill History",
                                         color: "bg-purple-500",
-                                    },
-                                    {
-                                        icon: Users,
-                                        label: "Manage Customers",
-                                        color: "bg-orange-500",
+                                        action: () => navigate("/pharmacy/dashboard?view=bills")
                                     },
                                 ].map((action, index) => (
                                     <button

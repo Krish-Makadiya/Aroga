@@ -291,18 +291,18 @@ const WomenHealthCalendar = ({ patientId }) => {
                             // Green = enabled, Red = disabled
                             return <>
                                 <button
-                                    className={`px-4 py-2 rounded-lg font-semibold ${!inActivePeriod && selectedDate && !betweenCycles ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
-                                    onClick={() => selectedDate && handlePeriodAction('start', selectedDate)}
-                                    disabled={!selectedDate || inActivePeriod || betweenCycles}
+                                    className={`px-4 py-2 rounded-lg font-semibold ${selectedDate && !betweenCycles ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
+                                    onClick={() => {
+                                        if (!selectedDate) return;
+                                        if (inActivePeriod) {
+                                            handlePeriodAction('end', selectedDate);
+                                        } else {
+                                            handlePeriodAction('start', selectedDate);
+                                        }
+                                    }}
+                                    disabled={!selectedDate || betweenCycles}
                                 >
-                                    Period Start
-                                </button>
-                                <button
-                                    className={`px-4 py-2 rounded-lg font-semibold ${inActivePeriod && selectedDate ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
-                                    onClick={() => selectedDate && handlePeriodAction('end', selectedDate)}
-                                    disabled={!selectedDate || !inActivePeriod}
-                                >
-                                    Period End
+                                    {inActivePeriod ? 'End Period' : 'Start Period'}
                                 </button>
                                 <button
                                     className={`px-4 py-2 rounded-lg font-semibold ${selectedDate ? (dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString()) ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700') : 'bg-red-500 opacity-70'} text-white transition`}

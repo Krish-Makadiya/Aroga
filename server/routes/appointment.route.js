@@ -168,7 +168,7 @@ router.get("/doctor/:clerkUserId", async (req, res) => {
         const appointments = await Appointment.find({ doctorId: doctor.id })
             .populate(
                 "patientId",
-                "fullName email phone district state dob gender address govIdType govIdNumber emergencyContactName emergencyContactPhone medicalHistory telemedicineConsent clerkUserId"
+                "fullName email phone district state dob gender address govIdType govIdNumber emergencyContactName emergencyContactPhone medicalHistory  alergies operations ongoingMedications permanentMedications majorDiseases telemedicineConsent clerkUserId"
             )
             .populate(
                 "doctorId",
@@ -202,7 +202,7 @@ router.get("/:id", async (req, res) => {
         const appointment = await Appointment.findById(newId)
             .populate(
                 "patientId",
-                "fullName email phone district state dob gender address govIdType govIdNumber emergencyContactName emergencyContactPhone medicalHistory telemedicineConsent clerkUserId"
+                "fullName email phone district state dob gender address govIdType govIdNumber emergencyContactName emergencyContactPhone medicalHistory alergies operations ongoingMedications permanentMedications majorDiseases telemedicineConsent clerkUserId"
             )
             .populate(
                 "doctorId",

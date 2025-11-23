@@ -183,6 +183,84 @@ const PatientDetailsDialog = ({ appointment, isOpen, onClose }) => {
                                     </p>
                                 </div>
                             )}
+
+                            {/* New: Optional repeatable patient fields (neat, 2-column grid) */}
+                            <div className="md:col-span-2">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                    {appointment.patientId?.alergies && appointment.patientId.alergies.length > 0 && (
+                                        <div className="rounded-md p-3 border bg-light-surface/50 dark:bg-dark-surface/50">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-2 flex items-center gap-2">
+                                                <AlertCircle className="w-4 h-4 text-orange-500" /> Allergies
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {appointment.patientId.alergies.map((a, i) => (
+                                                    <span key={i} className="px-3 py-1 rounded-full text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
+                                                        {a}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {appointment.patientId?.operations && appointment.patientId.operations.length > 0 && (
+                                        <div className="rounded-md p-3 border bg-light-surface/50 dark:bg-dark-surface/50">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-2 flex items-center gap-2">
+                                                <History className="w-4 h-4 text-purple-500" /> Operations / Surgeries
+                                            </p>
+                                            <ul className="list-inside list-disc text-sm text-light-primary-text dark:text-dark-primary-text space-y-1">
+                                                {appointment.patientId.operations.map((op, idx) => (
+                                                    <li key={idx} className="text-sm">{op}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {appointment.patientId?.ongoingMedications && appointment.patientId.ongoingMedications.length > 0 && (
+                                        <div className="rounded-md p-3 border bg-light-surface/50 dark:bg-dark-surface/50">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-2 flex items-center gap-2">
+                                                <Pill className="w-4 h-4 text-purple-500" /> Ongoing Medications
+                                            </p>
+                                            <div className="space-y-1">
+                                                {appointment.patientId.ongoingMedications.map((med, idx) => (
+                                                    <div key={idx} className="text-sm text-light-primary-text dark:text-dark-primary-text">
+                                                        {med}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {appointment.patientId?.permanentMedications && appointment.patientId.permanentMedications.length > 0 && (
+                                        <div className="rounded-md p-3 border bg-light-surface/50 dark:bg-dark-surface/50">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-2 flex items-center gap-2">
+                                                <Pill className="w-4 h-4 text-purple-500" /> Permanent Medications
+                                            </p>
+                                            <div className="space-y-1">
+                                                {appointment.patientId.permanentMedications.map((med, idx) => (
+                                                    <div key={idx} className="text-sm text-light-primary-text dark:text-dark-primary-text">
+                                                        {med}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {appointment.patientId?.majorDiseases && appointment.patientId.majorDiseases.length > 0 && (
+                                        <div className="rounded-md p-3 border bg-light-surface/50 dark:bg-dark-surface/50 md:col-span-2">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-2 flex items-center gap-2">
+                                                <Info className="w-4 h-4 text-blue-500" /> Major Diseases / Chronic Illnesses
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {appointment.patientId.majorDiseases.map((d, i) => (
+                                                    <span key={i} className="px-3 py-1 rounded-full text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                                                        {d}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </section>
 

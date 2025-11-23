@@ -26,6 +26,11 @@ export default function OnboardingForm() {
         emergencyContactName: "",
         emergencyContactPhone: "",
         medicalHistory: "",
+        alergies: [],
+        operations: [], // surgeries
+        ongoingMedications: [], // temporary
+        permanentMedications: [], // long-term
+        majorDiseases: [], // chronic illnesses
         clerkUserId: user.id,
         telemedicineConsent: true,
     });
@@ -66,6 +71,30 @@ export default function OnboardingForm() {
         password: "",
     });
 
+    // Helper functions to manage repeatable optional patient fields
+    const addPatientFieldItem = (field) => {
+        setPatient((prev) => ({
+            ...prev,
+            [field]: [...(prev[field] || []), ""],
+        }));
+    };
+
+    const updatePatientFieldItem = (field, index, value) => {
+        setPatient((prev) => {
+            const arr = [...(prev[field] || [])];
+            arr[index] = value;
+            return { ...prev, [field]: arr };
+        });
+    };
+
+    const removePatientFieldItem = (field, index) => {
+        setPatient((prev) => {
+            const arr = [...(prev[field] || [])];
+            arr.splice(index, 1);
+            return { ...prev, [field]: arr };
+        });
+    };
+
     // Check if user has already completed onboarding
     useEffect(() => {
         if (isLoaded && user && user.unsafeMetadata?.onboardingCompleted) {
@@ -82,6 +111,15 @@ export default function OnboardingForm() {
 
         setSaving(true);
         try {
+            // Log full onboarding payload for debugging/testing
+            console.log("Onboarding payload:", {
+                role,
+                patient,
+                doctor,
+                pharmacy,
+                admin,
+                clerkUserId: user?.id,
+            });
             let backendUrl = "";
             let backendBody = {};
 
@@ -92,7 +130,8 @@ export default function OnboardingForm() {
                 backendUrl = "http://localhost:5000/api/doctor/create-doctor";
                 backendBody = doctor;
             } else if (role === "Pharmacy") {
-                backendUrl = "http://localhost:5000/api/pharmacy/create-pharmacy";
+                backendUrl =
+                    "http://localhost:5000/api/pharmacy/create-pharmacy";
                 backendBody = pharmacy;
             } else if (role === "Admin") {
                 backendUrl = "http://localhost:5000/api/admin/create-admin";
@@ -584,6 +623,165 @@ export default function OnboardingForm() {
                                 </div>
                             </div>
 
+                            {/* Optional repeatable medical details - improved UI (2-column cards) */}
+                            <div className="col-span-full">
+                                <h3 className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text mb-4">
+                                    Optional Medical Details
+                                </h3>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {/* Card: Allergies */}
+                                    <div className="rounded-md border p-4 bg-light-surface/50 dark:bg-dark-surface/50">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <label className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">Allergies</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => addPatientFieldItem("alergies")}
+                                                className="text-xs font-medium rounded px-2 py-1 bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary hover:opacity-90">
+                                                + Add
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {(!patient.alergies || patient.alergies.length === 0) && (
+                                                <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">No allergies added</p>
+                                            )}
+                                            {patient.alergies && patient.alergies.map((item, idx) => (
+                                                <div key={`allergy-${idx}`} className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => updatePatientFieldItem("alergies", idx, e.target.value)}
+                                                        className="flex-1 rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-sm text-light-primary-text dark:text-dark-primary-text"
+                                                        placeholder="e.g. Peanuts, Pollen"
+                                                    />
+                                                    <button type="button" onClick={() => removePatientFieldItem("alergies", idx)} className="text-sm px-2 rounded-md bg-red-50 text-red-600">Remove</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Card: Operations */}
+                                    <div className="rounded-md border p-4 bg-light-surface/50 dark:bg-dark-surface/50">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <label className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">Operations / Surgeries</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => addPatientFieldItem("operations")}
+                                                className="text-xs font-medium rounded px-2 py-1 bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary hover:opacity-90">
+                                                + Add
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {(!patient.operations || patient.operations.length === 0) && (
+                                                <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">No operations added</p>
+                                            )}
+                                            {patient.operations && patient.operations.map((item, idx) => (
+                                                <div key={`operation-${idx}`} className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => updatePatientFieldItem("operations", idx, e.target.value)}
+                                                        className="flex-1 rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-sm text-light-primary-text dark:text-dark-primary-text"
+                                                        placeholder="e.g. Appendectomy - 2019"
+                                                    />
+                                                    <button type="button" onClick={() => removePatientFieldItem("operations", idx)} className="text-sm px-2 rounded-md bg-red-50 text-red-600">Remove</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Card: Ongoing Medications */}
+                                    <div className="rounded-md border p-4 bg-light-surface/50 dark:bg-dark-surface/50">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <label className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">Ongoing Medications</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => addPatientFieldItem("ongoingMedications")}
+                                                className="text-xs font-medium rounded px-2 py-1 bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary hover:opacity-90">
+                                                + Add
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {(!patient.ongoingMedications || patient.ongoingMedications.length === 0) && (
+                                                <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">No ongoing medications</p>
+                                            )}
+                                            {patient.ongoingMedications && patient.ongoingMedications.map((item, idx) => (
+                                                <div key={`ongoing-${idx}`} className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => updatePatientFieldItem("ongoingMedications", idx, e.target.value)}
+                                                        className="flex-1 rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-sm text-light-primary-text dark:text-dark-primary-text"
+                                                        placeholder="Medication name, dose (optional)"
+                                                    />
+                                                    <button type="button" onClick={() => removePatientFieldItem("ongoingMedications", idx)} className="text-sm px-2 rounded-md bg-red-50 text-red-600">Remove</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Card: Permanent Medications */}
+                                    <div className="rounded-md border p-4 bg-light-surface/50 dark:bg-dark-surface/50">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <label className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">Permanent Medications</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => addPatientFieldItem("permanentMedications")}
+                                                className="text-xs font-medium rounded px-2 py-1 bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary hover:opacity-90">
+                                                + Add
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {(!patient.permanentMedications || patient.permanentMedications.length === 0) && (
+                                                <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">No permanent medications</p>
+                                            )}
+                                            {patient.permanentMedications && patient.permanentMedications.map((item, idx) => (
+                                                <div key={`permanent-${idx}`} className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => updatePatientFieldItem("permanentMedications", idx, e.target.value)}
+                                                        className="flex-1 rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-sm text-light-primary-text dark:text-dark-primary-text"
+                                                        placeholder="Medication name, dose (optional)"
+                                                    />
+                                                    <button type="button" onClick={() => removePatientFieldItem("permanentMedications", idx)} className="text-sm px-2 rounded-md bg-red-50 text-red-600">Remove</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Card: Major Diseases */}
+                                    <div className="rounded-md border p-4 bg-light-surface/50 dark:bg-dark-surface/50">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <label className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">Major Diseases / Chronic Illnesses</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => addPatientFieldItem("majorDiseases")}
+                                                className="text-xs font-medium rounded px-2 py-1 bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary hover:opacity-90">
+                                                + Add
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {(!patient.majorDiseases || patient.majorDiseases.length === 0) && (
+                                                <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">No major diseases added</p>
+                                            )}
+                                            {patient.majorDiseases && patient.majorDiseases.map((item, idx) => (
+                                                <div key={`disease-${idx}`} className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => updatePatientFieldItem("majorDiseases", idx, e.target.value)}
+                                                        className="flex-1 rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-sm text-light-primary-text dark:text-dark-primary-text"
+                                                        placeholder="e.g. Diabetes, Hypertension"
+                                                    />
+                                                    <button type="button" onClick={() => removePatientFieldItem("majorDiseases", idx)} className="text-sm px-2 rounded-md bg-red-50 text-red-600">Remove</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="col-span-full">
                                 <div className="flex flex-col justify-center">
                                     <div className="flex h-6 shrink-0 gap-2 items-center">
@@ -1040,7 +1238,8 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                licenseNumber: e.target.value.toUpperCase(),
+                                                licenseNumber:
+                                                    e.target.value.toUpperCase(),
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
@@ -1064,16 +1263,27 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                registrationType: e.target.value,
+                                                registrationType:
+                                                    e.target.value,
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
                                         required>
-                                        <option value="">Select Registration Type</option>
-                                        <option value="Sole Proprietorship">Sole Proprietorship</option>
-                                        <option value="Partnership">Partnership</option>
-                                        <option value="Private Limited">Private Limited</option>
-                                        <option value="Public Limited">Public Limited</option>
+                                        <option value="">
+                                            Select Registration Type
+                                        </option>
+                                        <option value="Sole Proprietorship">
+                                            Sole Proprietorship
+                                        </option>
+                                        <option value="Partnership">
+                                            Partnership
+                                        </option>
+                                        <option value="Private Limited">
+                                            Private Limited
+                                        </option>
+                                        <option value="Public Limited">
+                                            Public Limited
+                                        </option>
                                         <option value="LLP">LLP</option>
                                         <option value="Other">Other</option>
                                     </select>
@@ -1169,7 +1379,8 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                gstNumber: e.target.value.toUpperCase(),
+                                                gstNumber:
+                                                    e.target.value.toUpperCase(),
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
@@ -1268,7 +1479,9 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                pincode: e.target.value.replace(/\D/g, '').slice(0, 6),
+                                                pincode: e.target.value
+                                                    .replace(/\D/g, "")
+                                                    .slice(0, 6),
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"

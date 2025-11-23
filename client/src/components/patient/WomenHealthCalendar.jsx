@@ -299,37 +299,25 @@ const WomenHealthCalendar = ({ patientId }) => {
                                 </button>
                                 <button
                                     className={`px-4 py-2 rounded-lg font-semibold ${inActivePeriod && selectedDate ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
-                                    onClick={() => selectedDate && handlePeriodAction('period', selectedDate)}
-                                    disabled={!selectedDate || !inActivePeriod}
-                                >
-                                    Period Day
-                                </button>
-                                <button
-                                    className={`px-4 py-2 rounded-lg font-semibold ${inActivePeriod && selectedDate ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
                                     onClick={() => selectedDate && handlePeriodAction('end', selectedDate)}
                                     disabled={!selectedDate || !inActivePeriod}
                                 >
                                     Period End
                                 </button>
                                 <button
-                                    className={`px-4 py-2 rounded-lg font-semibold ${selectedDate && !(dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString())) ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
-                                    onClick={() => setShowLogModal(true)}
-                                    disabled={!selectedDate || !!(dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString()))}
-                                >
-                                    Add Log
-                                </button>
-                                <button
-                                    className={`px-4 py-2 rounded-lg font-semibold ${dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString()) ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 opacity-70'} text-white transition`}
+                                    className={`px-4 py-2 rounded-lg font-semibold ${selectedDate ? (dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString()) ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700') : 'bg-red-500 opacity-70'} text-white transition`}
                                     onClick={() => {
                                         const log = dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString());
                                         if (log) {
                                             setViewLog(log);
                                             setShowViewLogModal(true);
+                                        } else {
+                                            setShowLogModal(true);
                                         }
                                     }}
                                     disabled={!selectedDate}
                                 >
-                                    View Log
+                                    {dailyLogs.find(l => new Date(l.date).toDateString() === selectedDate.toDateString()) ? 'View Log' : 'Add Log'}
                                 </button>
                             </>;
                         })()}

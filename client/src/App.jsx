@@ -1,5 +1,6 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus } from "lucide-react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Megaphone } from "lucide-react";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -8,14 +9,17 @@ import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashb
 import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
 import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
+import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
 import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
+import PostDetail from "./pages/community/PostDetail";
 import VideoAppointment from "./components/Doctor/VideoAppointment"
 import WomenHealth from "./pages/patientPages/WomenHealth/WomenHealth"
+import { useUser } from "@clerk/clerk-react";
 
 const patientTabs = [
     {
@@ -47,7 +51,14 @@ const patientTabs = [
         name: "Women’s Health",
         icon: Venus,
         path: "/patient/women-health",
-    }
+    },
+  {
+        id: 6,
+
+        name: "Community Health",
+        icon: Megaphone,
+        path: "/patient/community",
+    },
 ];
 
 const doctorTabs = [
@@ -71,7 +82,7 @@ const doctorTabs = [
     },
     {
         id: 4,
-        name: "Articles",
+        name: "Community Health",
         icon: File,
         path: "/doctor/articles",
     },
@@ -85,6 +96,35 @@ const pharmacyTabs = [
         path: "/pharmacy/dashboard",
     },
 ];
+
+const VideoAppointmentEntry = () => {
+    const { user, isLoaded } = useUser();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        if (!user) {
+            navigate("/", { replace: true });
+            return;
+        }
+
+        const role =
+            (user.unsafeMetadata?.role || user.publicMetadata?.role || "patient").toString();
+        const normalized = role.toLowerCase();
+
+        // Preserve query parameters (like roomID) when redirecting
+        const searchParams = new URLSearchParams(window.location.search);
+        const queryString = searchParams.toString();
+        const redirectUrl = `/video-appointment/${encodeURIComponent(normalized)}${queryString ? `?${queryString}` : ''}`;
+
+        navigate(redirectUrl, {
+            replace: true,
+        });
+    }, [isLoaded, user, navigate]);
+
+    return null;
+};
 
 
 function App() {
@@ -144,6 +184,23 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Patient">
                             <WomenHealth tabs={patientTabs}/>
+                       </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/patient/community"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <PatientCommunity tabs={patientTabs}/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/community/post/:id"
+                    element={
+                        <ProtectedRoute>
+                            <PostDetail />
+
                         </ProtectedRoute>
                     }
                 />
@@ -177,7 +234,17 @@ function App() {
                 <Route
                     path="/video-appointment"
                     element={
-                        <VideoAppointment/>
+                        <ProtectedRoute>
+                            <VideoAppointmentEntry />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/video-appointment/:role"
+                    element={
+                        <ProtectedRoute>
+                            <VideoAppointment />
+                        </ProtectedRoute>
                     }
                 />
                 <Route

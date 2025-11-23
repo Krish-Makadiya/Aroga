@@ -13,7 +13,9 @@ const aiRoutes = require("./routes/ai.route");
 const appointmentRoute = require("./routes/appointment.route");
 const articleRoute = require("./routes/articles.route");
 const paymentRoute = require("./routes/payment.routes");
+const healthRoute = require("./routes/health.route.js");
 const webhookRoute = require("./routes/webhook.route");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -22,6 +24,8 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 app.use("/api/patient", patientRoute);
 app.use("/api/doctor", doctorRoute);
@@ -36,6 +40,10 @@ app.use('/api/womenhealthai', womenhealthAiRoute);
 app.use("/api/appointment", appointmentRoute);
 app.use("/api/ai", aiRoutes);
 app.use("/api/articles", articleRoute);
+app.use("/api", healthRoute);
+
+
+
 
 app.get("/", (req, res) => {
     res.send("API is running!");

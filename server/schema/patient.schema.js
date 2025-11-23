@@ -126,6 +126,37 @@ const patientSchema = new mongoose.Schema(
             maxlength: [1000, "Medical history cannot exceed 1000 characters"],
         },
 
+        // Optional repeatable medical details
+        alergies: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        operations: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        ongoingMedications: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        permanentMedications: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        majorDiseases: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
         telemedicineConsent: {
             type: Boolean,
             required: [true, "Telemedicine consent is required"],

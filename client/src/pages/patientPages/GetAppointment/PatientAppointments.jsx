@@ -42,7 +42,13 @@ const PatientAppointments = () => {
                 );
 
                 if (!mounted) return;
-                setAppointments(res.data?.data || []);
+                
+                // Filter to only show confirmed appointments
+                const allAppointments = res.data?.data || [];
+                const confirmedAppointments = allAppointments.filter(
+                    (appt) => appt.status === "confirmed" || appt.status === "pending"
+                );
+                setAppointments(confirmedAppointments);
             } catch (err) {
                 setError("Failed to load appointments");
                 console.error(err?.response?.data || err);

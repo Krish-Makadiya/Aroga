@@ -16,6 +16,11 @@ exports.createPatient = async (req, res) => {
         emergencyContactPhone,
         medicalHistory,
         telemedicineConsent,
+        alergies,
+        operations,
+        ongoingMedications,
+        permanentMedications,
+        majorDiseases,
         clerkUserId,
     } = req.body;
 
@@ -134,6 +139,23 @@ exports.createPatient = async (req, res) => {
         errors.push("telemedicineConsent is required and must be a boolean");
     }
 
+    // Optional repeatable fields validation (if provided)
+    const validateStringArray = (arr, name) => {
+        if (arr === undefined || arr === null) return;
+        if (!Array.isArray(arr)) return errors.push(`${name} must be an array of strings`);
+        for (const v of arr) {
+            if (typeof v !== 'string') return errors.push(`${name} must contain only strings`);
+            if (v.trim().length === 0) return errors.push(`${name} must not contain empty strings`);
+            if (v.length > 200) return errors.push(`${name} items must be at most 200 characters`);
+        }
+    };
+
+    validateStringArray(alergies, 'alergies');
+    validateStringArray(operations, 'operations');
+    validateStringArray(ongoingMedications, 'ongoingMedications');
+    validateStringArray(permanentMedications, 'permanentMedications');
+    validateStringArray(majorDiseases, 'majorDiseases');
+
     // If there are validation errors, return them
     if (errors.length > 0) {
         return res
@@ -157,6 +179,12 @@ exports.createPatient = async (req, res) => {
             emergencyContactPhone,
             medicalHistory,
             telemedicineConsent,
+            // optional arrays (ensure fallback to empty arrays)
+            alergies: Array.isArray(alergies) ? alergies.map(s => s.trim()) : [],
+            operations: Array.isArray(operations) ? operations.map(s => s.trim()) : [],
+            ongoingMedications: Array.isArray(ongoingMedications) ? ongoingMedications.map(s => s.trim()) : [],
+            permanentMedications: Array.isArray(permanentMedications) ? permanentMedications.map(s => s.trim()) : [],
+            majorDiseases: Array.isArray(majorDiseases) ? majorDiseases.map(s => s.trim()) : [],
             clerkUserId,
         });
         res.status(201).json({

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import {
     Stethoscope,
     HeartPulse,
@@ -56,6 +56,7 @@ const SymptomCheckerContent = () => {
     const [language, setLanguage] = useState("en");
     const [recording, setRecording] = useState(false);
     const [aiInsight, setAiInsight] = useState(null);
+    const recognitionRef = useRef(null);
 
     const user = useUser().user.unsafeMetadata.patientData;
 
@@ -102,70 +103,27 @@ const SymptomCheckerContent = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const prompt = `
-                You are an AI-based medical assistant (not a doctor) that helps users understand their health based on their symptoms and personal details.
-                Your role is to analyze the input and provide clear, structured, and simple health insights.
-                Always use non-technical, easy-to-understand language.
-
-                ### User Input:
-                - Full Name: ${user.fullName || "N/A"}
-                - Date of Birth (DOB): ${user.dob || "N/A"} ${
-            user.dob ? `→ Age: ${age}` : ""
-        }
-                - Gender: ${user.gender || "N/A"}
-                - Previous Medical History: ${user.medicalHistory || "N/A"}
-                - Reported Symptoms: ${
-                    Array.isArray(symptoms) && symptoms.length
-                        ? symptoms.join(", ")
-                        : "N/A"
-                }
-                - Description of Feelings: ${input.trim() || "N/A"}
-
-                ### Your Tasks:
-                1. Health State Analysis: Provide an overall health condition assessment: Good / Mild / Moderate / Severe.
-                2. Possible Diseases: List 2–4 possible conditions with a confidence percentage (e.g., Flu – 75%) and a short reason that matches the symptoms.
-                3. Simple Remedies: Provide safe home remedies or lifestyle tips.
-                4. OTC Medicine Suggestions: Suggest safe over-the-counter medicines (e.g., paracetamol, antihistamines) when appropriate.
-                5. Urgent Care Alert: Clearly mention if symptoms indicate emergency medical attention is needed.
-                6. Lifestyle Advice: Suggest general health-improving actions (hydration, rest, diet, exercise).
-                7. Medical Disclaimer: Always end with: "This is not a medical diagnosis. Please consult a licensed doctor for professional advice."
-
-                ### Output Format (JSON only):
-                {
-                "healthState": "Good | Mild | Moderate | Severe",
-                "possibleDiseases": [
-                    {
-                    "name": "Disease Name",
-                    "confidence": "75%",
-                    "reason": "Explanation in simple words"
-                    }
-                ],
-                "remedies": [
-                    "Simple home remedy 1",
-                    "Simple home remedy 2"
-                ],
-                "otcMedicines": [
-                    "Medicine name with purpose"
-                ],
-                "urgentCare": "Yes/No, with explanation",
-                "lifestyleAdvice": [
-                    "Tip 1",
-                    "Tip 2"
-                ],
-                "disclaimer": "This is not a medical diagnosis. Please consult a licensed doctor for professional advice."
-                }
-                `.trim();
-
         if (!canSubmit) return;
+
+        const parts = [];
+        if (Array.isArray(symptoms) && symptoms.length) {
+            parts.push(symptoms.join(", "));
+        }
+        if (input.trim()) {
+            parts.push(input.trim());
+        }
+
+        const symptomsText = parts.join(". ");
+
+        if (!symptomsText) return;
 
         await toast.promise(
             (async () => {
                 try {
-                    const res = await axios.get(
-                        `http://localhost:5000/api/ai/generate-questions`,
+                    const res = await axios.post(
+                        "http://localhost:5000/api/health-analyze",
                         {
-                            params: { prompt },
+                            symptoms: symptomsText,
                         }
                     );
                     console.log(res.data);
@@ -177,22 +135,71 @@ const SymptomCheckerContent = () => {
                     return res.data;
                 } catch (e) {
                     console.log(e);
+                    throw e;
                 }
             })(),
             {
                 loading: "AI is analyzing your symptoms...",
                 success: (data) =>
-                    `Analysis complete! Found ${
-                        data.possibleDiseases?.length || 0
+                    `Analysis complete! Found ${data.possibleDiseases?.length || 0
                     } possible conditions.`,
-                error: (err) => `Failed to analyze symptoms.`,
+                error: () => `Failed to analyze symptoms.`,
             }
         );
     };
 
     const toggleVoice = () => {
         // Simple demo: simulates starting/stopping voice capture
-        setRecording((r) => !r);
+        if (
+            !("webkitSpeechRecognition" in window) &&
+            !("SpeechRecognition" in window)
+        ) {
+            toast.error("Voice input is not supported in this browser.");
+            return;
+        }
+
+        if (recording && recognitionRef.current) {
+            recognitionRef.current.stop();
+            return;
+        }
+
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        const langMap = {
+            en: "en-US",
+            hi: "hi-IN",
+            bn: "bn-IN",
+            te: "te-IN",
+            ta: "ta-IN",
+        };
+
+        recognition.lang = langMap[language] || "en-US";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            setRecording(true);
+        };
+
+        recognition.onend = () => {
+            setRecording(false);
+        };
+
+        recognition.onerror = () => {
+            setRecording(false);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInput((prev) =>
+                prev ? `${prev} ${transcript}` : transcript
+            );
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
     };
 
     return (
@@ -207,19 +214,7 @@ const SymptomCheckerContent = () => {
                                 Describe your symptoms
                             </h3>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Languages className="w-4 h-4 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]" />
-                            <select
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                                className="text-sm bg-transparent border rounded-lg px-2 py-1 border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
-                                <option value="en">English</option>
-                                <option value="hi">Hindi</option>
-                                <option value="bn">Bengali</option>
-                                <option value="te">Telugu</option>
-                                <option value="ta">Tamil</option>
-                            </select>
-                        </div>
+
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -235,11 +230,10 @@ const SymptomCheckerContent = () => {
                             <button
                                 type="button"
                                 onClick={toggleVoice}
-                                className={`absolute right-3 bottom-3 p-2 rounded-lg transition ${
-                                    recording
-                                        ? "bg-red-100 text-red-600 dark:bg-red-900/30"
-                                        : "bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]"
-                                }`}
+                                className={`absolute right-3 bottom-3 p-2 rounded-lg transition ${recording
+                                    ? "bg-red-100 text-red-600 dark:bg-red-900/30"
+                                    : "bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]"
+                                    }`}
                                 title="Voice Input"
                                 aria-pressed={recording}>
                                 <Mic className="w-4 h-4" />

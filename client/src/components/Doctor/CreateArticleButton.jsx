@@ -11,10 +11,8 @@ const CreateArticleButton = ({ onArticleCreated }) => {
 
     const [formData, setFormData] = useState({
         title: '',
-        subtitle: '',
         content: '',
-        category: '',
-        isPinned: false
+        type: ''
     });
 
     const handleChange = (e) => {
@@ -33,11 +31,11 @@ const CreateArticleButton = ({ onArticleCreated }) => {
             const token = await getToken();
             const articleData = {
                 authorClerkId: user.id,
+                type: formData.type,
                 title: formData.title,
-                subtitle: formData.subtitle,
                 content: formData.content,
-                category: formData.category,
-                isPinned: formData.isPinned
+                tags: [],
+                images: []
             };
 
             const response = await axios.post(
@@ -57,10 +55,8 @@ const CreateArticleButton = ({ onArticleCreated }) => {
             // Reset form
             setFormData({
                 title: '',
-                subtitle: '',
                 content: '',
-                category: '',
-                isPinned: false
+                type: ''
             });
 
             setIsEditorOpen(false);
@@ -71,7 +67,8 @@ const CreateArticleButton = ({ onArticleCreated }) => {
             }
         } catch (error) {
             console.error('Error creating article:', error);
-            alert('Failed to create article. Please try again.');
+            const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+            alert(`Failed to create article.${serverMsg ? `\n${serverMsg}` : ''}`);
         } finally {
             setIsLoading(false);
         }
@@ -80,10 +77,8 @@ const CreateArticleButton = ({ onArticleCreated }) => {
     const handleCancel = () => {
         setFormData({
             title: '',
-            subtitle: '',
             content: '',
-            category: '',
-            isPinned: false
+            type: ''
         });
         setIsEditorOpen(false);
     };
@@ -114,7 +109,12 @@ const CreateArticleButton = ({ onArticleCreated }) => {
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={handleSubmit}
-                                disabled={isLoading || !formData.title.trim() || !formData.content.trim()}
+                                disabled={
+                                    isLoading ||
+                                    !formData.type ||
+                                    !formData.title.trim() ||
+                                    !formData.content.trim()
+                                }
                                 className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed"
                             >
                                 {isLoading ? 'Publishing...' : 'Publish'}
@@ -140,39 +140,18 @@ const CreateArticleButton = ({ onArticleCreated }) => {
                             }}
                         />
 
-                        {/* Subtitle */}
-                        <textarea
-                            name="subtitle"
-                            value={formData.subtitle}
-                            onChange={handleChange}
-                            placeholder="Tell your story..."
-                            className="w-full text-xl md:text-2xl text-light-primary-text dark:text-dark-primary-text placeholder-light-secondary-text/50 dark:placeholder-dark-secondary-text/50 bg-transparent border-none outline-none resize-none overflow-hidden leading-relaxed mb-8"
-                            style={{ minHeight: '40px' }}
-                            onInput={(e) => {
-                                e.target.style.height = 'auto';
-                                e.target.style.height = e.target.scrollHeight + 'px';
-                            }}
-                        />
-
-                        {/* Category Selection */}
+                        {/* Post Type Selection */}
                         <div className="mb-8">
                             <select
-                                name="category"
-                                value={formData.category}
+                                name="type"
+                                value={formData.type}
                                 onChange={handleChange}
                                 className="py-2 pl-2 pr-2 rounded-md bg-light-surface dark:bg-dark-surface text-light-primary-text dark:text-dark-primary-text text-sm"
                             >
-                                <option value="">Select a category</option>
-                                <option value="General Health">General Health</option>
-                                <option value="Cardiology">Cardiology</option>
-                                <option value="Neurology">Neurology</option>
-                                <option value="Pediatrics">Pediatrics</option>
-                                <option value="Dermatology">Dermatology</option>
-                                <option value="Orthopedics">Orthopedics</option>
-                                <option value="Mental Health">Mental Health</option>
-                                <option value="Nutrition">Nutrition</option>
-                                <option value="Preventive Care">Preventive Care</option>
-                                <option value="Emergency Medicine">Emergency Medicine</option>
+                                <option value="">Select post type</option>
+                                <option value="Article">Article</option>
+                                <option value="Announcement">Announcement</option>
+                                <option value="Alert">Alert</option>
                             </select>
                         </div>
 
@@ -189,20 +168,6 @@ const CreateArticleButton = ({ onArticleCreated }) => {
                                 e.target.style.height = e.target.scrollHeight + 'px';
                             }}
                         />
-
-                        {/* Pin Option */}
-                        <div className="flex items-center gap-2 mt-8 pt-8 border-t border-light-border dark:border-dark-border">
-                            <input
-                                type="checkbox"
-                                name="isPinned"
-                                checked={formData.isPinned}
-                                onChange={handleChange}
-                                className="w-4 h-4 text-green-600 bg-light-surface dark:bg-dark-bg border-light-border dark:border-dark-border rounded"
-                            />
-                            <label className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
-                                Pin this article
-                            </label>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -215,7 +180,7 @@ const CreateArticleButton = ({ onArticleCreated }) => {
             className="flex items-center gap-2 px-4 py-2 bg-light-primary dark:bg-dark-primary text-white rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary focus:ring-offset-2"
         >
             <Plus className="w-4 h-4" />
-            Create New Article
+            Create New Post
         </button>
     );
 };

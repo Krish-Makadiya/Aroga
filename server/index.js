@@ -36,6 +36,9 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/articles", articleRoute);
 app.use("/api", healthRoute);
 
+
+
+
 app.get("/", (req, res) => {
     res.send("API is running!");
 });

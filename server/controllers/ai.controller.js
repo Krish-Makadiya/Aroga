@@ -16,8 +16,17 @@ const getResultController = async (req, res) => {
             cleanResult = jsonMatch[1].trim();
         }
         
-        // Return as JSON object instead of string
-        res.json(JSON.parse(cleanResult));
+        // Attempt to return JSON, fall back to plain text
+        try {
+            const parsed = JSON.parse(cleanResult);
+            return res.json(parsed);
+        } catch (parseError) {
+            console.warn("AI response not JSON, returning raw text");
+            return res.json({
+                type: "text",
+                content: cleanResult,
+            });
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

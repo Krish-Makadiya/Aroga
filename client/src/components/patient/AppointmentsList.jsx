@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useUser, useAuth } from "@clerk/clerk-react";
+import React, { useState } from "react";
 import {
     Stethoscope,
     Calendar,
@@ -17,12 +15,143 @@ import {
     ThumbsDown,
     Info,
     XCircle,
+    CreditCard,
+    Receipt,
+    StarIcon,
 } from "lucide-react";
 import Drawer from "../main/Drawer";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useRazorpay } from "react-razorpay";
+import { useUser } from "@clerk/clerk-react";
 
 const AppointmentsList = ({ appointments }) => {
     const [open, setOpen] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [processingPaymentId, setProcessingPaymentId] = useState(null);
+
+    const { user } = useUser();
+
+    // Inline rating form state
+    const [formRating, setFormRating] = useState({}); // appointmentId -> rating (1-5)
+    const [formReview, setFormReview] = useState({}); // appointmentId -> string
+    const [submitting, setSubmitting] = useState({}); // appointmentId -> bool
+    const [submitted, setSubmitted] = useState({}); // appointmentId -> bool
+    const [errMsg, setErrMsg] = useState({}); // appointmentId -> error
+
+    const { Razorpay } = useRazorpay();
+
+    const savePaymentEntry = async ({
+        appointmentId,
+        status,
+        orderId,
+        paymentId,
+    }) => {
+        const response = await axios.post(
+            `http://localhost:5000/api/payment/save-payment`,
+            {
+                appointmentId,
+                status,
+                orderId,
+                paymentId,
+            }
+        );
+        if (!response.data?.success) {
+            throw new Error(response.data?.message || "Unable to save payment");
+        }
+        return response.data.data;
+    };
+
+    const paymentClickHandler = async (appointmentId, amount) => {
+        try {
+            const res = await axios.post(
+                "http://localhost:5000/api/payment/create-order",
+                { amount },
+                { headers: { "Content-Type": "application/json" } }
+            );
+
+            var options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: res.data.data.amount,
+                currency: "INR",
+                name: "Arogya",
+                description: "Test Transaction",
+                image: "https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600",
+                order_id: res.data.data.id,
+                handler: (res) =>
+                    savePaymentEntry({
+                        appointmentId,
+                        status: "paid",
+                        orderId: res.razorpay_order_id,
+                        paymentId: res.razorpay_payment_id,
+                    }),
+                prefill: {
+                    //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                    name: "Gaurav Kumar", //your customer's name
+                    email: "gaurav.kumar@example.com",
+                    contact: "+919876543210", //Provide the customer's phone number for better conversion rates
+                },
+                notes: {
+                    address: "Razorpay Corporate Office",
+                },
+                theme: {
+                    color: "#3399cc",
+                },
+            };
+
+            var rzp1 = new Razorpay(options);
+
+            rzp1.on("payment.failed", function (response) {
+                alert(response.error.code);
+                alert(response.error.description);
+                alert(response.error.source);
+                alert(response.error.step);
+                alert(response.error.reason);
+                alert(response.error.metadata.order_id);
+                alert(response.error.metadata.payment_id);
+            });
+
+            rzp1.open();
+        } catch (error) {
+            console.error("Error creating payment order:", error);
+            toast.error("Error creating payment order");
+        }
+    };
+
+    // Inline Submit Handler
+    const handleInlineRatingSubmit = async (appointment) => {
+        const rating = formRating[appointment._id] || 5;
+        const review = formReview[appointment._id] || "";
+        setSubmitting((p) => ({ ...p, [appointment._id]: true }));
+        setErrMsg((e) => ({ ...e, [appointment._id]: null }));
+
+        console.log(
+            user.id,
+            appointment.doctorId?._id || appointment.doctorId,
+            rating,
+            review
+        );
+        try {
+            await axios.post(
+                `http://localhost:5000/api/appointment/${appointment._id}/rating`,
+                {
+                    patientId: user.id,
+                    doctorId: appointment.doctorId?._id || appointment.doctorId,
+                    rating,
+                    review,
+                }
+            );
+            setSubmitted((p) => ({ ...p, [appointment._id]: true }));
+            setTimeout(() => window.location.reload(), 800);
+        } catch (err) {
+            setErrMsg((e) => ({
+                ...e,
+                [appointment._id]: "Failed to submit rating.",
+            }));
+        } finally {
+            setSubmitting((p) => ({ ...p, [appointment._id]: false }));
+        }
+    };
 
     return (
         <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,7 +178,7 @@ const AppointmentsList = ({ appointments }) => {
                                             Appointment
                                         </span>
                                     </div>
-                                    {doc?.rating?.average && (
+                                    {doc?.rating?.average && appt.status !== "completed" && (
                                         <span className="flex items-center gap-1 text-xs px-3 py-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 ml-2">
                                             <div className="flex gap-1 items-center">
                                                 <Star size={20} />
@@ -158,39 +287,83 @@ const AppointmentsList = ({ appointments }) => {
                                     </span>
                                 )}
                             </div>
-                            {/* Meeting Link */}
-                            {appt.meetingLink && (
-                                <div className="flex items-center gap-1 mt-1">
-                                    <LinkIcon className="w-4 h-4 text-blue-500" />
-                                    <a
-                                        href={appt.meetingLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-blue-600 underline break-all">
-                                        Join Meeting
-                                    </a>
-                                </div>
-                            )}
+
                             {/* Payment Info */}
                             {appt.payment && (
-                                <div className="flex items-center gap-1 mt-1">
-                                    <FileText className="w-4 h-4 text-gray-400" />
-                                    <span className="text-xs  text-light-secondary-text dark:text-dark-secondary-text">
-                                        Payment: {appt.payment.status}
-                                    </span>
-                                    {appt.payment.transactionId && (
-                                        <span className="text-xs">
-                                            | Txn: {appt.payment.transactionId}
+                                <div className="flex flex-col gap-2 mt-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <CreditCard className="w-4 h-4 text-emerald-500" />
+                                        <span className="text-xs font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                            Payment Status:
                                         </span>
-                                    )}
-                                    {appt.payment.paidAt && (
-                                        <span className="text-xs">
-                                            | Paid:{" "}
-                                            {new Date(
-                                                appt.payment.paidAt
-                                            ).toLocaleString()}
-                                        </span>
-                                    )}
+                                        {appt.payment.status === "paid" && (
+                                            <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-semibold">
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Paid
+                                            </span>
+                                        )}
+                                        {appt.payment.status === "pending" && (
+                                            <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 font-semibold">
+                                                <Clock className="w-3 h-3" />
+                                                Pending
+                                            </span>
+                                        )}
+                                        {appt.payment.status === "failed" && (
+                                            <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 font-semibold">
+                                                <XCircle className="w-3 h-3" />
+                                                Failed
+                                            </span>
+                                        )}
+                                        {![
+                                            "paid",
+                                            "pending",
+                                            "failed",
+                                        ].includes(appt.payment.status) && (
+                                            <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300 font-semibold capitalize">
+                                                {appt.payment.status}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col gap-1 ml-6">
+                                        {appt.payment.orderId && (
+                                            <div className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                                <Receipt className="w-3.5 h-3.5 mr-0.5" />
+                                                <span>
+                                                    Order ID:{" "}
+                                                    {appt.payment.orderId}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {appt.payment.paymentId && (
+                                            <div className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                                <CreditCard className="w-3.5 h-3.5 mr-0.5" />
+                                                <span>
+                                                    Payment ID:{" "}
+                                                    {appt.payment.paymentId}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {appt.payment.paidAt && (
+                                            <div className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                                <Calendar className="w-3.5 h-3.5 mr-0.5" />
+                                                <span>
+                                                    Paid on:{" "}
+                                                    {new Date(
+                                                        appt.payment.paidAt
+                                                    ).toLocaleDateString(
+                                                        "en-IN",
+                                                        {
+                                                            day: "numeric",
+                                                            month: "short",
+                                                            year: "numeric",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                        }
+                                                    )}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                             {/* Review/Rating */}
@@ -212,19 +385,161 @@ const AppointmentsList = ({ appointments }) => {
                             {/* Meta Info */}
                             <div className="flex flex-wrap gap-1 items-center mt-2 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
                                 <Info className="w-4 h-4" />
-                                <span>
-                                    Created:{" "}
-                                    {new Date(appt.createdAt).toLocaleString()}
-                                </span>
+                                <span>Appointment ID: {appt._id}</span>
                             </div>
                         </div>
-                        <button className="bg-light-primary dark:bg-dark-primary py-2 px-4 w-fit rounded-md self-end"
-                            onClick={() => {
-                                setSelectedDoctor(doc);
-                                setOpen(true);
-                            }}>
-                            View Doctor
-                        </button>
+
+                        {/* Inline Rating/Review Form if not rated */}
+                        {appt.status === "completed" &&
+                            !appt.ratingId &&
+                            !submitted[appt._id] && (
+                                <div className="mt-4 rounded-xl border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40 px-4 py-2 shadow-sm">
+                                    <form
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            handleInlineRatingSubmit(appt);
+                                        }}
+                                        className="space-y-2">
+                                        <div className="flex items-center gap-2 justify-between">
+                                            <span className="font-semibold mr-2 text-light-primary-text dark:text-dark-primary-text">
+                                                Rate your experience
+                                            </span>
+                                            <div className="flex items-center gap-1">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        type="button"
+                                                        key={star}
+                                                        className={
+                                                            (formRating[
+                                                                appt._id
+                                                            ] || 5) >= star
+                                                                ? "text-yellow-400 fill-yellow-400"
+                                                                : "text-gray-200 fill-gray-200"
+                                                        }
+                                                        onClick={() =>
+                                                            setFormRating(
+                                                                (p) => ({
+                                                                    ...p,
+                                                                    [appt._id]:
+                                                                        star,
+                                                                })
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            submitting[appt._id]
+                                                        }>
+                                                        <StarIcon className="w-5 h-5 fill-current" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <textarea
+                                                className="w-full outline-none text-light-primary-text dark:text-dark-primary-text rounded p-2 min-h-[60px] text-sm"
+                                                placeholder="Write a review (optional)"
+                                                value={
+                                                    formReview[appt._id] || ""
+                                                }
+                                                onChange={(e) =>
+                                                    setFormReview((p) => ({
+                                                        ...p,
+                                                        [appt._id]:
+                                                            e.target.value,
+                                                    }))
+                                                }
+                                                disabled={submitting[appt._id]}
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-60"
+                                                disabled={submitting[appt._id]}>
+                                                {submitting[appt._id]
+                                                    ? "Submitting..."
+                                                    : "Submit"}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            )}
+                        {/* Review/Rating BELOW the card IF completed and has ratingId */}
+                        {appt.status === "completed" && appt.ratingId && (
+                            <div className="mt-4 rounded-lg bg-light-surface dark:bg-dark-surface px-5 py-3 shadow-sm flex flex-col gap-2">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                    <div className="flex items-center gap-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                type="button"
+                                                key={star}
+                                                className={
+                                                    (appt.ratingId.rating ||
+                                                        5) >= star
+                                                        ? "text-yellow-400 fill-yellow-400"
+                                                        : "text-gray-200 fill-gray-200"
+                                                }>
+                                                <StarIcon className="w-5 h-5 fill-current" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                {appt.ratingId.review && (
+                                    <div className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                        {appt.ratingId.review}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <div className="flex items-center justify-between">
+                            {/* Meeting Link */}
+                            {appt.meetingLink &&
+                                appt.status !== "completed" && (
+                                    <div className="flex w-40 items-center gap-1">
+                                        <LinkIcon className="w-4 h-4 text-blue-500" />
+                                        <a
+                                            href={appt.meetingLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-blue-600 break-all">
+                                            Join Meeting
+                                        </a>
+                                    </div>
+                                )}
+                            <div className="w-full flex items-center gap-3 justify-end">
+                                {appt.status === "confirmed" &&
+                                    appt.payment?.status !== "paid" && (
+                                        <button
+                                            onClick={() =>
+                                                paymentClickHandler(
+                                                    appt._id,
+                                                    appt.amount ??
+                                                        doc?.consultationFee ??
+                                                        0
+                                                )
+                                            }
+                                            disabled={
+                                                processingPaymentId === appt._id
+                                            }
+                                            className="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md transition">
+                                            {processingPaymentId === appt._id
+                                                ? "Processing..."
+                                                : "Pay Now"}
+                                        </button>
+                                    )}
+                                {appt.payment?.status === "paid" && (
+                                    <span className="flex items-center gap-1 text-sm px-3 py-2 rounded-md bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-semibold">
+                                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                        Paid
+                                    </span>
+                                )}
+                                <button
+                                    className="bg-light-primary dark:bg-dark-primary py-2 px-4 rounded-md"
+                                    onClick={() => {
+                                        setSelectedDoctor(doc);
+                                        setOpen(true);
+                                    }}>
+                                    View Doctor
+                                </button>
+                            </div>
+                        </div>
                         {open && selectedDoctor && (
                             <Drawer
                                 open={open}

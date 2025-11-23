@@ -26,6 +26,9 @@ const PatientAppointments = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const API_BASE_URL =
+        import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
+
     useEffect(() => {
         if (!user) return;
         let mounted = true;
@@ -34,14 +37,18 @@ const PatientAppointments = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `http://localhost:5000/api/appointment/patient/${user.id}`,
+                    `${API_BASE_URL}/api/appointment/patient/${user.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
+
                 if (!mounted) return;
-                const completed = Array.isArray(res.data?.data)
-                    ? res.data.data.filter((appt) => appt.status === "confirmed")
-                    : [];
-                setAppointments(completed);
+                
+                // Filter to only show confirmed appointments
+                const allAppointments = res.data?.data || [];
+                const confirmedAppointments = allAppointments.filter(
+                    (appt) => appt.status === "confirmed" || appt.status === "pending"
+                );
+                setAppointments(confirmedAppointments);
             } catch (err) {
                 setError("Failed to load appointments");
                 console.error(err?.response?.data || err);
@@ -69,8 +76,6 @@ const PatientAppointments = () => {
             </div>
         );
     }
-
-    console.log(appointments);
 
     return (
         <AppointmentsList appointments={appointments}/>

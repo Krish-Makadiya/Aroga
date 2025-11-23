@@ -12,7 +12,9 @@ import {
     Video,
     ExternalLink,
     Info,
+    Eye,
 } from "lucide-react";
+import PatientDetailsDialog from "../../../components/Doctor/PatientDetailsDialog";
 
 const formatDateTime = (iso) => {
     try {
@@ -49,6 +51,13 @@ const timeUntil = (date) => {
     return `${remMin}m`;
 };
 
+const getMinutesUntil = (date) => {
+    if (!date) return Infinity;
+    const diffMs = date.getTime() - Date.now();
+    if (diffMs <= 0) return 0;
+    return Math.floor(diffMs / 60000);
+};
+
 const Badge = ({ children }) => (
     <span
         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium bg-light-bg text-light-secondary-text dark:bg-dark-surface dark:text-dark-secondary-text`}>
@@ -74,6 +83,8 @@ const UpcomingAppointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -112,10 +123,13 @@ const UpcomingAppointments = () => {
             );
     }, [appointments]);
 
+    const startAppointmentHandler = (apptId) => {
+        // Navigate with role in the URL path and roomID as query parameter
+        window.location.href = `/video-appointment/doctor?roomID=${apptId}`;
+    };
+
     if (loading) {
-        return (
-            <div className="p-6">Loading appointments…</div>
-        );
+        return <div className="p-6">Loading appointments…</div>;
     }
 
     if (error) {
@@ -167,6 +181,8 @@ const UpcomingAppointments = () => {
                             appt.scheduledAt
                         );
                         const startsIn = timeUntil(raw);
+                        const minutesUntil = getMinutesUntil(raw);
+                        const showStartButton = minutesUntil <= 1000000;
                         return (
                             <div
                                 key={appt._id}
@@ -317,12 +333,46 @@ const UpcomingAppointments = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="w-full flex justify-end gap-3 mt-4">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedAppointment(appt);
+                                                setIsDetailsOpen(true);
+                                            }}
+                                            className="w-fit bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                                            <Eye className="w-4 h-4" />
+                                            View Patient Details
+                                        </button>
+
+                                        {showStartButton && (
+                                            <button
+                                                onClick={() =>
+                                                    startAppointmentHandler(
+                                                        appt._id
+                                                    )
+                                                }
+                                                className="w-fit bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                                                <Video className="w-4 h-4" />
+                                                Start Appointment
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         );
                     })}
                 </div>
             )}
+
+            {/* Patient Details Dialog */}
+            <PatientDetailsDialog
+                appointment={selectedAppointment}
+                isOpen={isDetailsOpen}
+                onClose={() => {
+                    setIsDetailsOpen(false);
+                    setSelectedAppointment(null);
+                }}
+            />
         </div>
     );
 };

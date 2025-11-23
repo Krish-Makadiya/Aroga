@@ -1,5 +1,6 @@
 import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Megaphone } from "lucide-react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -16,6 +17,8 @@ import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 import PostDetail from "./pages/community/PostDetail";
+import VideoAppointment from "./components/Doctor/VideoAppointment"
+import { useUser } from "@clerk/clerk-react";
 
 const patientTabs = [
     {
@@ -85,6 +88,35 @@ const pharmacyTabs = [
         path: "/pharmacy/dashboard",
     },
 ];
+
+const VideoAppointmentEntry = () => {
+    const { user, isLoaded } = useUser();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        if (!user) {
+            navigate("/", { replace: true });
+            return;
+        }
+
+        const role =
+            (user.unsafeMetadata?.role || user.publicMetadata?.role || "patient").toString();
+        const normalized = role.toLowerCase();
+
+        // Preserve query parameters (like roomID) when redirecting
+        const searchParams = new URLSearchParams(window.location.search);
+        const queryString = searchParams.toString();
+        const redirectUrl = `/video-appointment/${encodeURIComponent(normalized)}${queryString ? `?${queryString}` : ''}`;
+
+        navigate(redirectUrl, {
+            replace: true,
+        });
+    }, [isLoaded, user, navigate]);
+
+    return null;
+};
 
 
 function App() {
@@ -178,6 +210,23 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <MyAppointments tabs={doctorTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/video-appointment"
+                    element={
+                        <ProtectedRoute>
+                            <VideoAppointmentEntry />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/video-appointment/:role"
+                    element={
+                        <ProtectedRoute>
+                            <VideoAppointment />
                         </ProtectedRoute>
                     }
                 />

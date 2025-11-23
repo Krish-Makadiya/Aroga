@@ -12,7 +12,6 @@ const generatePrompt = async (prompt) => {
     try {
         const result = await model.generateContent(prompt);
         const response = result.response.candidates[0].content.parts[0].text;
-        console.log(result.response.candidates[0].content.parts[0]);
 
         return response;
     } catch (error) {

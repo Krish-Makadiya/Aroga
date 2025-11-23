@@ -25,19 +25,66 @@ const appointmentSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: [
-                "pending",
-                "confirmed",
-                "completed",
-                "cancelled",
-            ],
+            enum: ["pending", "confirmed", "completed", "cancelled"],
             default: "pending",
             index: true,
         },
-
+        appointmentType: {
+            type: String,
+            enum: ["online", "offline"],
+            default: "offline",
+            index: true,
+        },
         meetingLink: {
             type: String, // video link when telemedicine
             trim: true,
+            default: "",
+        },
+        roomStartedAt: {
+            type: Date,
+            default: null,
+        },
+        roomEndedAt: {
+            type: Date,
+            default: null,
+        },
+        patientJoinedAt: {
+            type: Date,
+            default: null,
+        },
+        patientLeftAt: {
+            type: Date,
+            default: null,
+        },
+        symptoms: {
+            type: [
+                {
+                    type: String,
+                    trim: true,
+                },
+            ],
+            default: [],
+        },
+        prescription: {
+            type: [
+                {
+                    medicine: { type: String, trim: true, required: true },
+                    dosage: { type: String, trim: true, default: "" },
+                    frequency: { type: String, trim: true, default: "" },
+                    notes: { type: String, trim: true, default: "" },
+                },
+            ],
+            default: [],
+        },
+        reports: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        aiSummary: {
+            type: String,
+            trim: true,
+            maxlength: 2000,
             default: "",
         },
         amount: {
@@ -51,48 +98,15 @@ const appointmentSchema = new mongoose.Schema(
                 enum: ["pending", "authorized", "paid", "refunded", "failed"],
                 default: "pending",
             },
-            transactionId: { type: String, trim: true, default: "" },
+            paymentId: { type: String, trim: true, default: "" },
+            orderId: { type: String, trim: true, default: "" },
             paidAt: { type: Date, default: null },
         },
-
-        // Post-appointment
-        rating: {
-            type: Number, // 1-5
-            min: 1,
-            max: 5,
+        ratingId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Rating",
             default: null,
         },
-        review: {
-            type: String,
-            trim: true,
-            maxlength: 2000,
-            default: "",
-        },
-
-        // cancellation: {
-        //     isCancelled: { type: Boolean, default: false },
-        //     cancelledBy: {
-        //         type: String,
-        //         enum: ["patient", "doctor", "system"],
-        //         default: null,
-        //     },
-        //     reason: { type: String, trim: true, maxlength: 500, default: "" },
-        //     cancelledAt: { type: Date, default: null },
-        //     refundEligible: { type: Boolean, default: false },
-        // },
-        // reschedule: {
-        //     rescheduleCount: { type: Number, default: 0, min: 0 },
-        //     lastRescheduledAt: { type: Date, default: null },
-        //     previousSlots: {
-        //         type: [
-        //             {
-        //                 scheduledAt: Date,
-        //                 durationMinutes: Number,
-        //             },
-        //         ],
-        //         default: [],
-        //     },
-        // },
     },
     {
         timestamps: true,

@@ -37,6 +37,7 @@ import {
 } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { div } from "motion/react-client";
+import GoogleTranslater from "./GoogleTranslater";
 
 const products = [
     {
@@ -225,13 +226,16 @@ export default function Navbar() {
                             </SignUpButton>
                         )}
                     </div>
-                    <button
-                        onClick={() =>
-                            setTheme(theme === "dark" ? "light" : "dark")
-                        }
-                        className="cursor-pointer text-light-primary-text dark:text-dark-primary-text">
-                        {theme === "dark" ? <Moon /> : <Sun />}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() =>
+                                setTheme(theme === "dark" ? "light" : "dark")
+                            }
+                            className="cursor-pointer text-light-primary-text dark:text-dark-primary-text">
+                            {theme === "dark" ? <Moon /> : <Sun />}
+                        </button>
+                        <GoogleTranslater />
+                    </div>
                 </div>
             </nav>
             <Dialog
@@ -298,7 +302,7 @@ export default function Navbar() {
                                     Company
                                 </a>
                             </div>
-                            <div className="py-6 flex flex-col gap-2">
+                            <div className="py-6 flex flex-col gap-3">
                                 <button
                                     onClick={() =>
                                         setTheme(
@@ -316,6 +320,9 @@ export default function Navbar() {
                                         </div>
                                     )}
                                 </button>
+                                <div className="max-w-[280px]">
+                                    <GoogleTranslater />
+                                </div>
                                 {isSignedIn ? (
                                     <button
                                         onClick={() => {

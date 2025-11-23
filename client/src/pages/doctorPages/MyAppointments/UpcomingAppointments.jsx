@@ -124,15 +124,8 @@ const UpcomingAppointments = () => {
     }, [appointments]);
 
     const startAppointmentHandler = (apptId) => {
-        window.location.href = `/video-appointment?roomID=${apptId}`;
-        url =
-            window.location.protocol +
-            "//" +
-            window.location.host +
-            window.location.pathname +
-            "?roomID=" +
-            apptId;
-        console.log(url);
+        // Navigate with role in the URL path and roomID as query parameter
+        window.location.href = `/video-appointment/doctor?roomID=${apptId}`;
     };
 
     if (loading) {

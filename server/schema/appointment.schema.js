@@ -29,7 +29,6 @@ const appointmentSchema = new mongoose.Schema(
             default: "pending",
             index: true,
         },
-
         appointmentType: {
             type: String,
             enum: ["online", "offline"],
@@ -103,19 +102,10 @@ const appointmentSchema = new mongoose.Schema(
             orderId: { type: String, trim: true, default: "" },
             paidAt: { type: Date, default: null },
         },
-
-        // Post-appointment
-        rating: {
-            type: Number, // 1-5
-            min: 1,
-            max: 5,
+        ratingId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Rating",
             default: null,
-        },
-        review: {
-            type: String,
-            trim: true,
-            maxlength: 2000,
-            default: "",
         },
     },
     {

@@ -157,34 +157,6 @@ const PatientDetailsDialog = ({ appointment, isOpen, onClose }) => {
                                     </div>
                                 </div>
                             )}
-                            {appointment.patientId?.address && (
-                                <div className="flex items-start gap-2 md:col-span-2">
-                                    <MapPin className="w-4 h-4 text-blue-500 mt-1" />
-                                    <div className="flex-1">
-                                        <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-1">
-                                            Address
-                                        </p>
-                                        <p className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">
-                                            {appointment.patientId.address}
-                                            {appointment.patientId.district &&
-                                                `, ${appointment.patientId.district}`}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                            {appointment.patientId?.govIdType &&
-                                appointment.patientId?.govIdNumber && (
-                                    <div>
-                                        <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-1">
-                                            {appointment.patientId.govIdType
-                                                .toUpperCase()
-                                                .replace("-", " ")}
-                                        </p>
-                                        <p className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">
-                                            {appointment.patientId.govIdNumber}
-                                        </p>
-                                    </div>
-                                )}
                             {appointment.patientId?.emergencyContactName && (
                                 <div>
                                     <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-1">
@@ -206,7 +178,7 @@ const PatientDetailsDialog = ({ appointment, isOpen, onClose }) => {
                                     <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mb-1">
                                         Medical History
                                     </p>
-                                    <p className="text-sm text-light-primary-text dark:text-dark-primary-text bg-light-bg dark:bg-dark-surface p-3 rounded-lg border border-light-secondary-text/10 dark:border-dark-secondary-text/10">
+                                    <p className="text-sm text-light-primary-text dark:text-dark-primary-text bg-light-bg dark:bg-dark-bg p-3 rounded-lg border border-light-secondary-text/10 dark:border-dark-secondary-text/10">
                                         {appointment.patientId.medicalHistory}
                                     </p>
                                 </div>

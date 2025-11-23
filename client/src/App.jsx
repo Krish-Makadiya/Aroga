@@ -18,6 +18,7 @@ import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 import PostDetail from "./pages/community/PostDetail";
 import VideoAppointment from "./components/Doctor/VideoAppointment"
+import WomenHealth from "./pages/patientPages/WomenHealth/WomenHealth"
 import { useUser } from "@clerk/clerk-react";
 
 const patientTabs = [
@@ -35,7 +36,7 @@ const patientTabs = [
     },
     {
         id: 3,
-        name: "Women’s Health",
+        name: "Women’s Health Blogs",
         icon: Venus,
         path: "/patient/womens-health",
     },
@@ -47,6 +48,13 @@ const patientTabs = [
     },
     {
         id: 5,
+        name: "Women’s Health",
+        icon: Venus,
+        path: "/patient/women-health",
+    },
+  {
+        id: 6,
+
         name: "Community Health",
         icon: Megaphone,
         path: "/patient/community",
@@ -172,6 +180,14 @@ function App() {
                     }
                 />
                 <Route
+                    path="/patient/women-health"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <WomenHealth tabs={patientTabs}/>
+                       </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/patient/community"
                     element={
                         <ProtectedRoute requiredRole="Patient">
@@ -184,6 +200,7 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <PostDetail />
+
                         </ProtectedRoute>
                     }
                 />

@@ -1,4 +1,4 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus } from "lucide-react";
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Search } from "lucide-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Onboarding from "./pages/auth/Onboarding";
@@ -15,6 +15,7 @@ import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 import VideoAppointment from "./components/Doctor/VideoAppointment"
+import MedicineSearch from "./pages/patientPages/MedicineSearch/MedicineSearch";
 
 const patientTabs = [
     {
@@ -40,6 +41,12 @@ const patientTabs = [
         name: "Get Appointment",
         icon: Stethoscope,
         path: "/patient/get-appointment",
+    },
+    {
+        id: 5,
+        name: "Search Medicine",
+        icon: Search,
+        path: "/patient/medicine-search",
     },
 ];
 
@@ -104,7 +111,7 @@ function App() {
                     path="/patient/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <PatientDashboard tabs={patientTabs}/>
+                            <PatientDashboard tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
@@ -112,7 +119,7 @@ function App() {
                     path="/patient/symptom-checker"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <SymptomChecker tabs={patientTabs}/>
+                            <SymptomChecker tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
@@ -120,7 +127,7 @@ function App() {
                     path="/patient/womens-health"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <WomensHealth tabs={patientTabs}/>
+                            <WomensHealth tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
@@ -128,12 +135,21 @@ function App() {
                     path="/patient/get-appointment"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <GetAppointment tabs={patientTabs}/>
+                            <GetAppointment tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
 
                 {/* TODO: DOCTORS */}
+                <Route
+                    path="/patient/medicine-search"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <MedicineSearch tabs={patientTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+
                 <Route
                     path="/doctor/dashboard"
                     element={
@@ -162,7 +178,7 @@ function App() {
                 <Route
                     path="/video-appointment"
                     element={
-                        <VideoAppointment/>
+                        <VideoAppointment />
                     }
                 />
                 <Route

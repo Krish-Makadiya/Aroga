@@ -13,6 +13,8 @@ const articleRoute = require("./routes/articles.route");
 const paymentRoute = require("./routes/payment.routes");
 const groqHealthRoute = require("./routes/groqHealthRoute");
 const webhookRoute = require("./routes/webhook.route");
+const medicineRoute = require("./routes/medicine.Routes");
+const pharmacyLocationRoute = require("./routes/pharmacy_Location.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,6 +37,9 @@ app.use("/api/appointment", appointmentRoute);
 app.use("/api/ai", aiRoutes);
 app.use("/api/articles", articleRoute);
 app.use("/api", groqHealthRoute);
+
+app.use("/api/medicine", medicineRoute);
+app.use("/api/pharmacyLocation", pharmacyLocationRoute);
 
 app.get("/", (req, res) => {
     res.send("API is running!");

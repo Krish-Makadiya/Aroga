@@ -41,6 +41,9 @@ exports.createPharmacy = async (req, res) => {
                 success: false,
                 message:
                     "Missing required fields: pharmacyName, ownerName, licenseNumber, phone, email, address, district, state, pincode, registrationType",
+                data: {
+                    gstNumber:gstNumber
+                }
             });
         }
 

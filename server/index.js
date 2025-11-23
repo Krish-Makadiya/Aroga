@@ -7,6 +7,8 @@ const patientRoute = require("./routes/patient.route");
 const doctorRoute = require("./routes/doctor.route");
 const pharmacyRoute = require("./routes/pharmacy.route");
 const eventRoute = require("./routes/event.route");
+const womenHealthRoute = require("./routes/womenhealth.route");
+const womenhealthAiRoute = require('./routes/womenhealthai.route');
 const aiRoutes = require("./routes/ai.route");
 const appointmentRoute = require("./routes/appointment.route");
 const articleRoute = require("./routes/articles.route");
@@ -29,6 +31,8 @@ app.use("/api/payment", paymentRoute);
 app.use("/api/webhook", webhookRoute);
 
 app.use("/api/event", eventRoute);
+app.use("/api/womenhealth", womenHealthRoute);
+app.use('/api/womenhealthai', womenhealthAiRoute);
 app.use("/api/appointment", appointmentRoute);
 app.use("/api/ai", aiRoutes);
 app.use("/api/articles", articleRoute);

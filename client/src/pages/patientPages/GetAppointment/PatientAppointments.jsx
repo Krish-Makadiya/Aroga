@@ -42,7 +42,13 @@ const PatientAppointments = () => {
                 );
 
                 if (!mounted) return;
-                setAppointments(res.data?.data || []);
+                
+                // Filter to only show confirmed appointments
+                const allAppointments = res.data?.data || [];
+                const confirmedAppointments = allAppointments.filter(
+                    (appt) => appt.status === "confirmed" || appt.status === "pending"
+                );
+                setAppointments(confirmedAppointments);
             } catch (err) {
                 setError("Failed to load appointments");
                 console.error(err?.response?.data || err);
@@ -65,7 +71,7 @@ const PatientAppointments = () => {
     }
     if (appointments.length === 0) {
         return (
-            <div className="p-6 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+            <div className="p-6 text-light-secondary-text dark:text-dark-secondary-text">
                 No appointments found.
             </div>
         );

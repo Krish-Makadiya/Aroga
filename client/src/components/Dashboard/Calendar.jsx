@@ -29,10 +29,12 @@ const Calendar = ({ patientId }) => {
     useEffect(() => {
         fetchEvents();
     }, [patientId]);
-    
+
     const fetchEvents = async () => {
         const response = await axios.get(
-            `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events`
+            `${
+                import.meta.env.VITE_SERVER_URL
+            }/api/event/patients/${patientId}/events`
         );
         setEvents(response.data);
     };
@@ -133,7 +135,11 @@ const Calendar = ({ patientId }) => {
             try {
                 await toast.promise(
                     axios.put(
-                        `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events/${editingEvent._id}`,
+                        `${
+                            import.meta.env.VITE_SERVER_URL
+                        }/api/event/patients/${patientId}/events/${
+                            editingEvent._id
+                        }`,
                         newEvent
                     ),
                     {
@@ -142,12 +148,12 @@ const Calendar = ({ patientId }) => {
                         error: <b>Could not update event.</b>,
                     }
                 );
-            setEvents(
-                events.map((event) =>
+                setEvents(
+                    events.map((event) =>
                         event._id === editingEvent._id ? newEvent : event
-                )
-            );
-            setEditingEvent(null);
+                    )
+                );
+                setEditingEvent(null);
             } catch (error) {
                 console.log(error);
             }
@@ -155,7 +161,9 @@ const Calendar = ({ patientId }) => {
             try {
                 await toast.promise(
                     axios.post(
-                        `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events`,
+                        `${
+                            import.meta.env.VITE_SERVER_URL
+                        }/api/event/patients/${patientId}/events`,
                         newEvent
                     ),
                     {
@@ -190,7 +198,9 @@ const Calendar = ({ patientId }) => {
         try {
             await toast.promise(
                 axios.delete(
-                    `${import.meta.env.VITE_SERVER_URL}/api/event/patients/${patientId}/events/${eventId}`
+                    `${
+                        import.meta.env.VITE_SERVER_URL
+                    }/api/event/patients/${patientId}/events/${eventId}`
                 ),
                 {
                     loading: "Deleting event...",
@@ -206,15 +216,15 @@ const Calendar = ({ patientId }) => {
 
     return (
         <div>
-            <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] flex items-center">
-                        <CalendarIcon className="w-6 h-6 mr-3 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+            <div className="dark:bg-dark-bg bg-light-surface rounded-2xl md:p-6 p-4 shadow-md hover:shadow-xl transition-all duration-300">
+                <div className="flex md:flex-row flex-col md:items-center items-start md:gap-0 gap-2 justify-between mb-6">
+                    <h3 className="md:text-2xl text-xl font-bold text-light-primary-text dark:text-dark-primary-text flex items-center">
+                        <CalendarIcon className="w-6 h-6 mr-3 text-light-primary dark:text-dark-primary" />
                         My Calendar
                     </h3>
                     <button
                         onClick={handleAddEvent}
-                        className="px-4 py-2 bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white rounded-xl hover:bg-[var(--color-light-primary-dark)] dark:hover:bg-[var(--color-dark-primary-dark)] transition-colors flex items-center">
+                        className="px-4 py-2 bg-light-primary dark:bg-dark-primary text-white rounded-xl hover:bg-light-primary-hover dark:hover:bg-dark-primary-hover transition-colors flex items-center">
                         <Plus className="w-4 h-4 mr-2" />
                         Add Event
                     </button>
@@ -227,10 +237,10 @@ const Calendar = ({ patientId }) => {
                         <div className="flex items-center justify-between mb-4">
                             <button
                                 onClick={() => navigateMonth("prev")}
-                                className="p-2 rounded-lg bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 transition-colors">
-                                <ChevronLeft className="w-5 h-5 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]" />
+                                className="p-2 rounded-lg bg-light-background dark:bg-dark-background hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors">
+                                <ChevronLeft className="w-5 h-5 text-light-primary-text dark:text-dark-primary-text" />
                             </button>
-                            <h4 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h4 className="md:text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                                 {currentMonth.toLocaleDateString("en-US", {
                                     month: "long",
                                     year: "numeric",
@@ -238,13 +248,13 @@ const Calendar = ({ patientId }) => {
                             </h4>
                             <button
                                 onClick={() => navigateMonth("next")}
-                                className="p-2 rounded-lg bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 transition-colors">
-                                <ChevronRight className="w-5 h-5 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]" />
+                                className="p-2 rounded-lg bg-light-background dark:bg-dark-background hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors">
+                                <ChevronRight className="w-5 h-5 text-light-primary-text dark:text-dark-primary-text" />
                             </button>
                         </div>
 
                         {/* Calendar Days Header */}
-                        <div className="grid grid-cols-7 gap-1 mb-2">
+                        <div className="grid grid-cols-7 md:gap-1 mb-2">
                             {[
                                 "Sun",
                                 "Mon",
@@ -256,7 +266,7 @@ const Calendar = ({ patientId }) => {
                             ].map((day) => (
                                 <div
                                     key={day}
-                                    className="p-2 text-center text-sm font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    className="md:p-2 text-center md:text-sm text-xs font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     {day}
                                 </div>
                             ))}
@@ -273,37 +283,37 @@ const Calendar = ({ patientId }) => {
                             ${
                                 !day
                                     ? "cursor-default"
-                                    : "hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10"
+                                    : "hover:bg-light-primary/10 dark:hover:bg-dark-primary/10"
                             }
                             ${
                                 isToday(day)
-                                    ? "bg-[var(--color-light-primary)] text-white font-bold"
+                                    ? "bg-light-primary text-white font-bold"
                                     : ""
                             }
                             ${
                                 isSelected(day) && !isToday(day)
-                                    ? "bg-[var(--color-light-primary)]/20 dark:bg-[var(--color-dark-primary)]/20 border-2 border-[var(--color-light-primary)] dark:border-[var(--color-dark-primary)]"
+                                    ? "bg-light-primary/20 dark:bg-dark-primary/20 border-2 border-light-primary dark:border-dark-primary"
                                     : ""
                             }
                             ${
                                 !day
                                     ? ""
-                                    : "border border-[var(--color-light-secondary-text)]/10 dark:border-[var(--color-dark-secondary-text)]/10"
+                                    : "border border-light-secondary-text/10 dark:border-dark-secondary-text/10"
                             }
                         `}>
                                     {day && (
                                         <>
                                             <span
-                                                className={`text-sm ${
+                                                className={`md:text-sm text-xs ${
                                                     isToday(day)
                                                         ? "text-white"
-                                                        : "text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]"
+                                                        : "text-light-primary-text dark:text-dark-primary-text"
                                                 }`}>
                                                 {day}
                                             </span>
                                             {hasEvent(day) && (
                                                 <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-                                                    <div className="w-1.5 h-1.5 bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] rounded-full"></div>
+                                                    <div className="w-1.5 h-1.5 bg-light-primary dark:bg-dark-primary rounded-full"></div>
                                                 </div>
                                             )}
                                         </>
@@ -315,8 +325,8 @@ const Calendar = ({ patientId }) => {
 
                     {/* Selected Date Events */}
                     <div className="lg:col-span-1">
-                        <div className="bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] rounded-xl p-4">
-                            <h5 className="text-lg font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-3">
+                        <div className="bg-light-background dark:bg-dark-background rounded-xl p-4">
+                            <h5 className="text-lg font-bold text-light-primary-text dark:text-dark-primary-text mb-3">
                                 {selectedDate.toLocaleDateString("en-US", {
                                     weekday: "long",
                                     month: "long",
@@ -326,7 +336,7 @@ const Calendar = ({ patientId }) => {
 
                             {getEventsForDate(selectedDate.getDate()).length ===
                             0 ? (
-                                <p className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] text-sm">
+                                <p className="text-light-secondary-text dark:text-dark-secondary-text text-sm">
                                     No events scheduled for this date.
                                 </p>
                             ) : (
@@ -336,18 +346,18 @@ const Calendar = ({ patientId }) => {
                                     ).map((event, index) => (
                                         <div
                                             key={index}
-                                            className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-lg p-3 border border-[var(--color-light-primary)]/20 dark:border-[var(--color-dark-primary)]/20">
+                                            className="bg-light-surface dark:bg-dark-surface rounded-lg p-4">
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
-                                                    <h6 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] text-sm">
+                                                    <h6 className="font-semibold text-light-primary-text dark:text-dark-primary-text text-sm">
                                                         {event.title}
                                                     </h6>
-                                                    <div className="flex items-center mt-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                                    <div className="flex items-center mt-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                         <Clock className="w-3 h-3 mr-1" />
                                                         {event.time}
                                                     </div>
                                                     {event.description && (
-                                                        <p className="text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] mt-1">
+                                                        <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text mt-1">
                                                             {event.description}
                                                         </p>
                                                     )}
@@ -371,8 +381,8 @@ const Calendar = ({ patientId }) => {
                                                                 event
                                                             )
                                                         }
-                                                        className="p-1 rounded hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 transition-colors">
-                                                        <Edit className="w-3 h-3 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]" />
+                                                        className="p-1 rounded hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors">
+                                                        <Edit className="w-3 h-3 text-light-secondary-text dark:text-dark-secondary-text" />
                                                     </button>
                                                     <button
                                                         onClick={() =>
@@ -397,9 +407,9 @@ const Calendar = ({ patientId }) => {
             {/* Event Modal */}
             {showEventModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                    <div className="bg-light-surface dark:bg-dark-surface rounded-2xl p-6 w-full max-w-md shadow-2xl">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                                 {editingEvent ? "Edit Event" : "Add New Event"}
                             </h3>
                             <button
@@ -414,14 +424,14 @@ const Calendar = ({ patientId }) => {
                                         description: "",
                                     });
                                 }}
-                                className="p-1 rounded-lg hover:bg-[var(--color-light-background)] dark:hover:bg-[var(--color-dark-background)] transition-colors">
-                                <X className="w-5 h-5 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]" />
+                                className="p-1 rounded-lg hover:bg-light-background dark:hover:bg-dark-background transition-colors">
+                                <X className="w-5 h-5 text-light-secondary-text dark:text-dark-secondary-text" />
                             </button>
                         </div>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                                <label className="block text-sm font-medium text-light-primary-text dark:text-dark-primary-text mb-2">
                                     Event Title *
                                 </label>
                                 <input
@@ -433,13 +443,13 @@ const Calendar = ({ patientId }) => {
                                             title: e.target.value,
                                         })
                                     }
-                                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                    className="w-full px-3 py-2 rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
                                     placeholder="Enter event title"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                                <label className="block text-sm font-medium text-light-primary-text dark:text-dark-primary-text mb-2">
                                     Date
                                 </label>
                                 <input
@@ -451,12 +461,12 @@ const Calendar = ({ patientId }) => {
                                             date: e.target.value,
                                         })
                                     }
-                                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                    className="w-full px-3 py-2 rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                                <label className="block text-sm font-medium text-light-primary-text dark:text-dark-primary-text mb-2">
                                     Time *
                                 </label>
                                 <input
@@ -468,12 +478,12 @@ const Calendar = ({ patientId }) => {
                                             time: e.target.value,
                                         })
                                     }
-                                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                    className="w-full px-3 py-2 rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                                <label className="block text-sm font-medium text-light-primary-text dark:text-dark-primary-text mb-2">
                                     Event Type
                                 </label>
                                 <select
@@ -484,7 +494,7 @@ const Calendar = ({ patientId }) => {
                                             type: e.target.value,
                                         })
                                     }
-                                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]">
+                                    className="w-full px-3 py-2 rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary">
                                     <option value="appointment">
                                         Doctor Appointment
                                     </option>
@@ -500,7 +510,7 @@ const Calendar = ({ patientId }) => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                                <label className="block text-sm font-medium text-light-primary-text dark:text-dark-primary-text mb-2">
                                     Description
                                 </label>
                                 <textarea
@@ -512,7 +522,7 @@ const Calendar = ({ patientId }) => {
                                         })
                                     }
                                     rows={3}
-                                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)] resize-none"
+                                    className="w-full px-3 py-2 rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary resize-none"
                                     placeholder="Add event description (optional)"
                                 />
                             </div>
@@ -531,13 +541,13 @@ const Calendar = ({ patientId }) => {
                                         description: "",
                                     });
                                 }}
-                                className="px-4 py-2 rounded-lg border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] hover:bg-[var(--color-light-background)] dark:hover:bg-[var(--color-dark-background)] transition-colors">
+                                className="px-4 py-2 rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 text-light-secondary-text dark:text-dark-secondary-text hover:bg-light-background dark:hover:bg-dark-background transition-colors">
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSaveEvent}
                                 disabled={!newEvent.title || !newEvent.time}
-                                className="px-4 py-2 rounded-lg bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white hover:bg-[var(--color-light-primary-dark)] dark:hover:bg-[var(--color-dark-primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="px-4 py-2 rounded-lg bg-light-primary dark:bg-dark-primary text-white hover:bg-light-primary-dark dark:hover:bg-dark-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                                 {editingEvent ? "Update Event" : "Add Event"}
                             </button>
                         </div>

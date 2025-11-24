@@ -7,11 +7,13 @@ const patientRoute = require("./routes/patient.route");
 const doctorRoute = require("./routes/doctor.route");
 const pharmacyRoute = require("./routes/pharmacy.route");
 const eventRoute = require("./routes/event.route");
+const womenHealthRoute = require("./routes/womenhealth.route");
+const womenhealthAiRoute = require('./routes/womenhealthai.route');
 const aiRoutes = require("./routes/ai.route");
 const appointmentRoute = require("./routes/appointment.route");
 const articleRoute = require("./routes/articles.route");
 const paymentRoute = require("./routes/payment.routes");
-const groqHealthRoute = require("./routes/groqHealthRoute");
+const healthRoute = require("./routes/health.route.js");
 const webhookRoute = require("./routes/webhook.route");
 const medicineRoute = require("./routes/medicine.Routes");
 const pharmacyLocationRoute = require("./routes/pharmacy_Location.routes");
@@ -25,6 +27,8 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 app.use("/api/patient", patientRoute);
 app.use("/api/doctor", doctorRoute);
@@ -34,10 +38,15 @@ app.use("/api/payment", paymentRoute);
 app.use("/api/webhook", webhookRoute);
 
 app.use("/api/event", eventRoute);
+app.use("/api/womenhealth", womenHealthRoute);
+app.use('/api/womenhealthai', womenhealthAiRoute);
 app.use("/api/appointment", appointmentRoute);
 app.use("/api/ai", aiRoutes);
 app.use("/api/articles", articleRoute);
-app.use("/api", groqHealthRoute);
+app.use("/api", healthRoute);
+
+
+
 
 app.use("/api/medicine", medicineRoute);
 app.use("/api/pharmacyLocation", pharmacyLocationRoute);

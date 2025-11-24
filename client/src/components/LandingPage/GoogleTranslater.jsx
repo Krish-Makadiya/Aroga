@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Languages } from "lucide-react";
 
 const GOOGLE_ELEMENT_URL = import.meta.env.VITE_GOOGLE_TRANSLATE_URL;
 export default function GoogleTranslater() {
@@ -84,16 +85,16 @@ export default function GoogleTranslater() {
     };
 
     return (
-        <div ref={wrapperRef} className="relative">
+        <div ref={wrapperRef} className="relative flex justify-center">
             <button
                 onClick={() => setOpen(!open)}
                 className="cursor-pointer text-sm font-semibold text-light-primary-text dark:text-dark-primary-text"
             >
-                Language
+                <Languages />
             </button>
 
             {open && (
-                <div className="absolute right-0 mt-2 p-3 bg-light-surface dark:bg-dark-surface rounded-2xl shadow-lg min-w-[220px] z-50 border border-light-primary/15 dark:border-dark-primary/15">
+                <div className="absolute right-0 mt-6 p-3 bg-light-surface dark:bg-dark-surface rounded-2xl shadow-lg min-w-[220px] z-50 border border-light-primary/15 dark:border-dark-primary/15">
                     <div className="text-xs mb-2 text-light-secondary-text dark:text-dark-secondary-text">
                         Choose language
                     </div>

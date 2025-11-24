@@ -6,7 +6,7 @@ export default function TestimonialSection() {
                     Arogya
                 </p>
                 <figure className="mt-10">
-                    <blockquote className="text-center text-xl/8 font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] sm:text-2xl/9">
+                    <blockquote className="text-center text-xl/8 font-semibold text-light-primary-text dark:text-dark-primary-text sm:text-2xl/9">
                         <p>
                             “Arogya made it so easy to get medical advice and
                             prescriptions from home. The AI symptom checker is

@@ -15,6 +15,9 @@ const articleRoute = require("./routes/articles.route");
 const paymentRoute = require("./routes/payment.routes");
 const healthRoute = require("./routes/health.route.js");
 const webhookRoute = require("./routes/webhook.route");
+const medicineRoute = require("./routes/medicine.Routes");
+const pharmacyLocationRoute = require("./routes/pharmacy_Location.routes");
+const pharmacyBillRoute = require("./routes/pharmcy.bill.route");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -44,6 +47,10 @@ app.use("/api", healthRoute);
 
 
 
+
+app.use("/api/medicine", medicineRoute);
+app.use("/api/pharmacyLocation", pharmacyLocationRoute);
+app.use("/api/pharmacyBill", pharmacyBillRoute);
 
 app.get("/", (req, res) => {
     res.send("API is running!");

@@ -1,3 +1,7 @@
+import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Search } from "lucide-react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import Onboarding from "./pages/auth/Onboarding";
 import { useUser } from "@clerk/clerk-react";
 import {
     Album,
@@ -34,6 +38,8 @@ import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashb
 import SheReads from "./pages/patientPages/SheReads/SheReads";
 import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
+import VideoAppointment from "./components/Doctor/VideoAppointment"
+import MedicineSearch from "./pages/patientPages/MedicineSearch/MedicineSearch";
 
 const patientTabs = [
     {
@@ -68,7 +74,12 @@ const patientTabs = [
     },
     {
         id: 6,
-
+        name: "Search Medicine",
+        icon: Search,
+        path: "/patient/medicine-search",
+    },
+    {
+        id: 7,
         name: "Community Health",
         icon: Megaphone,
         path: "/patient/community",
@@ -224,6 +235,15 @@ function App() {
 
                 {/* TODO: DOCTORS */}
                 <Route
+                    path="/patient/medicine-search"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <MedicineSearch tabs={patientTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
                     path="/doctor/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
@@ -251,17 +271,7 @@ function App() {
                 <Route
                     path="/video-appointment"
                     element={
-                        <ProtectedRoute>
-                            <VideoAppointmentEntry />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/video-appointment/:role"
-                    element={
-                        <ProtectedRoute>
-                            <VideoAppointment />
-                        </ProtectedRoute>
+                        <VideoAppointment />
                     }
                 />
                 <Route

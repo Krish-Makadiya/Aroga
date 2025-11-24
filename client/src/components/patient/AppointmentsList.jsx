@@ -18,6 +18,8 @@ import {
     CreditCard,
     Receipt,
     StarIcon,
+    X,
+    Pill,
 } from "lucide-react";
 import Drawer from "../main/Drawer";
 import toast from "react-hot-toast";
@@ -227,10 +229,10 @@ const AppointmentsList = ({ appointments }) => {
                         </div>
                         {/* Report Viewer Modal */}
                         {viewerOpen && viewingUrl && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                                 <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-light-surface dark:bg-dark-bg p-4 shadow-lg">
                                     <div className="flex items-start justify-between mb-3">
-                                        <h4 className="text-lg font-semibold">
+                                        <h4 className="text-lg font-semibold text-light-primary-text dark:text-dark-primary-text">
                                             Report Preview
                                         </h4>
                                         <button
@@ -239,8 +241,8 @@ const AppointmentsList = ({ appointments }) => {
                                                 setViewingUrl(null);
                                                 setViewingType(null);
                                             }}
-                                            className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-                                            Close
+                                            className="px-2 py-1 rounded text-light-primary-text dark:text-dark-primary-text hover:bg-light-bg dark:hover:bg-dark-surface">
+                                            <X />
                                         </button>
                                     </div>
                                     <div className="w-full">
@@ -648,8 +650,8 @@ const AppointmentsList = ({ appointments }) => {
                                                     );
                                                 }
                                             }}
-                                            className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10">
-                                            <FileText className="w-4 h-4" />
+                                            className="inline-flex items-center gap-1 py-2 px-4 rounded-md  font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 ml-2 bg-light-surface dark:bg-dark-surface">
+                                            <FileText size={20} />
                                             View Report
                                         </button>
                                     )}
@@ -669,8 +671,9 @@ const AppointmentsList = ({ appointments }) => {
                                                     });
                                                     setPrescriptionOpen(true);
                                                 }}
-                                                className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 ml-2">
-                                                View Prescription
+                                                className="inline-flex items-center gap-1 py-2 px-4 rounded-md  font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 ml-2 bg-light-surface dark:bg-dark-surface">
+                                                <Pill size={20} />
+                                                <p>Prescriptions</p>
                                             </button>
                                         )}
                                 </div>
@@ -701,14 +704,14 @@ const AppointmentsList = ({ appointments }) => {
                         )}
                         {/* Prescription Modal */}
                         {prescriptionOpen && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                                 <div className="w-full max-w-3xl max-h-[85vh] overflow-auto rounded-2xl bg-light-surface dark:bg-dark-bg p-4 shadow-lg">
                                     <div className="flex items-center justify-between mb-3">
                                         <div>
-                                            <h4 className="text-lg font-semibold">
+                                            <h4 className="text-lg font-semibold text-light-primary-text dark:text-dark-primary-text">
                                                 Prescription
                                             </h4>
-                                            <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                 Prescribed by{" "}
                                                 {prescriptionMeta.doctorName ||
                                                     "Doctor"}{" "}
@@ -724,8 +727,8 @@ const AppointmentsList = ({ appointments }) => {
                                                 onClick={() =>
                                                     setPrescriptionOpen(false)
                                                 }
-                                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800">
-                                                Close
+                                                className="px-2 py-1 rounded text-light-primary-text dark:text-dark-primary-text hover:bg-light-bg dark:hover:bg-dark-surface">
+                                                <X />
                                             </button>
                                         </div>
                                     </div>
@@ -737,9 +740,9 @@ const AppointmentsList = ({ appointments }) => {
                                                 (item, idx) => (
                                                     <div
                                                         key={idx}
-                                                        className="border rounded-lg p-3 bg-white dark:bg-gray-900">
+                                                        className="rounded-lg p-3 bg-light-surface dark:bg-dark-surface">
                                                         <div className="flex items-start justify-between gap-3">
-                                                            <div className="flex-1">
+                                                            <div className="flex-1 text-light-primary-text dark:text-dark-primary-text">
                                                                 <div className="text-md font-semibold">
                                                                     {item.medicine ||
                                                                         "Unknown medicine"}
@@ -752,12 +755,12 @@ const AppointmentsList = ({ appointments }) => {
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                            <div className="text-right text-sm">
+                                                            <div className="text-right text-sm text-light-primary-text dark:text-dark-primary-text">
                                                                 <div className="font-medium">
                                                                     {item.dosage ||
                                                                         "-"}
                                                                 </div>
-                                                                <div className="text-light-secondary-text dark:text-dark-secondary-text">
+                                                                <div className="text-light-secondary-text dark:text-dark-secondary-text mt-2">
                                                                     {item.frequency ||
                                                                         "-"}
                                                                 </div>

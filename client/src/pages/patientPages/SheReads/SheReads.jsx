@@ -1,8 +1,9 @@
+import React from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "../../../components/Sidebar";
-import WomenHealthContent from "./WomenHealthContent";
+import SheReadsContent from "./SheReadsContent";
 
-export default function WomenHealth({ tabs }) {
+const SheReads = ({tabs}) => {
     const location = useLocation();
 
     const getActiveTab = () => {
@@ -15,9 +16,12 @@ export default function WomenHealth({ tabs }) {
     return (
         <div className="flex relative">
             <Sidebar tabs={tabs} getActiveTab={getActiveTab} />
-            <div className="h-full w-full bg-light-bg dark:bg-dark-surface md:py-10 md:px-5 py-5">
-                <WomenHealthContent patientId={"demo-patient-id"} />
+
+            <div className="min-h-screen w-full bg-light-bg dark:bg-dark-surface md:py-10 md:px-5 py-5">
+                <SheReadsContent/>
             </div>
         </div>
     );
-}
+};
+
+export default SheReads;

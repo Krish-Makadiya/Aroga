@@ -1,25 +1,39 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Megaphone } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
+import {
+    Album,
+    DollarSign,
+    File,
+    LayoutDashboard,
+    Megaphone,
+    Pill,
+    Stethoscope,
+    Venus
+} from "lucide-react";
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
-import Onboarding from "./pages/auth/Onboarding";
+import {
+    BrowserRouter,
+    Navigate,
+    Route,
+    Routes,
+    useNavigate,
+} from "react-router-dom";
+import VideoAppointment from "./components/Doctor/VideoAppointment";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleRedirect from "./components/auth/RoleRedirect";
-import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashboard";
-import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
-import AdminDashboard from "./pages/dashboards/AdminDashboard";
-import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
-import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
-import WomensHealth from "./pages/patientPages/WomensHealth/WomensHealth";
-import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
-import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
-import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
-import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
-import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
+import LandingPage from "./pages/LandingPage";
+import Onboarding from "./pages/auth/Onboarding";
 import PostDetail from "./pages/community/PostDetail";
-import VideoAppointment from "./components/Doctor/VideoAppointment"
-import WomenHealth from "./pages/patientPages/WomenHealth/WomenHealth"
-import { useUser } from "@clerk/clerk-react";
+import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
+import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
+import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
+import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
+import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
+import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
+import MenstrualHealth from "./pages/patientPages/MenstrualHealth/MenstrualHealth";
+import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashboard";
+import SheReads from "./pages/patientPages/SheReads/SheReads";
+import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
+import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 
 const patientTabs = [
     {
@@ -36,23 +50,23 @@ const patientTabs = [
     },
     {
         id: 3,
-        name: "Women’s Health Blogs",
-        icon: Venus,
-        path: "/patient/womens-health",
+        name: "SheReads",
+        icon: Album,
+        path: "/patient/she-reads",
     },
     {
         id: 4,
+        name: "Menstrual Health",
+        icon: Venus,
+        path: "/patient/menstrual-health",
+    },
+    {
+        id: 5,
         name: "Get Appointment",
         icon: Stethoscope,
         path: "/patient/get-appointment",
     },
     {
-        id: 5,
-        name: "Women’s Health",
-        icon: Venus,
-        path: "/patient/women-health",
-    },
-  {
         id: 6,
 
         name: "Community Health",
@@ -109,14 +123,19 @@ const VideoAppointmentEntry = () => {
             return;
         }
 
-        const role =
-            (user.unsafeMetadata?.role || user.publicMetadata?.role || "patient").toString();
+        const role = (
+            user.unsafeMetadata?.role ||
+            user.publicMetadata?.role ||
+            "patient"
+        ).toString();
         const normalized = role.toLowerCase();
 
         // Preserve query parameters (like roomID) when redirecting
         const searchParams = new URLSearchParams(window.location.search);
         const queryString = searchParams.toString();
-        const redirectUrl = `/video-appointment/${encodeURIComponent(normalized)}${queryString ? `?${queryString}` : ''}`;
+        const redirectUrl = `/video-appointment/${encodeURIComponent(
+            normalized
+        )}${queryString ? `?${queryString}` : ""}`;
 
         navigate(redirectUrl, {
             replace: true,
@@ -125,7 +144,6 @@ const VideoAppointmentEntry = () => {
 
     return null;
 };
-
 
 function App() {
     return (
@@ -151,7 +169,7 @@ function App() {
                     path="/patient/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <PatientDashboard tabs={patientTabs}/>
+                            <PatientDashboard tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
@@ -159,15 +177,23 @@ function App() {
                     path="/patient/symptom-checker"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <SymptomChecker tabs={patientTabs}/>
+                            <SymptomChecker tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
                 <Route
-                    path="/patient/womens-health"
+                    path="/patient/she-reads"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <WomensHealth tabs={patientTabs}/>
+                            <SheReads tabs={patientTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/patient/menstrual-health"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <MenstrualHealth tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
@@ -175,23 +201,15 @@ function App() {
                     path="/patient/get-appointment"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <GetAppointment tabs={patientTabs}/>
+                            <GetAppointment tabs={patientTabs} />
                         </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/patient/women-health"
-                    element={
-                        <ProtectedRoute requiredRole="Patient">
-                            <WomenHealth tabs={patientTabs}/>
-                       </ProtectedRoute>
                     }
                 />
                 <Route
                     path="/patient/community"
                     element={
                         <ProtectedRoute requiredRole="Patient">
-                            <PatientCommunity tabs={patientTabs}/>
+                            <PatientCommunity tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />
@@ -200,7 +218,6 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <PostDetail />
-
                         </ProtectedRoute>
                     }
                 />
@@ -265,7 +282,6 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
 
                 {/*<Route
                     path="/dashboard/admin"

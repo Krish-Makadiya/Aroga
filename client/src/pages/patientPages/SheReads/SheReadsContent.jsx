@@ -354,7 +354,7 @@ const Pill = ({ text }) => (
     </span>
 );
 
-const WomensHealthContent = () => {
+const SheReadsContent = () => {
     const [query, setQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("All");
     const [selectedId, setSelectedId] = useState(null);
@@ -729,4 +729,4 @@ const WomensHealthContent = () => {
     );
 };
 
-export default WomensHealthContent;
+export default SheReadsContent;

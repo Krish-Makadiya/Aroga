@@ -4,7 +4,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import WomenHealthHistory from '../../../components/patient/WomenHealthHistory';
 
-const WomenHealthContent = () => {
+const MenstrualHealthContent = () => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user } = useUser();
@@ -47,4 +47,4 @@ const WomenHealthContent = () => {
     );
 };
 
-export default WomenHealthContent;
+export default MenstrualHealthContent;

@@ -20,12 +20,12 @@ const DoctorArticles = ({ tabs }) => {
         <div className="flex relative">
             <Sidebar tabs={tabs} getActiveTab={() => activeTab} />
             <div className="min-h-screen w-full bg-light-bg dark:bg-dark-surface md:py-8 md:px-5 py-5">
-                <div className="mb-4 flex justify-between gap-4 border-b border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20">
+                <div className="mb-4 flex justify-between gap-4 border-b border-light-secondary-text/20 dark:border-dark-secondary-text/20">
                     <div>
                         <button
                             className={`px-4 py-2 font-semibold rounded-t-lg transition-colors duration-200 focus:outline-none ${activeTab === "all-articles"
-                                    ? "bg-[var(--color-light-primary)] text-white dark:bg-[var(--color-dark-primary)]"
-                                    : "bg-transparent text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]"
+                                    ? "bg-light-primary text-white dark:bg-dark-primary"
+                                    : "bg-transparent text-light-primary-text dark:text-dark-primary-text"
                                 }`}
                             onClick={() => setActiveTab("all-articles")}
                         >
@@ -33,8 +33,8 @@ const DoctorArticles = ({ tabs }) => {
                         </button>
                         <button
                             className={`px-4 py-2 font-semibold rounded-t-lg transition-colors duration-200 focus:outline-none ${activeTab === "my-articles"
-                                    ? "bg-[var(--color-light-primary)] text-white dark:bg-[var(--color-dark-primary)]"
-                                    : "bg-transparent text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]"
+                                    ? "bg-light-primary text-white dark:bg-dark-primary"
+                                    : "bg-transparent text-light-primary-text dark:text-dark-primary-text"
                                 }`}
                             onClick={() => setActiveTab("my-articles")}
                         >

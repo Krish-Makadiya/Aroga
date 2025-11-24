@@ -38,7 +38,7 @@ const WomenHealthContent = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold text-[var(--color-light-primary-text)] mb-4 dark:text-[var(--color-dark-primary-text)]">
+            <h1 className="text-3xl font-bold text-light-primary-text mb-4 dark:text-dark-primary-text">
                 Women Health Content
             </h1>
             {userData && <WomenHealthCalendar patientId={userData._id} />}

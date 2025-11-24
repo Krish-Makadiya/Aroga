@@ -236,8 +236,8 @@ const WomenHealthCalendar = ({ patientId }) => {
         <div>
             <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] flex items-center">
-                        <CalendarIcon className="w-6 h-6 mr-3 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                    <h3 className="text-2xl font-bold text-light-primary-text dark:text-dark-primary-text flex items-center">
+                        <CalendarIcon className="w-6 h-6 mr-3 text-light-primary dark:text-dark-primary" />
                         My Calendar
                     </h3>
                     <div className="flex gap-2">
@@ -503,11 +503,11 @@ const WomenHealthCalendar = ({ patientId }) => {
         my-4 p-6 
         rounded-2xl 
         shadow-md 
-        bg-[var(--color-light-background)] 
-        dark:bg-[var(--color-dark-background)]
+        bg-light-background 
+        dark:bg-dark-background
         border 
-        border-[var(--color-light-secondary-text)]/20 
-        dark:border-[var(--color-dark-secondary-text)]/20
+        border-light-secondary-text/20 
+        dark:border-dark-secondary-text/20
         w-full
         transition-all
         text-m
@@ -516,7 +516,7 @@ const WomenHealthCalendar = ({ patientId }) => {
                             {/* SUMMARY SECTION */}
                             <div className="mb-6 space-y-3">
                                 <div>
-                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         Next Predicted Period:
                                     </span>
                                     <span className="text-blue-500 dark:text-blue-400 font-bold">
@@ -525,37 +525,37 @@ const WomenHealthCalendar = ({ patientId }) => {
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         Average Cycle Length:
                                     </span>
-                                    <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-light-primary-text dark:text-dark-primary-text">
                                         {summary.averageCycleLength ? " " + summary.averageCycleLength + ' days' : '--'}
                                     </span>
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         Average Period Length:
                                     </span>
-                                    <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-light-primary-text dark:text-dark-primary-text">
                                         {summary.averagePeriodLength ? " " + summary.averagePeriodLength + ' days' : '--'}
                                     </span>
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         Last Period Start:
                                     </span>
-                                    <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-light-primary-text dark:text-dark-primary-text">
                                         {summary.lastPeriodStart ? " " + new Date(summary.lastPeriodStart).toLocaleDateString() : '--'}
                                     </span>
                                 </div>
 
                                 <div>
-                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         Last Period End:
                                     </span>
-                                    <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-light-primary-text dark:text-dark-primary-text">
                                         {summary.lastPeriodEnd ? " " + new Date(summary.lastPeriodEnd).toLocaleDateString() : '--'}
                                     </span>
                                 </div>
@@ -566,7 +566,7 @@ const WomenHealthCalendar = ({ patientId }) => {
                                         const lastOvu = summary.ovulationDays[summary.ovulationDays.length - 1];
                                         return (
                                             <div>
-                                                <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">Ovulation Day:</span>
+                                                <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">Ovulation Day:</span>
                                                 <span className="text-purple-600 dark:text-purple-400 font-bold"> {lastOvu.toLocaleDateString()}</span>
                                             </div>
                                         );
@@ -579,11 +579,11 @@ const WomenHealthCalendar = ({ patientId }) => {
                                         return (
                                             <>
                                                 <div>
-                                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">Fertile Window Start:</span>
+                                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">Fertile Window Start:</span>
                                                     <span className="text-green-600 dark:text-green-400 font-bold"> {lastWin.start.toLocaleDateString()}</span>
                                                 </div>
                                                 <div>
-                                                    <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">Fertile Window End:</span>
+                                                    <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">Fertile Window End:</span>
                                                     <span className="text-green-600 dark:text-green-400 font-bold"> {lastWin.end.toLocaleDateString()}</span>
                                                 </div>
                                             </>
@@ -596,7 +596,7 @@ const WomenHealthCalendar = ({ patientId }) => {
 
                             {/* DAY STATUS SECTION */}
                             <div className="mt-4 text-center">
-                                <span className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     Day Status:
                                 </span>
                                 <br />
@@ -650,10 +650,10 @@ const WomenHealthCalendar = ({ patientId }) => {
                         <div className="flex items-center justify-between mb-4">
                             <button
                                 onClick={() => navigateMonth("prev")}
-                                className="p-2 rounded-lg bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 transition-colors">
-                                <ChevronLeft className="w-5 h-5 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]" />
+                                className="p-2 rounded-lg bg-light-background dark:bg-dark-background hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors">
+                                <ChevronLeft className="w-5 h-5 text-light-primary-text dark:text-dark-primary-text" />
                             </button>
-                            <h4 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h4 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                                 {currentMonth.toLocaleDateString("en-US", {
                                     month: "long",
                                     year: "numeric",
@@ -661,8 +661,8 @@ const WomenHealthCalendar = ({ patientId }) => {
                             </h4>
                             <button
                                 onClick={() => navigateMonth("next")}
-                                className="p-2 rounded-lg bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 transition-colors">
-                                <ChevronRight className="w-5 h-5 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]" />
+                                className="p-2 rounded-lg bg-light-background dark:bg-dark-background hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors">
+                                <ChevronRight className="w-5 h-5 text-light-primary-text dark:text-dark-primary-text" />
                             </button>
                         </div>
 
@@ -679,7 +679,7 @@ const WomenHealthCalendar = ({ patientId }) => {
                             ].map((day) => (
                                 <div
                                     key={day}
-                                    className="p-2 text-center text-sm font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    className="p-2 text-center text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     {day}
                                 </div>
                             ))}
@@ -695,19 +695,19 @@ const WomenHealthCalendar = ({ patientId }) => {
                             relative p-3 min-h-[48px] rounded-lg cursor-pointer transition-all duration-200 flex flex-col items-center justify-center
                             ${!day
                                             ? "cursor-default"
-                                            : "hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10"
+                                            : "hover:bg-light-primary/10 dark:hover:bg-dark-primary/10"
                                         }
                             ${isToday(day)
-                                            ? "bg-[var(--color-light-primary)] text-white font-bold"
+                                            ? "bg-light-primary text-white font-bold"
                                             : ""
                                         }
                             ${isSelected(day) && !isToday(day)
-                                            ? "bg-[var(--color-light-primary)]/20 dark:bg-[var(--color-dark-primary)]/20 border-2 border-[var(--color-light-primary)] dark:border-[var(--color-dark-primary)]"
+                                            ? "bg-light-primary/20 dark:bg-dark-primary/20 border-2 border-light-primary dark:border-dark-primary"
                                             : ""
                                         }
                             ${!day
                                             ? ""
-                                            : "border border-[var(--color-light-secondary-text)]/10 dark:border-[var(--color-dark-secondary-text)]/10"
+                                            : "border border-light-secondary-text/10 dark:border-dark-secondary-text/10"
                                         }
                         `}>
                                     {day && (
@@ -715,7 +715,7 @@ const WomenHealthCalendar = ({ patientId }) => {
                                             <span
                                                 className={`text-sm ${isToday(day)
                                                     ? "text-white"
-                                                    : "text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]"
+                                                    : "text-light-primary-text dark:text-dark-primary-text"
                                                     }`}>
                                                 {day}
                                             </span>

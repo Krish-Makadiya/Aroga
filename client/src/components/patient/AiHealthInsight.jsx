@@ -45,7 +45,7 @@ const AiHealthInsight = ({ aiInsight }) => {
             case 'mild': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300';
             case 'moderate': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-300';
             case 'severe': return 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-300';
-            default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30 dark:text-gray-300';
+            default: return 'text-gray-600 bg-light-surface dark:bg-dark-surface dark:text-gray-300';
         }
     };
 
@@ -62,10 +62,10 @@ const AiHealthInsight = ({ aiInsight }) => {
     return (
         <div className="space-y-6 mt-8">
             {/* Health State Overview */}
-            <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl p-6 shadow-lg">
+            <div className="bg-light-bg dark:bg-dark-surface rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
-                    <Heart className="w-6 h-6 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
-                    <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                    <Heart className="w-6 h-6 text-light-primary dark:text-dark-primary" />
+                    <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                         Health Analysis
                     </h3>
                 </div>
@@ -75,7 +75,7 @@ const AiHealthInsight = ({ aiInsight }) => {
                         {getHealthStateIcon(healthState)}
                         {healthState || 'Unknown'}
                     </div>
-                    <p className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                    <p className="text-light-secondary-text dark:text-dark-secondary-text">
                         Overall health condition assessment
                     </p>
                 </div>
@@ -83,31 +83,31 @@ const AiHealthInsight = ({ aiInsight }) => {
 
             {/* Possible Diseases */}
             {possibleDiseases && possibleDiseases.length > 0 && (
-                <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl p-6 shadow-lg">
+                <div className="bg-light-bg dark:bg-dark-surface rounded-2xl p-6 shadow-lg">
                     <div className="flex items-center gap-3 mb-4">
                         <AlertTriangle className="w-6 h-6 text-amber-500" />
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                             Possible Conditions
                         </h3>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 ">
                         {possibleDiseases.map((disease, index) => {
                             const diseaseName = formatItem(disease.name);
                             const confidenceText = formatItem(disease.confidence);
                             const reasonText = formatItem(disease.reason);
 
                             return (
-                                <div key={index} className="border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 rounded-xl p-4">
+                                <div key={index} className="bg-light-surface dark:bg-dark-bg rounded-xl p-4">
                                     <div className="flex items-start justify-between mb-2">
-                                        <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] text-lg">
+                                        <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text text-lg">
                                             {diseaseName}
                                         </h4>
                                         <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
                                             {confidenceText}
                                         </span>
                                     </div>
-                                    <p className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    <p className="text-light-secondary-text dark:text-dark-secondary-text">
                                         {reasonText}
                                     </p>
                                 </div>
@@ -119,10 +119,10 @@ const AiHealthInsight = ({ aiInsight }) => {
 
             {/* Remedies */}
             {remedies && remedies.length > 0 && (
-                <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl p-6 shadow-lg">
+                <div className="bg-light-bg dark:bg-dark-surface rounded-2xl p-6 shadow-lg">
                     <div className="flex items-center gap-3 mb-4">
                         <Leaf className="w-6 h-6 text-green-600" />
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                             Home Remedies
                         </h3>
                     </div>
@@ -131,7 +131,7 @@ const AiHealthInsight = ({ aiInsight }) => {
                         {remedies.map((remedy, index) => (
                             <li key={index} className="flex items-start gap-3">
                                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                                <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-light-primary-text dark:text-dark-primary-text">
                                     {formatItem(remedy)}
                                 </span>
                             </li>
@@ -142,10 +142,10 @@ const AiHealthInsight = ({ aiInsight }) => {
 
             {/* OTC Medicines */}
             {otcMedicines && otcMedicines.length > 0 && (
-                <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl p-6 shadow-lg">
+                <div className="bg-light-bg dark:bg-dark-surface rounded-2xl p-6 shadow-lg">
                     <div className="flex items-center gap-3 mb-4">
                         <Pill className="w-6 h-6 text-purple-600" />
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                             Medicine Suggestions
                         </h3>
                     </div>
@@ -154,7 +154,7 @@ const AiHealthInsight = ({ aiInsight }) => {
                         {otcMedicines.map((medicine, index) => (
                             <li key={index} className="flex items-start gap-3">
                                 <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                                <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-light-primary-text dark:text-dark-primary-text">
                                     {formatItem(medicine)}
                                 </span>
                             </li>
@@ -194,10 +194,10 @@ const AiHealthInsight = ({ aiInsight }) => {
 
             {/* Lifestyle Advice */}
             {lifestyleAdvice && lifestyleAdvice.length > 0 && (
-                <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl p-6 shadow-lg">
+                <div className="bg-light-bg dark:bg-dark-surface rounded-2xl p-6 shadow-lg">
                     <div className="flex items-center gap-3 mb-4">
                         <Lightbulb className="w-6 h-6 text-yellow-500" />
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                             Lifestyle Tips
                         </h3>
                     </div>
@@ -206,7 +206,7 @@ const AiHealthInsight = ({ aiInsight }) => {
                         {lifestyleAdvice.map((advice, index) => (
                             <li key={index} className="flex items-start gap-3">
                                 <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-                                <span className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-light-primary-text dark:text-dark-primary-text">
                                     {formatItem(advice)}
                                 </span>
                             </li>

@@ -206,11 +206,11 @@ const SymptomCheckerContent = () => {
         <div className="w-full max-w-8xl mx-auto ">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Input Card */}
-                <div className="lg:col-span-2 bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] rounded-2xl shadow p-5">
+                <div className="lg:col-span-2 bg-light-surface dark:bg-dark-bg rounded-2xl shadow p-5">
                     <div className="flex items-start justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <HeartPulse className="w-7 h-7 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
-                            <h3 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <HeartPulse className="w-7 h-7 text-light-primary dark:text-dark-primary" />
+                            <h3 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 Describe your symptoms
                             </h3>
                         </div>
@@ -225,14 +225,14 @@ const SymptomCheckerContent = () => {
                                 onKeyDown={handleKeyDown}
                                 rows={4}
                                 placeholder="Describe how you feel or press Enter to add..."
-                                className="w-full rounded-xl border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                className="w-full rounded-xl border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
                             />
                             <button
                                 type="button"
                                 onClick={toggleVoice}
                                 className={`absolute right-3 bottom-3 p-2 rounded-lg transition ${recording
                                     ? "bg-red-100 text-red-600 dark:bg-red-900/30"
-                                    : "bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]"
+                                    : "bg-light-background dark:bg-dark-background text-light-secondary-text dark:text-dark-secondary-text"
                                     }`}
                                 title="Voice Input"
                                 aria-pressed={recording}>
@@ -262,10 +262,10 @@ const SymptomCheckerContent = () => {
                             </div>
                         )}
 
-                        <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl  p-5">
+                        <div className="bg-light-surface dark:bg-dark-surface rounded-2xl  p-5">
                             <div className="flex items-center gap-2 mb-3">
                                 <AlertTriangle className="w-5 h-5 text-amber-500" />
-                                <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     Common symptoms
                                 </h4>
                             </div>
@@ -275,7 +275,7 @@ const SymptomCheckerContent = () => {
                                         key={s}
                                         onClick={() => handleCommonClick(s)}
                                         type="button"
-                                        className="px-3 py-1.5 rounded-full  text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] hover:bg-[var(--color-light-bg)]/50 dark:hover:bg-[var(--color-dark-bg)]/50 bg-light-bg dark:bg-dark-bg text-sm">
+                                        className="px-3 py-1.5 rounded-full  text-light-secondary-text dark:text-dark-secondary-text hover:bg-light-bg/50 dark:hover:bg-dark-bg/50 bg-light-bg dark:bg-dark-bg text-sm">
                                         {s}
                                     </button>
                                 ))}
@@ -286,14 +286,14 @@ const SymptomCheckerContent = () => {
                             <button
                                 type="button"
                                 onClick={handleClear}
-                                className="px-4 py-2 rounded-xl border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] hover:bg-[var(--color-light-background)] dark:hover:bg-[var(--color-dark-background)]">
+                                className="px-4 py-2 rounded-xl border border-light-secondary-text/20 dark:border-dark-secondary-text/20 text-light-secondary-text dark:text-dark-secondary-text hover:bg-light-background dark:hover:bg-dark-background">
                                 <RefreshCcw className="w-4 h-4 inline mr-2" />{" "}
                                 Reset
                             </button>
                             <button
                                 type="submit"
                                 disabled={!canSubmit}
-                                className="px-4 py-2 rounded-xl bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white hover:bg-[var(--color-light-primary-dark)] dark:hover:bg-[var(--color-dark-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="px-4 py-2 rounded-xl bg-light-primary dark:bg-dark-primary text-white hover:bg-light-primary-dark dark:hover:bg-dark-primary-dark disabled:opacity-50 disabled:cursor-not-allowed">
                                 <CheckCircle2 className="w-4 h-4 inline mr-2" />{" "}
                                 Check Health
                             </button>
@@ -305,14 +305,14 @@ const SymptomCheckerContent = () => {
 
                 {/* Common Symptoms & Info */}
                 <div className="space-y-6">
-                    <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] rounded-2xl shadow p-5">
+                    <div className="bg-light-surface dark:bg-dark-bg rounded-2xl shadow p-5">
                         <div className="flex items-center gap-2 mb-3">
                             <Pill className="w-5 h-5 text-fuchsia-600" />
-                            <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 What you get
                             </h4>
                         </div>
-                        <ul className="list-disc pl-5 text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] space-y-1">
+                        <ul className="list-disc pl-5 text-sm text-light-secondary-text dark:text-dark-secondary-text space-y-1">
                             <li>
                                 AI analysis: Good / Mild / Moderate / Severe
                             </li>
@@ -327,18 +327,18 @@ const SymptomCheckerContent = () => {
                         </ul>
                     </div>
 
-                    <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] rounded-2xl shadow p-5">
+                    <div className="bg-light-surface dark:bg-dark-bg rounded-2xl shadow p-5">
                         <div className="flex items-center gap-2 mb-2">
                             <Leaf className="w-5 h-5 text-emerald-600" />
-                            <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 Accessibility
                             </h4>
                         </div>
-                        <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                        <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
                             Voice input, large icons, adjustable font size,
                             multilingual support.
                         </p>
-                        <div className="flex items-center gap-2 text-xs mt-2 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                        <div className="flex items-center gap-2 text-xs mt-2 text-light-secondary-text dark:text-dark-secondary-text">
                             <Clock className="w-4 h-4" /> Results will appear in
                             the browser console after submitting.
                         </div>

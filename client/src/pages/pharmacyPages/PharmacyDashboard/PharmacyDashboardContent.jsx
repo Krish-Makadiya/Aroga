@@ -105,10 +105,10 @@ const PharmacyDashboardContent = () => {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                    <h2 className="text-2xl font-bold text-light-primary-text dark:text-dark-primary-text mb-2">
                         Pharmacy Not Found
                     </h2>
-                    <p className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                    <p className="text-light-secondary-text dark:text-dark-secondary-text">
                         Please complete your pharmacy registration first.
                     </p>
                 </div>
@@ -117,14 +117,14 @@ const PharmacyDashboardContent = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)]">
+        <div className="min-h-screen bg-gradient-to-br from-light-background to-light-background-secondary dark:from-dark-background dark:to-dark-background-secondary">
             <div className="max-w-8xl mx-auto">
                 {/* Enhanced Header with Gradient */}
                 <div className="relative mb-4 overflow-hidden rounded-3xl dark:bg-dark-bg bg-light-surface p-8 text-light-primary-text dark:text-dark-primary-text">
                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex items-center space-x-6 mb-6 lg:mb-0">
                             <div className="relative">
-                                <div className="w-30 h-30 rounded-full object-cover border-4 border-white/30 shadow-lg bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] flex items-center justify-center">
+                                <div className="w-30 h-30 rounded-full object-cover border-4 border-white/30 shadow-lg bg-light-primary dark:bg-dark-primary flex items-center justify-center">
                                     <Building2 className="w-16 h-16 text-white" />
                                 </div>
                                 <div className="absolute -bottom-0 -right-0 w-8 h-8 bg-dark-surface rounded-full flex items-center justify-center">
@@ -183,7 +183,7 @@ const PharmacyDashboardContent = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-2xl font-bold flex items-center">
                                 <Building2 className="w-6 h-6 mr-3 text-light-primary dark:text-dark-primary" />
-                                <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <p className="text-light-primary-text dark:text-dark-primary-text">
                                     Pharmacy Information
                                 </p>
                             </h2>
@@ -193,7 +193,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Pharmacy Name:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.pharmacyName}
                                 </span>
                             </div>
@@ -201,7 +201,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Owner Name:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.ownerName}
                                 </span>
                             </div>
@@ -209,7 +209,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     License Number:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.licenseNumber}
                                 </span>
                             </div>
@@ -217,7 +217,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Phone:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.phone}
                                 </span>
                             </div>
@@ -225,7 +225,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Email:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.email}
                                 </span>
                             </div>
@@ -234,7 +234,7 @@ const PharmacyDashboardContent = () => {
                                     <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                         Alternate Phone:
                                     </span>
-                                    <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         {pharmacyData.alternatePhone}
                                     </span>
                                 </div>
@@ -243,7 +243,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     District:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.district}
                                 </span>
                             </div>
@@ -251,7 +251,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     State:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.state}
                                 </span>
                             </div>
@@ -259,7 +259,7 @@ const PharmacyDashboardContent = () => {
                                 <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Pincode:
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.pincode}
                                 </span>
                             </div>
@@ -268,7 +268,7 @@ const PharmacyDashboardContent = () => {
                             <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                 Address:
                             </span>
-                            <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 {pharmacyData.address}
                             </span>
                         </div>
@@ -276,8 +276,8 @@ const PharmacyDashboardContent = () => {
 
                     {/* Quick Actions */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl py-6 px-4 shadow-md hover:shadow-xl transition-all duration-300">
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
-                            <Plus className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-6 flex items-center">
+                            <Plus className="w-5 h-5 mr-2 text-light-primary dark:text-dark-primary" />
                             Quick Actions
                         </h3>
                         <div className="space-y-3">
@@ -305,15 +305,15 @@ const PharmacyDashboardContent = () => {
                             ].map((action, index) => (
                                 <button
                                     key={index}
-                                    className="w-full flex items-center space-x-3 p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/5 dark:hover:bg-[var(--color-dark-primary)]/5 transition-colors group">
+                                    className="w-full flex items-center space-x-3 p-3 rounded-xl bg-light-background dark:bg-dark-background hover:bg-light-primary/5 dark:hover:bg-dark-primary/5 transition-colors group">
                                     <div
                                         className={`w-8 h-8 ${action.color} rounded-lg flex items-center justify-center text-white`}>
                                         <action.icon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] group-hover:text-[var(--color-light-primary)] dark:group-hover:text-[var(--color-dark-primary)]">
+                                    <span className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text group-hover:text-light-primary dark:group-hover:text-dark-primary">
                                         {action.label}
                                     </span>
-                                    <ChevronRight className="w-4 h-4 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] ml-auto" />
+                                    <ChevronRight className="w-4 h-4 text-light-secondary-text dark:text-dark-secondary-text ml-auto" />
                                 </button>
                             ))}
                         </div>
@@ -321,8 +321,8 @@ const PharmacyDashboardContent = () => {
 
                     {/* Notifications */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
-                            <Bell className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-6 flex items-center">
+                            <Bell className="w-5 h-5 mr-2 text-light-primary dark:text-dark-primary" />
                             Notifications
                         </h3>
                         <div className="space-y-3">
@@ -355,31 +355,31 @@ const PharmacyDashboardContent = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                     {/* Business Details */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
-                            <FileTextIcon className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-6 flex items-center">
+                            <FileTextIcon className="w-5 h-5 mr-2 text-light-primary dark:text-dark-primary" />
                             Business Details
                         </h3>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                                <span className="text-sm font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                                <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Registration Type
                                 </span>
-                                <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     {pharmacyData.registrationType}
                                 </span>
                             </div>
                             {pharmacyData.gstNumber && (
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                                    <span className="text-sm font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                                    <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                         GST Number
                                     </span>
-                                    <span className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text">
                                         {pharmacyData.gstNumber}
                                     </span>
                                 </div>
                             )}
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                                <span className="text-sm font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                                <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text">
                                     Verification Status
                                 </span>
                                 <span className="text-sm font-semibold">
@@ -387,11 +387,11 @@ const PharmacyDashboardContent = () => {
                                 </span>
                             </div>
                             {pharmacyData.description && (
-                                <div className="p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                                    <span className="text-sm font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] block mb-2">
+                                <div className="p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                                    <span className="text-sm font-medium text-light-secondary-text dark:text-dark-secondary-text block mb-2">
                                         Description
                                     </span>
-                                    <span className="text-sm text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <span className="text-sm text-light-primary-text dark:text-dark-primary-text">
                                         {pharmacyData.description}
                                     </span>
                                 </div>
@@ -401,8 +401,8 @@ const PharmacyDashboardContent = () => {
 
                     {/* Operating Hours */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
-                            <Clock className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-6 flex items-center">
+                            <Clock className="w-5 h-5 mr-2 text-light-primary dark:text-dark-primary" />
                             Operating Hours
                         </h3>
                         <div className="space-y-2">
@@ -410,8 +410,8 @@ const PharmacyDashboardContent = () => {
                                 pharmacyData.operatingHours.map((hours, index) => (
                                     <div
                                         key={index}
-                                        className="flex items-center justify-between p-2 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                                        <span className="text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                        className="flex items-center justify-between p-2 rounded-xl bg-light-background dark:bg-dark-background">
+                                        <span className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">
                                             {hours.day}
                                         </span>
                                         {hours.isOpen ? (
@@ -426,7 +426,7 @@ const PharmacyDashboardContent = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
                                     Operating hours not set
                                 </p>
                             )}
@@ -435,8 +435,8 @@ const PharmacyDashboardContent = () => {
 
                     {/* Services Offered */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                        <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
-                            <Package className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                        <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-6 flex items-center">
+                            <Package className="w-5 h-5 mr-2 text-light-primary dark:text-dark-primary" />
                             Services Offered
                         </h3>
                         <div className="space-y-2">
@@ -444,14 +444,14 @@ const PharmacyDashboardContent = () => {
                                 pharmacyData.services.map((service, index) => (
                                     <div
                                         key={index}
-                                        className="p-2 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                                        <span className="text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                        className="p-2 rounded-xl bg-light-background dark:bg-dark-background">
+                                        <span className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">
                                             • {service}
                                         </span>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
                                     No services listed
                                 </p>
                             )}
@@ -461,32 +461,32 @@ const PharmacyDashboardContent = () => {
 
                 {/* Account Information */}
                 <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">
-                    <h3 className="text-xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-6 flex items-center">
-                        <Settings className="w-5 h-5 mr-2 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                    <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-6 flex items-center">
+                        <Settings className="w-5 h-5 mr-2 text-light-primary dark:text-dark-primary" />
                         Account Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                            <p className="text-xs font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] mb-1">
+                        <div className="p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                            <p className="text-xs font-medium text-light-secondary-text dark:text-dark-secondary-text mb-1">
                                 Pharmacy ID:
                             </p>
-                            <p className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] truncate">
+                            <p className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text truncate">
                                 {pharmacyData._id}
                             </p>
                         </div>
-                        <div className="p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                            <p className="text-xs font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] mb-1">
+                        <div className="p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                            <p className="text-xs font-medium text-light-secondary-text dark:text-dark-secondary-text mb-1">
                                 User ID:
                             </p>
-                            <p className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] truncate">
+                            <p className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text truncate">
                                 {user.id}
                             </p>
                         </div>
-                        <div className="p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)]">
-                            <p className="text-xs font-medium text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] mb-1">
+                        <div className="p-3 rounded-xl bg-light-background dark:bg-dark-background">
+                            <p className="text-xs font-medium text-light-secondary-text dark:text-dark-secondary-text mb-1">
                                 Account Created:
                             </p>
-                            <p className="text-sm font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] truncate">
+                            <p className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text truncate">
                                 {formatDate(pharmacyData.createdAt)}
                             </p>
                         </div>

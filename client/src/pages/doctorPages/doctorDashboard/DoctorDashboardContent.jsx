@@ -102,15 +102,15 @@ const DoctorDashboardContent = () => {
 
     if (!doctorData) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)]">
+            <div className="min-h-screen bg-gradient-to-br from-light-background to-light-background-secondary dark:from-dark-background dark:to-dark-background-secondary">
                 <div className="max-w-8xl mx-auto p-4">
             <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                     <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2">
+                    <h3 className="text-lg font-semibold text-light-primary-text dark:text-dark-primary-text mb-2">
                         Doctor Profile Not Found
                     </h3>
-                    <p className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                    <p className="text-light-secondary-text dark:text-dark-secondary-text">
                         Please complete your doctor registration first.
                     </p>
                         </div>
@@ -121,7 +121,7 @@ const DoctorDashboardContent = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-light-background)] to-[var(--color-light-background-secondary)] dark:from-[var(--color-dark-background)] dark:to-[var(--color-dark-background-secondary)]">
+        <div className="min-h-screen bg-gradient-to-br from-light-background to-light-background-secondary dark:from-dark-background dark:to-dark-background-secondary">
             <div className="max-w-8xl mx-auto">
                 {/* Enhanced Header with Gradient */}
                 <div className="relative mb-4 overflow-hidden rounded-3xl dark:bg-dark-bg bg-light-surface p-8 text-light-primary-text dark:text-dark-primary-text">
@@ -182,7 +182,7 @@ const DoctorDashboardContent = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-2xl font-bold flex items-center">
                                 <User className="w-6 h-6 mr-3 text-light-primary dark:text-dark-primary" />
-                                <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <p className="text-light-primary-text dark:text-dark-primary-text">
                                     Professional Information
                                 </p>
                                 </h2>
@@ -250,7 +250,7 @@ const DoctorDashboardContent = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold flex items-center">
                                 <Mail className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <p className="text-light-primary-text dark:text-dark-primary-text">
                                     Contact
                                 </p>
                                 </h2>
@@ -290,7 +290,7 @@ const DoctorDashboardContent = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold flex items-center">
                                 <Shield className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <p className="text-light-primary-text dark:text-dark-primary-text">
                                     Status
                                 </p>
                             </h2>
@@ -329,10 +329,10 @@ const DoctorDashboardContent = () => {
                                     <Edit className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <h2 className="text-lg font-bold text-light-primary-text dark:text-dark-primary-text">
                                         Get Started
                                     </h2>
-                                    <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
                                         Complete setup to start earning
                                     </p>
                                 </div>
@@ -411,10 +411,10 @@ const DoctorDashboardContent = () => {
                                     <Clock className="w-5 h-5 text-yellow-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <h2 className="text-lg font-bold text-light-primary-text dark:text-dark-primary-text">
                                         Verification
                                     </h2>
-                                    <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
                                         Takes 48 hours to verify
                                     </p>
                                 </div>
@@ -473,7 +473,7 @@ const DoctorDashboardContent = () => {
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold flex items-center">
                                     <Star className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                    <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <p className="text-light-primary-text dark:text-dark-primary-text">
                                         Rating & Reviews
                                     </p>
                                 </h2>
@@ -502,7 +502,7 @@ const DoctorDashboardContent = () => {
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold flex items-center">
                                     <DollarSign className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                    <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <p className="text-light-primary-text dark:text-dark-primary-text">
                                         Consultation Fee
                                     </p>
                                 </h2>
@@ -525,7 +525,7 @@ const DoctorDashboardContent = () => {
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold flex items-center">
                                     <Settings className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                    <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <p className="text-light-primary-text dark:text-dark-primary-text">
                                         Quick Actions
                                     </p>
                                 </h2>
@@ -561,7 +561,7 @@ const DoctorDashboardContent = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold flex items-center">
                                 <Globe className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <p className="text-light-primary-text dark:text-dark-primary-text">
                                         Languages
                                 </p>
                             </h2>
@@ -589,7 +589,7 @@ const DoctorDashboardContent = () => {
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold flex items-center">
                                 <Stethoscope className="w-5 h-5 mr-3 text-light-primary dark:text-dark-primary" />
-                                <p className="text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <p className="text-light-primary-text dark:text-dark-primary-text">
                                     Telemedicine
                                 </p>
                             </h2>

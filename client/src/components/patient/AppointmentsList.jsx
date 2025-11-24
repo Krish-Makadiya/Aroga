@@ -36,7 +36,10 @@ const AppointmentsList = ({ appointments }) => {
     const [viewingType, setViewingType] = useState(null); // 'pdf' | 'image' | 'unknown'
     const [prescriptionOpen, setPrescriptionOpen] = useState(false);
     const [prescriptionItems, setPrescriptionItems] = useState([]);
-    const [prescriptionMeta, setPrescriptionMeta] = useState({ doctorName: '', date: '' });
+    const [prescriptionMeta, setPrescriptionMeta] = useState({
+        doctorName: "",
+        date: "",
+    });
 
     // Inline rating form state
     const [formRating, setFormRating] = useState({}); // appointmentId -> rating (1-5)
@@ -167,16 +170,16 @@ const AppointmentsList = ({ appointments }) => {
                 return (
                     <div
                         key={appt._id}
-                        className="rounded-2xl dark:bg-dark-bg bg-light-surface p-5 shadow-md border border-[var(--color-light-primary)]/10 dark:border-[var(--color-dark-primary)]/10 flex flex-col gap-3">
+                        className="rounded-2xl dark:bg-dark-bg bg-light-surface p-5 shadow-md border border-light-primary/10 dark:border-dark-primary/10 flex flex-col gap-3">
                         {/* Header */}
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-[var(--color-light-primary)]/10 dark:bg-[var(--color-dark-primary)]/10 flex items-center justify-center">
-                                <Stethoscope className="w-6 h-6 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
+                            <div className="w-12 h-12 rounded-xl bg-light-primary/10 dark:bg-dark-primary/10 flex items-center justify-center">
+                                <Stethoscope className="w-6 h-6 text-light-primary dark:text-dark-primary" />
                             </div>
                             <div className="flex-1">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <h3 className="text-lg font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                        <h3 className="text-lg font-bold text-light-primary-text dark:text-dark-primary-text">
                                             Dr. {doc?.fullName || "Unknown"}
                                         </h3>
                                         <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
@@ -184,30 +187,38 @@ const AppointmentsList = ({ appointments }) => {
                                             Appointment
                                         </span>
                                     </div>
-                                    {doc?.rating?.average && appt.status !== "completed" && (
-                                        <span className="flex items-center gap-1 text-xs px-3 py-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 ml-2">
-                                            <div className="flex gap-1 items-center">
-                                                <Star size={20} />
-                                                <p>
-                                                    {doc.rating.average.toFixed(
-                                                        1
-                                                    )}
-                                                </p>
+                                    {doc?.rating?.average &&
+                                        appt.status !== "completed" && (
+                                            <div className="flex items-center gap-1 px-2 py-1 rounded-full dark:text-yellow-300 text-sm">
+                                                <Star
+                                                    className="fill-amber-400"
+                                                    size={26}
+                                                    color="amber-400"
+                                                />
+                                                <div className="flex gap-1 items-center">
+                                                    <span className="text-xl font-medium">
+                                                        {(
+                                                            doc.rating
+                                                                ?.average ?? 0
+                                                        ).toFixed(1)}
+                                                    </span>
+                                                    <span className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
+                                                        (
+                                                        {doc.rating?.count ?? 0}
+                                                        )
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <span className="ml-1">
-                                                ({doc.rating.count ?? 0})
-                                            </span>
-                                        </span>
-                                    )}
+                                        )}
                                 </div>
                                 <div className="flex gap-2 mt-1">
                                     {doc?.qualifications && (
-                                        <p className="text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                        <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                             | {doc.qualifications}
                                         </p>
                                     )}
                                     {doc?.id && (
-                                        <p className="text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                        <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                             ID: {doc.id}
                                         </p>
                                     )}
@@ -217,9 +228,11 @@ const AppointmentsList = ({ appointments }) => {
                         {/* Report Viewer Modal */}
                         {viewerOpen && viewingUrl && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                                <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 shadow-lg">
+                                <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-light-surface dark:bg-dark-bg p-4 shadow-lg">
                                     <div className="flex items-start justify-between mb-3">
-                                        <h4 className="text-lg font-semibold">Report Preview</h4>
+                                        <h4 className="text-lg font-semibold">
+                                            Report Preview
+                                        </h4>
                                         <button
                                             onClick={() => {
                                                 setViewerOpen(false);
@@ -231,23 +244,25 @@ const AppointmentsList = ({ appointments }) => {
                                         </button>
                                     </div>
                                     <div className="w-full">
-                                        {viewingType === 'pdf' && (
+                                        {viewingType === "pdf" && (
                                             <iframe
                                                 title="report-pdf"
                                                 src={viewingUrl}
                                                 className="w-full h-[70vh]"
                                             />
                                         )}
-                                        {viewingType === 'image' && (
+                                        {viewingType === "image" && (
                                             <img
                                                 src={viewingUrl}
                                                 alt="report"
                                                 className="w-full object-contain max-h-[70vh]"
                                             />
                                         )}
-                                        {viewingType === 'unknown' && (
+                                        {viewingType === "unknown" && (
                                             <div>
-                                                <p className="mb-2">File preview not available.</p>
+                                                <p className="mb-2">
+                                                    File preview not available.
+                                                </p>
                                                 <a
                                                     href={viewingUrl}
                                                     target="_blank"
@@ -261,7 +276,7 @@ const AppointmentsList = ({ appointments }) => {
                                 </div>
                             </div>
                         )}
-                        <hr className="my-1 border-[var(--color-light-secondary-text)]/10 dark:border-[var(--color-dark-secondary-text)]/10" />
+                        <hr className="my-1 border-light-secondary-text/10 dark:border-dark-secondary-text/10" />
                         {/* Appointment Info */}
                         <div className="flex flex-wrap justify-between items-center gap-4">
                             <div className="flex items-center gap-2">
@@ -311,30 +326,30 @@ const AppointmentsList = ({ appointments }) => {
                                     </span>
                                 )}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                                 <IndianRupee className="w-5 h-5 text-emerald-600" />
-                                <span className="text-lg text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <span className="text-2xl text-light-primary-text dark:text-dark-primary-text font-semibold">
                                     {doc?.consultationFee ?? appt.amount ?? 0}
                                 </span>
-                                <span className="text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
-                                    / consultation
+                                <span className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
+                                    /consultation
                                 </span>
                             </div>
                         </div>
 
-                        <hr className="my-1 border-[var(--color-light-secondary-text)]/10 dark:border-[var(--color-dark-secondary-text)]/10" />
+                        <hr className="my-1 border-light-secondary-text/10 dark:border-dark-secondary-text/10" />
 
                         {/* Doctor Contact */}
                         <div className="flex flex-col gap-2">
                             <div className="flex flex-wrap gap-6 items-center mt-1">
                                 {doc?.email && (
-                                    <span className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    <span className="flex items-center gap-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                         <Mail className="w-4 h-4 mr-1" />{" "}
                                         {doc.email}
                                     </span>
                                 )}
                                 {doc?.phone && (
-                                    <span className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    <span className="flex items-center gap-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                         <Phone className="w-4 h-4 mr-1" />{" "}
                                         {doc.phone}
                                     </span>
@@ -346,7 +361,7 @@ const AppointmentsList = ({ appointments }) => {
                                 <div className="flex flex-col gap-2 mt-1">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <CreditCard className="w-4 h-4 text-emerald-500" />
-                                        <span className="text-xs font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                        <span className="text-xs font-medium text-light-primary-text dark:text-dark-primary-text">
                                             Payment Status:
                                         </span>
                                         {appt.payment.status === "paid" && (
@@ -379,7 +394,7 @@ const AppointmentsList = ({ appointments }) => {
                                     </div>
                                     <div className="flex flex-col gap-1 ml-6">
                                         {appt.payment.orderId && (
-                                            <div className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                            <div className="flex items-center gap-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                 <Receipt className="w-3.5 h-3.5 mr-0.5" />
                                                 <span>
                                                     Order ID:{" "}
@@ -388,7 +403,7 @@ const AppointmentsList = ({ appointments }) => {
                                             </div>
                                         )}
                                         {appt.payment.paymentId && (
-                                            <div className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                            <div className="flex items-center gap-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                 <CreditCard className="w-3.5 h-3.5 mr-0.5" />
                                                 <span>
                                                     Payment ID:{" "}
@@ -397,7 +412,7 @@ const AppointmentsList = ({ appointments }) => {
                                             </div>
                                         )}
                                         {appt.payment.paidAt && (
-                                            <div className="flex items-center gap-1 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                            <div className="flex items-center gap-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                 <Calendar className="w-3.5 h-3.5 mr-0.5" />
                                                 <span>
                                                     Paid on:{" "}
@@ -429,14 +444,14 @@ const AppointmentsList = ({ appointments }) => {
                                         </span>
                                     )}
                                     {appt.review && (
-                                        <span className="text-xs italic text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                        <span className="text-xs italic text-light-secondary-text dark:text-dark-secondary-text">
                                             "{appt.review}"
                                         </span>
                                     )}
                                 </div>
                             )}
                             {/* Meta Info */}
-                            <div className="flex flex-wrap gap-1 items-center mt-2 text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                            <div className="flex flex-wrap gap-1 items-center mt-2 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                 <Info className="w-4 h-4" />
                                 <span>Appointment ID: {appt._id}</span>
                             </div>
@@ -535,7 +550,7 @@ const AppointmentsList = ({ appointments }) => {
                                     </div>
                                 </div>
                                 {appt.ratingId.review && (
-                                    <div className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                    <div className="text-light-secondary-text dark:text-dark-secondary-text">
                                         {appt.ratingId.review}
                                     </div>
                                 )}
@@ -571,10 +586,16 @@ const AppointmentsList = ({ appointments }) => {
                                             disabled={
                                                 processingPaymentId === appt._id
                                             }
-                                            className="bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md transition">
-                                            {processingPaymentId === appt._id
-                                                ? "Processing..."
-                                                : "Pay Now"}
+                                            className="bg-light-primary hover:bg-light-primary-hover cursor-pointer dark:bg-dark-primary dark:hover:bg-dark-primary-hover  py-2 px-4 rounded-md">
+                                            {processingPaymentId ===
+                                            appt._id ? (
+                                                "Processing..."
+                                            ) : (
+                                                <span className="flex items-center text-dark-primary-text font-semibold gap-1">
+                                                    <IndianRupee size={20} />
+                                                    <p>Pay Now</p>
+                                                </span>
+                                            )}
                                         </button>
                                     )}
 
@@ -584,56 +605,85 @@ const AppointmentsList = ({ appointments }) => {
                                             onClick={async () => {
                                                 try {
                                                     // If URL is already present, use it; otherwise fetch appointment
-                                                    let url = appt.cloudinaryFileUrl;
+                                                    let url =
+                                                        appt.cloudinaryFileUrl;
                                                     if (!url) {
-                                                        const resp = await axios.get(
-                                                            `http://localhost:5000/api/appointment/${appt._id}`
-                                                        );
-                                                        url = resp.data?.data?.cloudinaryFileUrl;
+                                                        const resp =
+                                                            await axios.get(
+                                                                `http://localhost:5000/api/appointment/${appt._id}`
+                                                            );
+                                                        url =
+                                                            resp.data?.data
+                                                                ?.cloudinaryFileUrl;
                                                     }
                                                     if (!url) {
-                                                        toast.error("No report file available for this appointment.");
+                                                        toast.error(
+                                                            "No report file available for this appointment."
+                                                        );
                                                         return;
                                                     }
 
                                                     // Guess type by file extension
-                                                    const lower = url.toLowerCase();
-                                                    if (lower.endsWith('.pdf')) setViewingType('pdf');
-                                                    else if (lower.match(/\.(jpg|jpeg|png|gif|webp)$/)) setViewingType('image');
-                                                    else setViewingType('unknown');
+                                                    const lower =
+                                                        url.toLowerCase();
+                                                    if (lower.endsWith(".pdf"))
+                                                        setViewingType("pdf");
+                                                    else if (
+                                                        lower.match(
+                                                            /\.(jpg|jpeg|png|gif|webp)$/
+                                                        )
+                                                    )
+                                                        setViewingType("image");
+                                                    else
+                                                        setViewingType(
+                                                            "unknown"
+                                                        );
 
                                                     setViewingUrl(url);
                                                     setViewerOpen(true);
                                                 } catch (err) {
                                                     console.error(err);
-                                                    toast.error('Failed to load report');
+                                                    toast.error(
+                                                        "Failed to load report"
+                                                    );
                                                 }
                                             }}
-                                            className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10">
+                                            className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10">
                                             <FileText className="w-4 h-4" />
                                             View Report
                                         </button>
                                     )}
-                                    {appt.prescription && appt.prescription.length > 0 && (
-                                        <button
-                                            onClick={() => {
-                                                setPrescriptionItems(appt.prescription || []);
-                                                setPrescriptionMeta({ doctorName: doc?.fullName || '', date: appt.createdAt || appt.scheduledAt });
-                                                setPrescriptionOpen(true);
-                                            }}
-                                            className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] hover:bg-[var(--color-light-primary)]/10 dark:hover:bg-[var(--color-dark-primary)]/10 ml-2">
-                                            View Prescription
-                                        </button>
-                                    )}
+                                    {appt.prescription &&
+                                        appt.prescription.length > 0 && (
+                                            <button
+                                                onClick={() => {
+                                                    setPrescriptionItems(
+                                                        appt.prescription || []
+                                                    );
+                                                    setPrescriptionMeta({
+                                                        doctorName:
+                                                            doc?.fullName || "",
+                                                        date:
+                                                            appt.createdAt ||
+                                                            appt.scheduledAt,
+                                                    });
+                                                    setPrescriptionOpen(true);
+                                                }}
+                                                className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 ml-2">
+                                                View Prescription
+                                            </button>
+                                        )}
                                 </div>
-                                {appt.payment?.status === "paid" && appt.status !== "cancelled" && appt.status !== "completed" && (
-                                    <span className="flex items-center gap-1 text-sm px-3 py-2 rounded-md bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-semibold">
-                                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                        Paid
-                                    </span>
-                                )}
+                                {appt.payment?.status === "paid" &&
+                                    appt.status !== "cancelled" &&
+                                    appt.status !== "completed" && (
+                                        <span className="flex items-center gap-1 text-sm px-3 py-2 rounded-md bg-light-success text-green-800 dark:bg-dark-success dark:text-green-300 font-semibold">
+                                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                            Paid
+                                        </span>
+                                    )}
                                 <button
-                                    className="bg-light-primary dark:bg-dark-primary py-2 px-4 rounded-md"
+                                    className="bg-light-primary dark:bg-dark-primary hover:bg-light-primary-hover dark:hover:bg-dark-primary-hover text-dark-primary-text font-semibold py-2 px-4 rounded-md"
                                     onClick={() => {
                                         setSelectedDoctor(doc);
                                         setOpen(true);
@@ -652,15 +702,28 @@ const AppointmentsList = ({ appointments }) => {
                         {/* Prescription Modal */}
                         {prescriptionOpen && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                                <div className="w-full max-w-3xl max-h-[85vh] overflow-auto rounded-2xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 shadow-lg">
+                                <div className="w-full max-w-3xl max-h-[85vh] overflow-auto rounded-2xl bg-light-surface dark:bg-dark-bg p-4 shadow-lg">
                                     <div className="flex items-center justify-between mb-3">
                                         <div>
-                                            <h4 className="text-lg font-semibold">Prescription</h4>
-                                            <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">Prescribed by {prescriptionMeta.doctorName || 'Doctor'} {prescriptionMeta.date ? `on ${new Date(prescriptionMeta.date).toLocaleString()}` : ''}</p>
+                                            <h4 className="text-lg font-semibold">
+                                                Prescription
+                                            </h4>
+                                            <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                                Prescribed by{" "}
+                                                {prescriptionMeta.doctorName ||
+                                                    "Doctor"}{" "}
+                                                {prescriptionMeta.date
+                                                    ? `on ${new Date(
+                                                          prescriptionMeta.date
+                                                      ).toLocaleString()}`
+                                                    : ""}
+                                            </p>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button
-                                                onClick={() => setPrescriptionOpen(false)}
+                                                onClick={() =>
+                                                    setPrescriptionOpen(false)
+                                                }
                                                 className="px-3 py-1 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 Close
                                             </button>
@@ -668,25 +731,45 @@ const AppointmentsList = ({ appointments }) => {
                                     </div>
 
                                     <div className="space-y-3">
-                                        {prescriptionItems && prescriptionItems.length > 0 ? (
-                                            prescriptionItems.map((item, idx) => (
-                                                <div key={idx} className="border rounded-lg p-3 bg-white dark:bg-gray-900">
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <div className="flex-1">
-                                                            <div className="text-md font-semibold">{item.medicine || 'Unknown medicine'}</div>
-                                                            {item.notes && (
-                                                                <div className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] mt-1">{item.notes}</div>
-                                                            )}
-                                                        </div>
-                                                        <div className="text-right text-sm">
-                                                            <div className="font-medium">{item.dosage || '-'}</div>
-                                                            <div className="text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">{item.frequency || '-'}</div>
+                                        {prescriptionItems &&
+                                        prescriptionItems.length > 0 ? (
+                                            prescriptionItems.map(
+                                                (item, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="border rounded-lg p-3 bg-white dark:bg-gray-900">
+                                                        <div className="flex items-start justify-between gap-3">
+                                                            <div className="flex-1">
+                                                                <div className="text-md font-semibold">
+                                                                    {item.medicine ||
+                                                                        "Unknown medicine"}
+                                                                </div>
+                                                                {item.notes && (
+                                                                    <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text mt-1">
+                                                                        {
+                                                                            item.notes
+                                                                        }
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-right text-sm">
+                                                                <div className="font-medium">
+                                                                    {item.dosage ||
+                                                                        "-"}
+                                                                </div>
+                                                                <div className="text-light-secondary-text dark:text-dark-secondary-text">
+                                                                    {item.frequency ||
+                                                                        "-"}
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))
+                                                )
+                                            )
                                         ) : (
-                                            <div className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">No prescriptions available.</div>
+                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                                No prescriptions available.
+                                            </div>
                                         )}
                                     </div>
                                 </div>

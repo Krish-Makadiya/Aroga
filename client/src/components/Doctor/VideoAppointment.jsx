@@ -271,7 +271,7 @@ export default function VideoAppointment() {
             {/* Report Viewer Modal */}
             {viewerOpen && viewingUrl && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                    <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 shadow-lg">
+                    <div className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-2xl bg-light-surface dark:bg-dark-bg p-4 shadow-lg">
                         <div className="flex items-start justify-between mb-3">
                             <h4 className="text-lg font-semibold">Report Preview</h4>
                             <button

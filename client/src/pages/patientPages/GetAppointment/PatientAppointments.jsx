@@ -71,7 +71,7 @@ const PatientAppointments = () => {
     }
     if (appointments.length === 0) {
         return (
-            <div className="p-6 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+            <div className="p-6 text-light-secondary-text dark:text-dark-secondary-text">
                 No appointments found.
             </div>
         );

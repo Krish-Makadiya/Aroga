@@ -27,6 +27,7 @@ export function getUrlParams(url = window.location.href) {
 
 export default function VideoAppointment() {
     const { role = "" } = useParams();
+    console.log("Role from URL params:", useParams());
 
     const normalizedRole =
         typeof role === "string"
@@ -130,8 +131,8 @@ export default function VideoAppointment() {
         const initializeMeeting = async () => {
             try {
                 // generate Kit Token
-                const appID = 909640328;
-                const serverSecret = "17dd38d36ceacce75350b72ab523289f";
+                const appID = parseInt(import.meta.env.VITE_ZEGOCCLOUD_APP_ID);
+                const serverSecret = import.meta.env.VITE_ZEGOCLOUD_SERVER_SECRET;
                 const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
                     appID,
                     serverSecret,

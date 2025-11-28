@@ -18,6 +18,7 @@ import {
     Info,
 } from "lucide-react";
 import AppointmentsList from "../../../components/patient/AppointmentsList";
+import Loader from "../../../components/main/Loader";
 
 const PatientAppointments = () => {
     const { user } = useUser();
@@ -62,7 +63,7 @@ const PatientAppointments = () => {
     }, [user, getToken]);
 
     if (loading) {
-        return <div className="p-6">Loading appointments…</div>;
+        return <Loader/>;
     }
     if (error) {
         return (

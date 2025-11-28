@@ -10,9 +10,14 @@ export default function ProtectedRoute({ children, requiredRole }) {
 		return <Navigate to="/" replace state={{ from: location }} />;
 	}
 
-	const role = user?.unsafeMetadata?.role;
-	if (requiredRole && role !== requiredRole) {
-		return <Navigate to="/dashboard" replace />;
+	const rawRole = user?.publicMetadata?.role || user?.unsafeMetadata?.role || "";
+	const role = typeof rawRole === "string" ? rawRole.trim().toLowerCase() : "";
+
+	if (requiredRole) {
+		const required = String(requiredRole).trim().toLowerCase();
+		if (role !== required) {
+			return <Navigate to="/dashboard" replace />;
+		}
 	}
 
 	return children;

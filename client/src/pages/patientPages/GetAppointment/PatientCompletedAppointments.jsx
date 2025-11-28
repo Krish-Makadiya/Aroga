@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import AppointmentsList from "../../../components/patient/AppointmentsList";
 import RatingDialog from "../../../components/patient/RatingDialog";
+import Loader from "../../../components/main/Loader";
 
 const PatientCompletedAppointments = () => {
     const { user } = useUser();
@@ -89,7 +90,7 @@ const PatientCompletedAppointments = () => {
     };
 
     if (loading) {
-        return <div className="p-6">Loading completed appointments…</div>;
+        return <Loader/>;
     }
     if (error) {
         return (

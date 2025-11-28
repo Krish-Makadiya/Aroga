@@ -19,6 +19,7 @@ import {
     UserCircle,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import Loader from "../../../components/main/Loader";
 
 const COMMON_SYMPTOMS = [
     "Fever",
@@ -299,16 +300,7 @@ const GetAppointmentContent = () => {
 
     if (loading) {
         return (
-            <div className="max-w-6xl mx-auto p-6">
-                <div className="animate-pulse grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[...Array(4)].map((_, i) => (
-                        <div
-                            key={i}
-                            className="rounded-2xl dark:bg-dark-bg bg-light-surface p-6 h-44"
-                        />
-                    ))}
-                </div>
-            </div>
+            <Loader/>
         );
     }
 
@@ -338,7 +330,7 @@ const GetAppointmentContent = () => {
                         <div
                             key={doc._id}
                             className="rounded-2xl bg-light-surface dark:bg-dark-bg p-4 shadow-md hover:shadow-xl transition-all duration-200 border border-transparent hover:border-light-primary/20 dark:hover:border-dark-primary/20">
-                            <div className="grid grid-cols-7 gap-4 items-center">
+                            <div className="grid grid-cols-9 gap-4 items-center">
                                 <div className="col-span-2 flex items-center">
                                     <div className="w-full aspect-square rounded-full bg-gradient-to-br from-light-primary/20 to-light-primary/10 dark:from-dark-primary/20 dark:to-dark-primary/10 flex items-center justify-center text-xl font-semibold text-light-primary dark:text-dark-primary">
                                         {doc.fullName
@@ -351,7 +343,7 @@ const GetAppointmentContent = () => {
                                     </div>
                                 </div>
 
-                                <div className="col-span-3">
+                                <div className="col-span-5">
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-lg font-semibold text-light-primary-text dark:text-dark-primary-text">
                                             Dr. {doc.fullName}
@@ -395,14 +387,16 @@ const GetAppointmentContent = () => {
                                                 : "N/A"}{" "}
                                             experience
                                         </div>
-                                        {doc.languages?.length > 0 &&
-                                            doc.languages.map((l, i) => (
-                                                <span
-                                                    key={i}
-                                                    className="px-2 py-0.5 rounded-full bg-light-primary/10 dark:bg-dark-primary/10 text-xs text-light-primary dark:text-dark-primary">
-                                                    {l}
-                                                </span>
-                                            ))}
+                                        <div className="flex gap-1">
+                                            {doc.languages?.length > 0 &&
+                                                doc.languages.map((l, i) => (
+                                                    <span
+                                                        key={i}
+                                                        className="px-2 py-0.5 rounded-full bg-light-primary/10 dark:bg-dark-primary/10 text-xs text-light-primary dark:text-dark-primary">
+                                                        {l}
+                                                    </span>
+                                                ))}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -644,7 +638,8 @@ const GetAppointmentContent = () => {
                                                     htmlFor="patient-report"
                                                     className="relative cursor-pointer rounded-md bg-transparent font-semibold text-light-primary dark:text-dark-primary">
                                                     <span className="text-light-secondary dark:text-dark-secondary font-bold">
-                                                        Upload Relevant Medical File
+                                                        Upload Relevant Medical
+                                                        File
                                                     </span>
                                                     <input
                                                         id="patient-report"

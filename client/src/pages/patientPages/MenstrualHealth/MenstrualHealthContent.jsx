@@ -3,6 +3,7 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import WomenHealthHistory from '../../../components/patient/WomenHealthHistory';
+import Loader from '../../../components/main/Loader';
 
 const MenstrualHealthContent = () => {
     const [userData, setUserData] = useState(null);
@@ -34,7 +35,7 @@ const MenstrualHealthContent = () => {
         fetchUserData();
     }, [user, getToken]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loader/>;
 
     return (
         <div>

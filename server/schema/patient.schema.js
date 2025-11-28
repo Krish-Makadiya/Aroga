@@ -45,7 +45,7 @@ const patientSchema = new mongoose.Schema(
 
         email: {
             type: String,
-            required: [true, "Email is required"],
+            required: [false, "Email is required"],
             trim: true,
             lowercase: true,
             unique: true,
@@ -90,7 +90,7 @@ const patientSchema = new mongoose.Schema(
 
         govIdNumber: {
             type: String,
-            required: [true, "Government ID number is required"],
+            required: [false, "Government ID number is required"],
             trim: true,
             uppercase: true,
             unique: true,
@@ -121,7 +121,7 @@ const patientSchema = new mongoose.Schema(
 
         medicalHistory: {
             type: String,
-            required: [true, "Medical history is required"],
+            required: [false, "Medical history is required"],
             trim: true,
             maxlength: [1000, "Medical history cannot exceed 1000 characters"],
         },

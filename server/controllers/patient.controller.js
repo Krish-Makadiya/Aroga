@@ -1,4 +1,5 @@
 // server/controllers/patient.controller.js
+const { sendSms } = require("../config/sms.config");
 const Patient = require("../schema/patient.schema");
 
 exports.createPatient = async (req, res) => {
@@ -7,21 +8,18 @@ exports.createPatient = async (req, res) => {
         dob,
         gender,
         phone,
-        email,
         address,
         district,
         govIdType,
-        govIdNumber,
         emergencyContactName,
         emergencyContactPhone,
-        medicalHistory,
         telemedicineConsent,
+        clerkUserId,
         alergies,
         operations,
         ongoingMedications,
         permanentMedications,
         majorDiseases,
-        clerkUserId,
     } = req.body;
 
     const errors = [];
@@ -55,15 +53,6 @@ exports.createPatient = async (req, res) => {
             "district is required and must be a non-empty string (max 50 chars)"
         );
     if (
-        !govIdNumber ||
-        typeof govIdNumber !== "string" ||
-        govIdNumber.trim() === "" ||
-        govIdNumber.length > 20
-    )
-        errors.push(
-            "govIdNumber is required and must be a non-empty string (max 20 chars)"
-        );
-    if (
         !emergencyContactName ||
         typeof emergencyContactName !== "string" ||
         emergencyContactName.trim() === "" ||
@@ -71,15 +60,6 @@ exports.createPatient = async (req, res) => {
     )
         errors.push(
             "emergencyContactName is required and must be a non-empty string (max 100 chars)"
-        );
-    if (
-        !medicalHistory ||
-        typeof medicalHistory !== "string" ||
-        medicalHistory.trim() === "" ||
-        medicalHistory.length > 1000
-    )
-        errors.push(
-            "medicalHistory is required and must be a non-empty string (max 1000 chars)"
         );
     if (
         !clerkUserId ||
@@ -107,20 +87,8 @@ exports.createPatient = async (req, res) => {
         errors.push("phone is required and must be a valid phone number");
     }
 
-    // email
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!email || !emailRegex.test(email)) {
-        errors.push("email is required and must be a valid email address");
-    }
-
     // govIdType
-    const allowedGovIdTypes = [
-        "aadhar",
-        "pan",
-        "passport",
-        "driving-license",
-        "voter-id",
-    ];
+    const allowedGovIdTypes = ["aadhar", "voter-id"];
     if (!allowedGovIdTypes.includes(govIdType)) {
         errors.push(
             "govIdType must be one of: " + allowedGovIdTypes.join(", ")
@@ -139,23 +107,6 @@ exports.createPatient = async (req, res) => {
         errors.push("telemedicineConsent is required and must be a boolean");
     }
 
-    // Optional repeatable fields validation (if provided)
-    const validateStringArray = (arr, name) => {
-        if (arr === undefined || arr === null) return;
-        if (!Array.isArray(arr)) return errors.push(`${name} must be an array of strings`);
-        for (const v of arr) {
-            if (typeof v !== 'string') return errors.push(`${name} must contain only strings`);
-            if (v.trim().length === 0) return errors.push(`${name} must not contain empty strings`);
-            if (v.length > 200) return errors.push(`${name} items must be at most 200 characters`);
-        }
-    };
-
-    validateStringArray(alergies, 'alergies');
-    validateStringArray(operations, 'operations');
-    validateStringArray(ongoingMedications, 'ongoingMedications');
-    validateStringArray(permanentMedications, 'permanentMedications');
-    validateStringArray(majorDiseases, 'majorDiseases');
-
     // If there are validation errors, return them
     if (errors.length > 0) {
         return res
@@ -170,23 +121,24 @@ exports.createPatient = async (req, res) => {
             dob,
             gender,
             phone,
-            email,
             address,
             district,
             govIdType,
-            govIdNumber,
             emergencyContactName,
             emergencyContactPhone,
-            medicalHistory,
             telemedicineConsent,
-            // optional arrays (ensure fallback to empty arrays)
-            alergies: Array.isArray(alergies) ? alergies.map(s => s.trim()) : [],
-            operations: Array.isArray(operations) ? operations.map(s => s.trim()) : [],
-            ongoingMedications: Array.isArray(ongoingMedications) ? ongoingMedications.map(s => s.trim()) : [],
-            permanentMedications: Array.isArray(permanentMedications) ? permanentMedications.map(s => s.trim()) : [],
-            majorDiseases: Array.isArray(majorDiseases) ? majorDiseases.map(s => s.trim()) : [],
             clerkUserId,
         });
+
+        const newPhone = phone.startsWith("+91") ? phone : "+91" + phone;
+
+        sendSms(
+            newPhone,
+            `Dear ${fullName}, your patient profile has been created successfully.`
+        ).catch((err) => {
+            console.error("Error sending SMS:", err);
+        });
+
         res.status(201).json({
             message: "Patient created successfully",
             patient,
@@ -236,8 +188,9 @@ exports.getPatientByClerkId = async (req, res) => {
 exports.getPatientWithEvents = async (req, res) => {
     try {
         const { patientId } = req.params;
-        const patient = await Patient.findById(patientId).populate('events');
-        if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        const patient = await Patient.findById(patientId).populate("events");
+        if (!patient)
+            return res.status(404).json({ error: "Patient not found" });
         res.json(patient);
     } catch (err) {
         res.status(400).json({ error: err.message });

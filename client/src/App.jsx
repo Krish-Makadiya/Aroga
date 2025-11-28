@@ -1,18 +1,23 @@
-import { ArrowRight, Book, Brain, ChartColumnIncreasing, DollarSign, File, FileText, Headset, LayoutDashboard, Phone, Pill, Settings, Stethoscope, Venus, Search } from "lucide-react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
-import Onboarding from "./pages/auth/Onboarding";
-import { useUser } from "@clerk/clerk-react";
 import {
-    Album,
+    ArrowRight,
+    Book,
+    Brain,
+    ChartColumnIncreasing,
     DollarSign,
     File,
+    FileText,
+    Headset,
     LayoutDashboard,
-    Megaphone,
+    Phone,
     Pill,
+    Settings,
     Stethoscope,
-    Venus
+    Venus,
+    Search,
+    Megaphone,
+    Album,
 } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import {
     BrowserRouter,
@@ -21,7 +26,6 @@ import {
     Routes,
     useNavigate,
 } from "react-router-dom";
-import VideoAppointment from "./components/Doctor/VideoAppointment";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleRedirect from "./components/auth/RoleRedirect";
 import LandingPage from "./pages/LandingPage";
@@ -38,7 +42,7 @@ import PatientDashboard from "./pages/patientPages/PatientDashboard/PatientDashb
 import SheReads from "./pages/patientPages/SheReads/SheReads";
 import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
-import VideoAppointment from "./components/Doctor/VideoAppointment"
+import VideoAppointment from "./components/Doctor/VideoAppointment";
 import MedicineSearch from "./pages/patientPages/MedicineSearch/MedicineSearch";
 
 const patientTabs = [
@@ -119,6 +123,36 @@ const pharmacyTabs = [
         name: "Dashboard",
         icon: LayoutDashboard,
         path: "/pharmacy/dashboard",
+    },
+    {
+        id: 2,
+        name: "Manage Inventory",
+        icon: LayoutDashboard,
+        path: "/pharmacy/manage-inventory",
+    },
+    {
+        id: 3,
+        name: "Create Bill",
+        icon: LayoutDashboard,
+        path: "/pharmacy/create-bill",
+    },
+    {
+        id: 4,
+        name: "Billing History",
+        icon: LayoutDashboard,
+        path: "/pharmacy/billing-history",
+    },
+    {
+        id: 5,
+        name: "My Location",
+        icon: LayoutDashboard,
+        path: "/pharmacy/my-location",
+    },
+    {
+        id: 6,
+        name: "Settings",
+        icon: LayoutDashboard,
+        path: "/pharmacy/settings",
     },
 ];
 
@@ -269,10 +303,8 @@ function App() {
                 />
 
                 <Route
-                    path="/video-appointment"
-                    element={
-                        <VideoAppointment />
-                    }
+                    path="/video-appointment/:role"
+                    element={<VideoAppointment />}
                 />
                 <Route
                     path="/doctor/articles"
@@ -289,6 +321,48 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Pharmacy">
                             <PharmacyDashboard tabs={pharmacyTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Pharmacy subpages - use dedicated routes */}
+                <Route
+                    path="/pharmacy/manage-inventory"
+                    element={
+                        <ProtectedRoute requiredRole="Pharmacy">
+                            <PharmacyDashboard tabs={pharmacyTabs} view="inventory" />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/pharmacy/create-bill"
+                    element={
+                        <ProtectedRoute requiredRole="Pharmacy">
+                            <PharmacyDashboard tabs={pharmacyTabs} view="create-bill" />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/pharmacy/billing-history"
+                    element={
+                        <ProtectedRoute requiredRole="Pharmacy">
+                            <PharmacyDashboard tabs={pharmacyTabs} view="bills" />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/pharmacy/my-location"
+                    element={
+                        <ProtectedRoute requiredRole="Pharmacy">
+                            <PharmacyDashboard tabs={pharmacyTabs} view="location" />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/pharmacy/settings"
+                    element={
+                        <ProtectedRoute requiredRole="Pharmacy">
+                            <PharmacyDashboard tabs={pharmacyTabs} view="settings" />
                         </ProtectedRoute>
                     }
                 />

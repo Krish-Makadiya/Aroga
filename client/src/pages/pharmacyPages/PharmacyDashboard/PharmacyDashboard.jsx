@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import Sidebar from "../../../components/Sidebar";
 import PharmacyDashboardContent from "./PharmacyDashboardContent";
 
-export default function PharmacyDashboard({ tabs }) {
+export default function PharmacyDashboard({ tabs, view }) {
     const location = useLocation();
 
     const getActiveTab = () => {
@@ -17,7 +17,7 @@ export default function PharmacyDashboard({ tabs }) {
             <Sidebar tabs={tabs} getActiveTab={getActiveTab} />
 
             <div className="h-full w-full bg-light-bg dark:bg-dark-surface md:py-10 md:px-5 py-5">
-                <PharmacyDashboardContent />
+                <PharmacyDashboardContent viewOverride={view} />
             </div>
         </div>
     );

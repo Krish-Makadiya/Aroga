@@ -1,7 +1,10 @@
 const express = require("express");
 const Appointment = require("../schema/appointment.schema");
 const mongoose = require("mongoose");
+const { sendSms } = require("../config/sms.config");
 const router = express.Router();
+const Patient = require("../schema/patient.schema");
+const { translate } = require("@vitalets/google-translate-api");
 
 router.post("/room-create", async (req, res) => {
     try {
@@ -28,11 +31,25 @@ router.post("/room-closed", async (req, res) => {
         const { room_id } = req.body;
 
         const roomObjectId = new mongoose.Types.ObjectId(room_id);
-        await Appointment.findByIdAndUpdate(
+        const appt = await Appointment.findByIdAndUpdate(
             roomObjectId,
             { roomEndedAt: new Date(Date.now()), status: "completed" },
             { new: true }
         );
+
+        const patientId = appt.patientId;
+        const patient = await Patient.findById(patientId);
+
+        console.log("Appointment completed for patient:", patient);
+        console.log("Appointment:", appt);
+
+        const phone = patient.phone.startsWith("+91")
+            ? patient.phone
+            : "+91" + patient.phone;
+
+        const message = `Dear ${patient.fullName}, your appointment has been completed. Dont forget to provide feedback to the doctor. Your Prescription will be available in your profile.`;
+        const result = await translate(message, { to: "en" });
+        sendSms(phone, result.text);
 
         return res.status(200).json({ message: "Room closed", roomObjectId });
     } catch (error) {

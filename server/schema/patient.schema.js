@@ -170,6 +170,25 @@ const patientSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
+        // Medication reminders set by the patient (optional)
+        medicationReminders: {
+            type: [
+                {
+                    medicine: { type: String, trim: true },
+                    dosage: { type: String, trim: true },
+                    frequency: { type: String, trim: true },
+                    // time is stored as HH:MM (24-hour) string for simplicity
+                    time: { type: String, trim: true },
+                    // optional note the patient wants included in reminders
+                    note: { type: String, trim: true, default: '' },
+                    // last time this reminder was notified (used to avoid duplicates)
+                    lastNotifiedAt: { type: Date, default: null },
+                    active: { type: Boolean, default: true },
+                    createdAt: { type: Date, default: Date.now },
+                },
+            ],
+            default: [],
+        },
     },
     {
         timestamps: true,

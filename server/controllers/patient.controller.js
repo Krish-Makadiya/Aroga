@@ -1,4 +1,5 @@
 // server/controllers/patient.controller.js
+const { translate } = require("@vitalets/google-translate-api");
 const { sendSms } = require("../config/sms.config");
 const Patient = require("../schema/patient.schema");
 
@@ -132,9 +133,12 @@ exports.createPatient = async (req, res) => {
 
         const newPhone = phone.startsWith("+91") ? phone : "+91" + phone;
 
+        const message = `Dear ${fullName}, your patient profile has been created successfully.`;
+        const result = await translate(message, { to: "en" });
+
         sendSms(
             newPhone,
-            `Dear ${fullName}, your patient profile has been created successfully.`
+            result.text
         ).catch((err) => {
             console.error("Error sending SMS:", err);
         });
@@ -194,5 +198,225 @@ exports.getPatientWithEvents = async (req, res) => {
         res.json(patient);
     } catch (err) {
         res.status(400).json({ error: err.message });
+    }
+};
+
+// Get medication reminders for a patient by clerkUserId
+exports.getMedicationReminders = async (req, res) => {
+    try {
+        const { clerkUserId } = req.params;
+        if (!clerkUserId)
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing clerkUserId" });
+
+        const patient = await Patient.findOne({ clerkUserId });
+        if (!patient)
+            return res
+                .status(404)
+                .json({ success: false, message: "Patient not found" });
+
+        return res
+            .status(200)
+            .json({
+                success: true,
+                reminders: patient.medicationReminders || [],
+            });
+    } catch (err) {
+        console.error(
+            "[patient.getMedicationReminders] error",
+            err.message || err
+        );
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Failed to fetch reminders",
+                error: err.message,
+            });
+    }
+};
+
+// Add a medication reminder for a patient
+exports.addMedicationReminder = async (req, res) => {
+    try {
+        const { clerkUserId } = req.params;
+        const {
+            medicine,
+            dosage = "",
+            frequency = "",
+            time = "",
+            note = "",
+        } = req.body;
+
+        if (!clerkUserId)
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing clerkUserId" });
+        if (!medicine || typeof medicine !== "string" || !medicine.trim()) {
+            return res
+                .status(400)
+                .json({ success: false, message: "medicine is required" });
+        }
+
+        const patient = await Patient.findOne({ clerkUserId });
+        if (!patient)
+            return res
+                .status(404)
+                .json({ success: false, message: "Patient not found" });
+
+        const reminder = {
+            medicine: medicine.trim(),
+            dosage: dosage.trim(),
+            frequency: frequency.trim(),
+            time: time.trim(),
+            note: String(note).trim(),
+            active: true,
+            lastNotifiedAt: null,
+        };
+
+        patient.medicationReminders.push(reminder);
+        await patient.save();
+
+        // Return the newly added reminder (last item)
+        const added =
+            patient.medicationReminders[patient.medicationReminders.length - 1];
+        return res.status(201).json({ success: true, reminder: added });
+    } catch (err) {
+        console.error(
+            "[patient.addMedicationReminder] error",
+            err.message || err
+        );
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Failed to add reminder",
+                error: err.message,
+            });
+    }
+};
+
+// Update a medication reminder
+exports.updateMedicationReminder = async (req, res) => {
+    try {
+        const { clerkUserId, reminderId } = req.params;
+        const { medicine, dosage, frequency, time, active, note } = req.body;
+
+        if (!clerkUserId || !reminderId)
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing identifiers" });
+
+        const patient = await Patient.findOne({ clerkUserId });
+        if (!patient)
+            return res
+                .status(404)
+                .json({ success: false, message: "Patient not found" });
+
+        // Try Mongoose subdocument access first
+        let rem = null;
+        if (
+            patient.medicationReminders &&
+            typeof patient.medicationReminders.id === "function"
+        ) {
+            rem = patient.medicationReminders.id(reminderId);
+        }
+        // Fallback to find in case .id is not available or returned plain object
+        if (!rem) {
+            rem = patient.medicationReminders.find(
+                (r) => String(r._id || r.id || "") === String(reminderId)
+            );
+        }
+        if (!rem)
+            return res
+                .status(404)
+                .json({ success: false, message: "Reminder not found" });
+
+        if (medicine !== undefined) rem.medicine = String(medicine).trim();
+        if (dosage !== undefined) rem.dosage = String(dosage).trim();
+        if (frequency !== undefined) rem.frequency = String(frequency).trim();
+        if (time !== undefined) rem.time = String(time).trim();
+        if (note !== undefined) rem.note = String(note).trim();
+        if (active !== undefined) rem.active = Boolean(active);
+
+        await patient.save();
+        return res.status(200).json({ success: true, reminder: rem });
+    } catch (err) {
+        console.error(
+            "[patient.updateMedicationReminder] error",
+            err.message || err
+        );
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Failed to update reminder",
+                error: err.message,
+            });
+    }
+};
+
+// Delete a medication reminder
+exports.deleteMedicationReminder = async (req, res) => {
+    try {
+        const { clerkUserId, reminderId } = req.params;
+        if (!clerkUserId || !reminderId)
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing identifiers" });
+
+        const patient = await Patient.findOne({ clerkUserId });
+        if (!patient)
+            return res
+                .status(404)
+                .json({ success: false, message: "Patient not found" });
+
+        // Try the DocumentArray lookup first (Mongoose subdocument)
+        let rem = null;
+        if (
+            patient.medicationReminders &&
+            typeof patient.medicationReminders.id === "function"
+        ) {
+            rem = patient.medicationReminders.id(reminderId);
+        }
+
+        // Fallback: if .id didn't find a subdoc (or isn't available) try to find by _id or id
+        if (!rem) {
+            rem = patient.medicationReminders.find(
+                (r) => String(r._id || r.id || "") === String(reminderId)
+            );
+        }
+
+        if (!rem)
+            return res
+                .status(404)
+                .json({ success: false, message: "Reminder not found" });
+
+        // If this is a Mongoose subdocument it will have a remove() method; otherwise remove via filter
+        if (typeof rem.remove === "function") {
+            rem.remove();
+        } else {
+            patient.medicationReminders = patient.medicationReminders.filter(
+                (r) => String(r._id || r.id || "") !== String(reminderId)
+            );
+        }
+        await patient.save();
+
+        return res
+            .status(200)
+            .json({ success: true, message: "Reminder removed" });
+    } catch (err) {
+        console.error(
+            "[patient.deleteMedicationReminder] error",
+            err.message || err
+        );
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Failed to delete reminder",
+                error: err.message,
+            });
     }
 };

@@ -10,6 +10,8 @@ const Rating = require("../schema/rating.schema");
 const cloudinary = require("../config/cloudinary");
 
 const multer = require("multer");
+const { sendSms } = require("../config/sms.config");
+const { translate } = require("@vitalets/google-translate-api");
 const upload = multer({ storage: multer.memoryStorage() });
 
 // POST /api/appointment - create with minimal fields
@@ -115,6 +117,17 @@ router.post(
                 type: "appointment",
             });
 
+            const newPhone = patient.phone.startsWith("+91")
+                ? patient.phone
+                : "+91" + patient.phone;
+
+            const message = `Dear ${patient.fullName}, your appointment request has been sent successfully, you will be notified once it is confirmed.`;
+            const result = await translate(message, { to: "en" });
+
+            sendSms(newPhone, result.text).catch((err) => {
+                console.error("Error sending SMS:", err);
+            });
+
             return res.status(201).json({
                 success: true,
                 data: {
@@ -137,6 +150,10 @@ router.post(
 router.get("/patient/:clerkUserId", async (req, res) => {
     try {
         const { clerkUserId } = req.params;
+        console.log(
+            "Fetching appointments for patient clerkUserId:",
+            clerkUserId
+        );
         if (!clerkUserId) {
             return res
                 .status(400)
@@ -295,7 +312,27 @@ router.put("/:id/status", async (req, res) => {
             .populate("patientId", "fullName email phone")
             .populate("doctorId", "fullName email phone");
 
-        console.log(`Appointment ${id} status updated to: ${status}`);
+        const newPhone = appointment.patientId.phone.startsWith("+91")
+            ? appointment.patientId.phone
+            : "+91" + appointment.patientId.phone;
+
+        const message = `Dear ${
+            appointment.patientId.fullName
+        }, your appointment scheduled on ${
+            appointment.scheduledAt.toISOString().split("T")[0]
+        } at ${appointment.scheduledAt
+            .toTimeString()
+            .split(" ")[0]
+            .substring(
+                0,
+                5
+            )} has been ${status}. Link will be shared once doctor joins the meeting.`;
+
+        const result = await translate(message, { to: "en" });
+
+        sendSms(newPhone, result.text).catch((err) => {
+            console.error("Error sending SMS:", err);
+        });
 
         return res.status(200).json({
             success: true,

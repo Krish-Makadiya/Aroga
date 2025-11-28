@@ -10,9 +10,11 @@ import {
     FileText as FileTextIcon,
     Heart,
     Pill,
+    PillIcon,
     Plus,
     Settings,
     Stethoscope,
+    TabletIcon,
     TrendingUp,
     User,
 } from "lucide-react";
@@ -25,6 +27,11 @@ const PatientDashboardContent = () => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [medOpen, setMedOpen] = useState(false);
+    const [prescriptions, setPrescriptions] = useState([]); // unique list of prescribed items
+    const [reminders, setReminders] = useState([]);
+    const [savingMap, setSavingMap] = useState({});
+
     const { user } = useUser();
     const { getToken } = useAuth();
 
@@ -48,7 +55,6 @@ const PatientDashboardContent = () => {
                 }
             );
             setUserData(response.data);
-            console.log("Fetched user data:", response.data);
         } catch (error) {
             console.error(
                 "Error fetching user data:",
@@ -86,7 +92,68 @@ const PatientDashboardContent = () => {
         return age;
     };
 
+    // Medication reminder modal state and helpers
+
     if (loading) return <Loader />;
+
+    const openMedicationModal = async () => {
+        setMedOpen(true);
+        try {
+            const token = await getToken();
+
+            // Fetch appointments (to collect prescriptions)
+            const apptRes = await axios.get(
+                `${
+                    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+                }/api/appointment/patient/${user.id}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            const allAppts = apptRes.data?.data || [];
+
+            console.log("All appointments:", allAppts);
+
+            // Flatten prescriptions and deduplicate by medicine+dosage
+            const flat = [];
+            const seen = new Set();
+            for (const a of allAppts) {
+                if (Array.isArray(a.prescription)) {
+                    for (const item of a.prescription) {
+                        const key = `${item.medicine || ""}::${
+                            item.dosage || ""
+                        }`;
+                        if (!seen.has(key) && item.medicine) {
+                            seen.add(key);
+                            flat.push({
+                                medicine: item.medicine,
+                                dosage: item.dosage || "",
+                                frequency: item.frequency || "",
+                            });
+                        }
+                    }
+                }
+            }
+            setPrescriptions(flat);
+
+            // Fetch already saved reminders
+            const rRes = await axios.get(
+                `${
+                    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+                }/api/patient/${user.id}/reminders`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setReminders(rRes.data.reminders || []);
+        } catch (err) {
+            console.error(
+                "Error loading medication data:",
+                err?.response?.data || err.message || err
+            );
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-light-background to-light-background-secondary dark:from-dark-background dark:to-dark-background-secondary">
@@ -241,20 +308,28 @@ const PatientDashboardContent = () => {
                                     navigateTo: "/patient/symptom-checker",
                                 },
                                 {
-                                    icon: FileTextIcon,
-                                    label: "View Reports",
-                                    color: "bg-purple-500",
-                                },
-                                {
                                     icon: Pill,
                                     label: "Medication Reminder",
                                     color: "bg-orange-500",
                                 },
+                                {
+                                    icon: TabletIcon,
+                                    label: "Get Medicine",
+                                    color: "bg-purple-500",
+                                    navigateTo: "/patient/medicine-search",
+                                },
                             ].map((action, index) => (
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (action.navigateTo) {
                                             navigate(action.navigateTo);
+                                            return;
+                                        }
+                                        if (
+                                            action.label ===
+                                            "Medication Reminder"
+                                        ) {
+                                            await openMedicationModal();
                                         }
                                     }}
                                     key={index}
@@ -271,6 +346,239 @@ const PatientDashboardContent = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Medication Reminder Modal */}
+                    {medOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div
+                                className="absolute inset-0 bg-black/40"
+                                onClick={() => setMedOpen(false)}
+                            />
+                            <div className="relative z-10 w-full max-w-3xl bg-white dark:bg-dark-bg rounded-2xl shadow-xl p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xl font-bold">
+                                        Medication Reminders
+                                    </h3>
+                                    <button
+                                        onClick={() => setMedOpen(false)}
+                                        className="px-3 py-1 rounded-md bg-slate-100 dark:bg-slate-800">
+                                        Close
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm text-muted mb-2">
+                                            Prescribed medicines (collected from
+                                            your appointments)
+                                        </p>
+                                        {prescriptions.length === 0 ? (
+                                            <p className="text-sm text-muted">
+                                                No prescriptions found in your
+                                                appointments.
+                                            </p>
+                                        ) : (
+                                            prescriptions.map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="p-3 rounded-lg bg-light-background dark:bg-dark-background flex items-center gap-3">
+                                                    <div className="flex-1">
+                                                        <div className="font-semibold">
+                                                            {item.medicine}
+                                                        </div>
+                                                        <div className="text-xs text-muted">
+                                                            {item.dosage}{" "}
+                                                            {item.frequency &&
+                                                                `· ${item.frequency}`}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <input
+                                                            type="time"
+                                                            id={`t-${idx}`}
+                                                            className="p-2 rounded-md bg-white dark:bg-slate-800 text-sm border"
+                                                        />
+                                                        <button
+                                                            onClick={async () => {
+                                                                const el =
+                                                                    document.getElementById(
+                                                                        `t-${idx}`
+                                                                    );
+                                                                const time =
+                                                                    el?.value ||
+                                                                    "";
+                                                                const token =
+                                                                    await getToken();
+                                                                setSavingMap(
+                                                                    (s) => ({
+                                                                        ...s,
+                                                                        [idx]: true,
+                                                                    })
+                                                                );
+                                                                try {
+                                                                    await axios.post(
+                                                                        `${
+                                                                            import.meta
+                                                                                .env
+                                                                                .VITE_API_BASE_URL ||
+                                                                            "http://localhost:5000"
+                                                                        }/api/patient/${
+                                                                            user.id
+                                                                        }/reminders`,
+                                                                        {
+                                                                            medicine:
+                                                                                item.medicine,
+                                                                            dosage: item.dosage,
+                                                                            frequency:
+                                                                                item.frequency,
+                                                                            time,
+                                                                        },
+                                                                        {
+                                                                            headers:
+                                                                                {
+                                                                                    Authorization: `Bearer ${token}`,
+                                                                                },
+                                                                        }
+                                                                    );
+
+                                                                    // refresh reminders
+                                                                    const rRes =
+                                                                        await axios.get(
+                                                                            `${
+                                                                                import.meta.env.VITE_API_BASE_URL ||
+                                                                                "http://localhost:5000"
+                                                                            }/api/patient/${
+                                                                                user.id
+                                                                            }/reminders`,
+                                                                            {
+                                                                                headers:
+                                                                                    {
+                                                                                        Authorization: `Bearer ${token}`,
+                                                                                    },
+                                                                            }
+                                                                        );
+                                                                    setReminders(
+                                                                        rRes
+                                                                            .data
+                                                                            .reminders ||
+                                                                            []
+                                                                    );
+                                                                } catch (err) {
+                                                                    console.error(
+                                                                        "Failed to save reminder:",
+                                                                        err
+                                                                            ?.response
+                                                                            ?.data ||
+                                                                            err.message ||
+                                                                            err
+                                                                    );
+                                                                } finally {
+                                                                    setSavingMap(
+                                                                        (
+                                                                            s
+                                                                        ) => ({
+                                                                            ...s,
+                                                                            [idx]: false,
+                                                                        })
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
+                                                            {savingMap[idx]
+                                                                ? "Saving..."
+                                                                : "Add Reminder"}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm text-muted mb-2">
+                                            Your saved reminders
+                                        </p>
+                                        {reminders.length === 0 ? (
+                                            <p className="text-sm text-muted">
+                                                No reminders saved yet
+                                            </p>
+                                        ) : (
+                                            reminders.map((r) => (
+                                                <div
+                                                    key={r._id}
+                                                    className="p-3 rounded-lg bg-light-background dark:bg-dark-background flex items-center gap-3 justify-between">
+                                                    <div>
+                                                        <div className="font-semibold">
+                                                            {r.medicine}
+                                                        </div>
+                                                        <div className="text-xs text-muted">
+                                                            {r.dosage}{" "}
+                                                            {r.frequency &&
+                                                                `· ${r.frequency}`}
+                                                        </div>
+                                                        <div className="text-xs text-muted">
+                                                            Time:{" "}
+                                                            {r.time ||
+                                                                "Not set"}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const token =
+                                                                        await getToken();
+                                                                    await axios.delete(
+                                                                        `${
+                                                                            import.meta.env.VITE_API_BASE_URL ||
+                                                                            "http://localhost:5000"
+                                                                        }/api/patient/${
+                                                                            user.id
+                                                                        }/reminders/${
+                                                                            r._id
+                                                                        }`,
+                                                                        {
+                                                                            headers:
+                                                                                {
+                                                                                    Authorization: `Bearer ${token}`,
+                                                                                },
+                                                                        }
+                                                                    );
+                                                                    setReminders(
+                                                                        (
+                                                                            prev
+                                                                        ) =>
+                                                                            prev.filter(
+                                                                                (
+                                                                                    x
+                                                                                ) =>
+                                                                                    x._id !==
+                                                                                    r._id
+                                                                            )
+                                                                    );
+                                                                } catch (err) {
+                                                                    console.error(
+                                                                        "Failed to delete reminder",
+                                                                        err
+                                                                            ?.response
+                                                                            ?.data ||
+                                                                            err.message ||
+                                                                            err
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className="px-3 py-1 rounded-md bg-red-100 text-red-700 text-sm hover:bg-red-200">
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Health Reminders */}
                     <div className="dark:bg-dark-bg bg-light-surface rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300">

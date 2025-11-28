@@ -18,6 +18,8 @@ const webhookRoute = require("./routes/webhook.route");
 const medicineRoute = require("./routes/medicine.Routes");
 const pharmacyLocationRoute = require("./routes/pharmacy_Location.routes");
 const pharmacyBillRoute = require("./routes/pharmcy.bill.route");
+const { startReminderCron } = require("./config/reminderCronJob.js");
+const { startPrescriptionCron } = require("./config/prescriptionJob.js");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -58,4 +60,6 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}`);
+    // startReminderCron();
+    startPrescriptionCron();
 });

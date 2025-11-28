@@ -97,6 +97,16 @@ const appointmentSchema = new mongoose.Schema(
             required: true,
             min: 0,
         },
+        // Reminder tracking
+        reminderSent: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
+        reminderSentAt: {
+            type: Date,
+            default: null,
+        },
         payment: {
             status: {
                 type: String,

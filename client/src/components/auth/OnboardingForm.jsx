@@ -133,10 +133,30 @@ export default function OnboardingForm() {
             const token = await getToken();
 
             if (backendUrl) {
+                console.log('----------');
                 console.log(backendBody);
-                const response = await axios.post(backendUrl, backendBody, {
+                const formData = new FormData();
+                console.log("---Roel: ", role);
+                //formdata for doctors
+                if (role === "Doctor") {
+                    console.log("Preparing form data for doctor:", doctor);
+                    formData.append("fullName", doctor.fullName);
+                    formData.append("qualifications", doctor.qualifications);
+                    formData.append("registrationNumber", doctor.registrationNumber);
+                    formData.append("specialty", doctor.specialty);
+                    formData.append("phone", doctor.phone);
+                    formData.append("email", doctor.email);
+                    formData.append("licenseFile", doctor.licenseFile);
+                    formData.append("idProofFile", doctor.idProofFile);
+                    formData.append("affiliation", doctor.affiliation);
+                    formData.append("experience", doctor.experience);
+                    formData.append("telemedicineConsent", doctor.telemedicineConsent);
+                }
+                console.log("Submitting to backend:", backendUrl, formData);
+
+                const response = await axios.post(backendUrl, formData, {
                     headers: {
-                        "Content-Type": "application/json",
+                        "Content-Type": "multipart/form-data",
                         Authorization: `Bearer ${token}`,
                     },
                 });

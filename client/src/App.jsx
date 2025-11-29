@@ -16,6 +16,8 @@ import {
     Search,
     Megaphone,
     Album,
+    Calendar,
+    Map,
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
@@ -44,6 +46,10 @@ import SymptomChecker from "./pages/patientPages/SymptomChecker/SymptomChecker";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 import VideoAppointment from "./components/Doctor/VideoAppointment";
 import MedicineSearch from "./pages/patientPages/MedicineSearch/MedicineSearch";
+import AdminDashboard from "./pages/adminPages/Dashboard/AdminDashboard";
+import ManageDoctors from "./pages/adminPages/ManageDoctors/ManageDoctors";
+import AdminAppointments from "./pages/adminPages/AdminAppointments/AdminAppointments";
+import LocationMap from "./pages/adminPages/LocationMap/LocationMap";
 
 const patientTabs = [
     {
@@ -154,6 +160,33 @@ const pharmacyTabs = [
         icon: LayoutDashboard,
         path: "/pharmacy/settings",
     },
+];
+
+const adminTabs = [
+    {
+        id: 1,
+        name: "Dashboard",
+        icon: ChartColumnIncreasing,
+        path: "/admin/dashboard",
+    },
+    {
+        id: 2,
+        name: "Manage Doctors",
+        icon: Headset,
+        path: "/admin/manage-doctors",
+    },
+    {
+        id: 3,
+        name: "Appointments",
+        icon: Calendar,
+        path: "/admin/appointments",
+    },
+    {
+        id: 4,
+        name: "Location Map",
+        icon: Map,
+        path: "/admin/location-map",
+    }
 ];
 
 const VideoAppointmentEntry = () => {
@@ -367,14 +400,40 @@ function App() {
                     }
                 />
 
-                {/*<Route
+                <Route
                     path="/dashboard/admin"
                     element={
                         <ProtectedRoute requiredRole="Admin">
-                            <AdminDashboard />
+                            <AdminDashboard tabs={adminTabs} />
                         </ProtectedRoute>
                     }
-                /> */}
+                />
+
+                <Route
+                    path="/admin/manage-doctors"
+                    element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <ManageDoctors tabs={adminTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/appointments"
+                    element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <AdminAppointments tabs={adminTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/location-map"
+                    element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <LocationMap tabs={adminTabs} />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />

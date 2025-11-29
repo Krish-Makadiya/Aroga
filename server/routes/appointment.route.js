@@ -636,4 +636,30 @@ router.get("/doctor/:doctorId/ratings", async (req, res) => {
     }
 });
 
+// GET /api/appointment/admin/all - Get all appointments for admin (with full patient and doctor details)
+router.get("/admin/all", async (req, res) => {
+    try {
+        const appointments = await Appointment.find({})
+            .populate(
+                "patientId",
+                "fullName email phone district state dob gender address govIdType govIdNumber emergencyContactName emergencyContactPhone medicalHistory alergies operations ongoingMedications permanentMedications majorDiseases telemedicineConsent clerkUserId"
+            )
+            .populate(
+                "doctorId",
+                "fullName qualifications specialty consultationFee experience verificationStatus languages bio district state rating email phone registrationNumber affiliation"
+            )
+            .populate("ratingId", "rating review")
+            .sort({ scheduledAt: -1 });
+
+        return res.status(200).json({ success: true, data: appointments });
+    } catch (error) {
+        console.error("Get all appointments error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch appointments",
+            error: error.message,
+        });
+    }
+});
+
 module.exports = router;

@@ -20,6 +20,7 @@ const pharmacyLocationRoute = require("./routes/pharmacy_Location.routes");
 const pharmacyBillRoute = require("./routes/pharmcy.bill.route");
 const { startReminderCron } = require("./config/reminderCronJob.js");
 const { startPrescriptionCron } = require("./config/prescriptionJob.js");
+const adminRoute = require('./routes/admin.route');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,12 +48,11 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/articles", articleRoute);
 app.use("/api", healthRoute);
 
-
-
-
 app.use("/api/medicine", medicineRoute);
 app.use("/api/pharmacyLocation", pharmacyLocationRoute);
 app.use("/api/pharmacyBill", pharmacyBillRoute);
+
+app.use('/api/admin', adminRoute);
 
 app.get("/", (req, res) => {
     res.send("API is running!");
@@ -61,5 +61,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}`);
     // startReminderCron();
-    startPrescriptionCron();
+    // startPrescriptionCron();
 });

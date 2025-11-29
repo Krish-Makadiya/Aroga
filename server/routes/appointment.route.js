@@ -60,6 +60,49 @@ router.post(
                 });
             }
 
+            // Enforce 20-minute slots and doctor availability/blackouts
+            const localHours = when.getHours().toString().padStart(2, "0");
+            const localMinutes = when.getMinutes().toString().padStart(2, "0");
+            const minuteVal = when.getMinutes();
+            if (minuteVal % 20 !== 0) {
+                return res.status(400).json({ success: false, message: "Please select a 20-minute slot (:00, :20, :40)." });
+            }
+            const dateStr = `${when.getFullYear()}-${(when.getMonth() + 1)
+                .toString()
+                .padStart(2, "0")}-${when.getDate().toString().padStart(2, "0")}`;
+
+            const doctor = await Doctor.findById(doctorId).select("availableSlots blackouts");
+            if (!doctor) {
+                return res.status(404).json({ success: false, message: "Doctor not found" });
+            }
+
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const day = dayNames[when.getDay()];
+            const ranges = (doctor.availableSlots || []).filter((r) => r.day === day);
+            const hhmm = `${localHours}:${localMinutes}`;
+            const toMinutes = (s) => {
+                const [h, m] = s.split(":").map(Number);
+                return h * 60 + m;
+            };
+            const startMin = toMinutes(hhmm);
+            const withinRange = ranges.some((r) => startMin >= toMinutes(r.startTime) && startMin + 20 <= toMinutes(r.endTime));
+            if (!withinRange) {
+                return res.status(400).json({ success: false, message: "Selected time is outside doctor's availability." });
+            }
+            const dayBlackouts = (doctor.blackouts || []).filter((b) => b.date === dateStr);
+            const inBlackout = dayBlackouts.some((b) => {
+                return startMin >= toMinutes(b.startTime) && startMin < toMinutes(b.endTime);
+            });
+            if (inBlackout) {
+                return res.status(400).json({ success: false, message: "Selected time is blocked by doctor." });
+            }
+
+            // Optional pre-check for existing appointment at same slot
+            const exists = await Appointment.findOne({ doctorId, scheduledAt: when });
+            if (exists) {
+                return res.status(409).json({ success: false, message: "This slot has just been booked. Please choose another." });
+            }
+
             const patient = await Patient.findOne({ clerkUserId: patientId });
             if (!patient) {
                 return res

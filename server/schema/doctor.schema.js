@@ -160,6 +160,34 @@ const doctorSchema = new mongoose.Schema(
             },
         ],
 
+        // Date-specific blackout windows where no appointments are allowed
+        blackouts: [
+            {
+                date: {
+                    type: String, // YYYY-MM-DD
+                    trim: true,
+                },
+                startTime: {
+                    type: String, // HH:MM
+                    validate: {
+                        validator: function (value) {
+                            return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+                        },
+                        message: "Time must be in HH:MM format (24-hour)",
+                    },
+                },
+                endTime: {
+                    type: String, // HH:MM
+                    validate: {
+                        validator: function (value) {
+                            return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+                        },
+                        message: "Time must be in HH:MM format (24-hour)",
+                    },
+                },
+            },
+        ],
+
         // Verification Status
         verificationStatus: {
             type: String,

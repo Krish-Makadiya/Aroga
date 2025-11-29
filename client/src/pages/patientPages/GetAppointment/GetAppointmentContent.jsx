@@ -119,7 +119,10 @@ const GetAppointmentContent = () => {
         reports: "",
         reportFile: null,
     });
+    const [availableSlots, setAvailableSlots] = useState([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
     const [userMetadata, setUserMetadata] = useState(user.unsafeMetadata || {});
+    const [isBooking, setIsBooking] = useState(false);
 
     const API_BASE_URL =
         import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
@@ -151,11 +154,13 @@ const GetAppointmentContent = () => {
         return () => {
             mounted = false;
         };
+
+    // No pre-click revalidation; rely on 5s refresh and conflict removal on booking
     }, [user, getToken]);
 
     const validateAppointmentDate = (date, time) => {
         if (!date || !time)
-            return { ok: false, msg: "Please select both date and time." };
+            return { ok: false, msg: "Please select date and a slot." };
         const inputValue = `${date}T${time}`;
         const d = new Date(inputValue);
         if (isNaN(d.getTime()))
@@ -172,11 +177,8 @@ const GetAppointmentContent = () => {
             };
         }
         const mins = d.getMinutes();
-        if (!(mins === 0 || mins === 15 || mins === 30 || mins === 45)) {
-            return {
-                ok: false,
-                msg: "Please select a 30-minute slot (:00, :15, :30, or :45).",
-            };
+        if (mins % 20 !== 0) {
+            return { ok: false, msg: "Please select a 20-minute slot (:00, :20, :40)." };
         }
         return { ok: true, date: d, inputValue };
     };
@@ -197,6 +199,7 @@ const GetAppointmentContent = () => {
         }
 
         try {
+            setIsBooking(true);
             const prompt = buildDiagnosisPrompt(
                 userMetadata,
                 appointmentForm.symptoms
@@ -229,11 +232,11 @@ const GetAppointmentContent = () => {
                 formData,
                 token
                     ? {
-                          headers: {
-                              Authorization: `Bearer ${token}`,
-                              "Content-Type": "multipart/form-data",
-                          },
-                      }
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
                     : undefined
             );
 
@@ -241,15 +244,46 @@ const GetAppointmentContent = () => {
             closeBookingModal();
         } catch (e) {
             console.log(e);
-            toast.error(
-                e.response?.data?.message || "Failed to create appointment."
-            );
+            // If a time was selected, treat as a slot conflict: silently remove from UI and refresh slots
+            const msg = e.response?.data?.message || "Failed to create appointment.";
+            if (appointmentForm.time) {
+                try {
+                    const failedSlot = appointmentForm.time;
+                    setAvailableSlots((prev) => prev.filter((s) => s !== failedSlot));
+                    setAppointmentForm((prev) => ({ ...prev, time: "" }));
+                    const token2 = await getToken();
+                    const res2 = await axios.get(
+                        `${API_BASE_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                        {
+                            params: { date: appointmentForm.date },
+                            headers: token2 ? { Authorization: `Bearer ${token2}` } : undefined,
+                        }
+                    );
+                    setAvailableSlots(res2.data?.data || []);
+                } catch (_) {
+                    // no-op: keep optimistic removal
+                }
+            } else {
+                // Silent fail for other errors as well (no popup)
+                console.warn(msg);
+            }
+        } finally {
+            setIsBooking(false);
         }
     };
 
-    const openBookingModal = (doctor) => {
+    // Clear selected time if it's no longer in available slots (prevents selecting booked slot)
+    useEffect(() => {
+        if (appointmentForm.time && !availableSlots.includes(appointmentForm.time)) {
+            setAppointmentForm((prev) => ({ ...prev, time: "" }));
+        }
+    }, [availableSlots]);
+
+    const openBookingModal = async (doctor) => {
         setSelectedDoctor(doctor);
         setBookingModalOpen(true);
+        setAvailableSlots([]);
+        setAppointmentForm((prev) => ({ ...prev, date: "", time: "" }));
     };
 
     const closeBookingModal = () => {
@@ -265,12 +299,57 @@ const GetAppointmentContent = () => {
         });
     };
 
-    const handleAppointmentFormChange = (field, value) => {
-        setAppointmentForm((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+    const handleAppointmentFormChange = async (field, value) => {
+        setAppointmentForm((prev) => ({ ...prev, [field]: value }));
+        if (field === "date" && selectedDoctor) {
+            try {
+                setLoadingSlots(true);
+                const token = await getToken();
+                const res = await axios.get(
+                    `${API_BASE_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    {
+                        params: { date: value },
+                        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                    }
+                );
+                setAvailableSlots(res.data?.data || []);
+                // reset time when date changes
+                setAppointmentForm((prev) => ({ ...prev, time: "" }));
+            } catch (e) {
+                console.error(e);
+                setAvailableSlots([]);
+                toast.error("Failed to load slots");
+            } finally {
+                setLoadingSlots(false);
+            }
+        }
     };
+
+    // Auto-refresh slots periodically while booking modal is open to remove booked slots from UI
+    useEffect(() => {
+        if (!bookingModalOpen || !selectedDoctor || !appointmentForm.date) return;
+        let cancelled = false;
+        const tick = async () => {
+            try {
+                const token = await getToken();
+                const res = await axios.get(
+                    `${API_BASE_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    {
+                        params: { date: appointmentForm.date },
+                        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                    }
+                );
+                if (!cancelled) setAvailableSlots(res.data?.data || []);
+            } catch (_) {}
+        };
+        // initial fetch to sync
+        tick();
+        const id = setInterval(tick, 5000); // 5s
+        return () => {
+            cancelled = true;
+            clearInterval(id);
+        };
+    }, [bookingModalOpen, selectedDoctor, appointmentForm.date, getToken, API_BASE_URL]);
 
     const handleAddSymptom = () => {
         const value = appointmentForm.symptomInput.trim();
@@ -473,20 +552,36 @@ const GetAppointmentContent = () => {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-light-primary-text dark:text-dark-primary-text">
-                                        Appointment Time (30-min slots)
+                                        Available Slots (20-min)
                                     </p>
-                                    <input
-                                        type="time"
-                                        step="900"
-                                        value={appointmentForm.time}
-                                        onChange={(e) =>
-                                            handleAppointmentFormChange(
-                                                "time",
-                                                e.target.value
+                                    <div className="mt-2 min-h-[44px]">
+                                        {loadingSlots ? (
+                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">Loading slots...</div>
+                                        ) : appointmentForm.date ? (
+                                            availableSlots.length > 0 ? (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {availableSlots.map((s) => (
+                                                        <button
+                                                            key={s}
+                                                            disabled={isBooking}
+                                                            onClick={() => !isBooking && setAppointmentForm((p) => ({ ...p, time: s }))}
+                                                            className={`px-3 py-2 rounded-md text-sm border transition ${
+                                                                appointmentForm.time === s
+                                                                    ? "bg-light-primary text-white border-light-primary"
+                                                                    : "bg-light-bg dark:bg-dark-surface text-light-primary-text dark:text-dark-primary-text border-light-secondary-text/20 dark:border-dark-secondary-text/20"
+                                                            } ${isBooking ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"}`}
+                                                        >
+                                                            {s}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">No slots available for this date.</div>
                                             )
-                                        }
-                                        className="mt-2 w-full rounded-lg border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background px-3 py-2 text-light-primary-text dark:text-dark-primary-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
-                                    />
+                                        ) : (
+                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">Select a date to see slots.</div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div>

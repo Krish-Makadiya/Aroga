@@ -16,5 +16,13 @@ router.post("/profile", doctorController.upsertDoctorProfile);
 
 router.get("/verified-doctors", doctorController.getVerifiedDoctors);
 
+// Availability & blackout management
+router.post("/availability", doctorController.setAvailability);
+router.get("/availability", doctorController.getAvailability);
+router.post("/blackouts", doctorController.addBlackout);
+router.delete("/blackouts/:index", doctorController.removeBlackout);
+
+// List available 20-min slots for a specific date
+router.get("/:doctorId/slots", doctorController.getAvailableSlotsForDate);
 
 module.exports = router;

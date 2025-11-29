@@ -129,7 +129,8 @@ const appointmentSchema = new mongoose.Schema(
 );
 
 // // Helpful compound indexes
-// appointmentSchema.index({ doctorId: 1, scheduledAt: 1 });
+// Ensure a doctor cannot be booked twice at the same start time
+appointmentSchema.index({ doctorId: 1, scheduledAt: 1 }, { unique: true });
 // appointmentSchema.index({ patientId: 1, scheduledAt: 1 });
 // appointmentSchema.index({ "payment.status": 1 });
 // appointmentSchema.index({ status: 1, isTelemedicine: 1 });

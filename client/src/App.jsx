@@ -18,6 +18,11 @@ import {
     Album,
     Calendar,
     Map,
+    PackageSearch,
+    FilePlus2,
+    History,
+    MapPin,
+    Settings2,
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
@@ -133,31 +138,31 @@ const pharmacyTabs = [
     {
         id: 2,
         name: "Manage Inventory",
-        icon: LayoutDashboard,
+        icon: PackageSearch,       // inventory icon
         path: "/pharmacy/manage-inventory",
     },
     {
         id: 3,
         name: "Create Bill",
-        icon: LayoutDashboard,
+        icon: FilePlus2,           // bill creation icon
         path: "/pharmacy/create-bill",
     },
     {
         id: 4,
         name: "Billing History",
-        icon: LayoutDashboard,
+        icon: History,             // history icon
         path: "/pharmacy/billing-history",
     },
     {
         id: 5,
         name: "My Location",
-        icon: LayoutDashboard,
+        icon: MapPin,              // map/location icon
         path: "/pharmacy/my-location",
     },
     {
         id: 6,
         name: "Settings",
-        icon: LayoutDashboard,
+        icon: Settings2,            // settings icon
         path: "/pharmacy/settings",
     },
 ];

@@ -195,6 +195,16 @@ const patientSchema = new mongoose.Schema(
             ],
             default: [],
         },
+        location: {
+            latitude: {
+                type: Number,
+                default: null,
+            },
+            longitude: {
+                type: Number,
+                default: null,
+            },
+        },
     },
     {
         timestamps: true,

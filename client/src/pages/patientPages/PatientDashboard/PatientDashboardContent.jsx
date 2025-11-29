@@ -34,12 +34,83 @@ const PatientDashboardContent = () => {
 
     const { user } = useUser();
     const { getToken } = useAuth();
+    const [locationSaved, setLocationSaved] = useState(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchUserData();
     }, [user, getToken]);
+
+    // Save location once when component renders (only if not already saved)
+    useEffect(() => {
+        const saveLocation = async () => {
+            // Only save if location hasn't been saved yet and user data is loaded
+            if (locationSaved || !user || !userData) return;
+
+            // Check if location already exists in userData
+            if (userData.location?.latitude && userData.location?.longitude) {
+                setLocationSaved(true);
+                return;
+            }
+
+            // Check if geolocation is available
+            if (!navigator.geolocation) {
+                console.warn("Geolocation is not supported by this browser.");
+                return;
+            }
+
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0, // Don't use cached location
+                    });
+                });
+
+                const { latitude, longitude } = position.coords;
+                console.log("Location obtained:", latitude, longitude);
+
+                // Save to backend
+                const token = await getToken();
+                await axios.put(
+                    `http://localhost:5000/api/patient/${user.id}/location`,
+                    { latitude, longitude },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                console.log("Location saved successfully");
+                setLocationSaved(true);
+
+                // Update userData with new location
+                setUserData((prev) => ({
+                    ...prev,
+                    location: { latitude, longitude },
+                }));
+            } catch (error) {
+                if (error.code === error.PERMISSION_DENIED) {
+                    console.warn("User denied geolocation permission");
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    console.warn("Location information unavailable");
+                } else if (error.code === error.TIMEOUT) {
+                    console.warn("Location request timed out");
+                } else {
+                    console.error("Error saving location:", error);
+                }
+            }
+        };
+
+        // Only run if userData is loaded and location hasn't been saved
+        if (userData && !locationSaved) {
+            saveLocation();
+        }
+    }, [user, userData, locationSaved, getToken]);
 
     const fetchUserData = async () => {
         if (!user) return;
@@ -187,26 +258,6 @@ const PatientDashboardContent = () => {
                                         {formatDate(currentTime)}
                                     </span>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <div className="bg-light-bg dark:bg-dark-surface backdrop-blur-sm rounded-2xl p-4 text-center">
-                                <Activity className="w-8 h-8 mx-auto mb-2" />
-                                <p className="text-sm font-medium">
-                                    Health Score
-                                </p>
-                                <p className="md:text-2xl text-xl font-bold">
-                                    95%
-                                </p>
-                            </div>
-                            <div className="bg-light-bg dark:bg-dark-surface backdrop-blur-sm rounded-2xl p-4 text-center">
-                                <TrendingUp className="w-8 h-8 mx-auto mb-2" />
-                                <p className="text-sm font-medium">
-                                    Active Days
-                                </p>
-                                <p className="md:text-2xl text-xl font-bold">
-                                    7
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -445,7 +496,9 @@ const PatientDashboardContent = () => {
                                                                     const rRes =
                                                                         await axios.get(
                                                                             `${
-                                                                                import.meta.env.VITE_API_BASE_URL ||
+                                                                                import.meta
+                                                                                    .env
+                                                                                    .VITE_API_BASE_URL ||
                                                                                 "http://localhost:5000"
                                                                             }/api/patient/${
                                                                                 user.id
@@ -530,7 +583,9 @@ const PatientDashboardContent = () => {
                                                                         await getToken();
                                                                     await axios.delete(
                                                                         `${
-                                                                            import.meta.env.VITE_API_BASE_URL ||
+                                                                            import.meta
+                                                                                .env
+                                                                                .VITE_API_BASE_URL ||
                                                                             "http://localhost:5000"
                                                                         }/api/patient/${
                                                                             user.id

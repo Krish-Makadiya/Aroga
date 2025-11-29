@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Patient = require("../schema/patient.schema");
-const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents, getMedicationReminders, addMedicationReminder, updateMedicationReminder, deleteMedicationReminder, setPreferredLanguage } = require("../controllers/patient.controller");
+const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents, getMedicationReminders, addMedicationReminder, updateMedicationReminder, deleteMedicationReminder, setPreferredLanguage, updateLocation } = require("../controllers/patient.controller");
 
 // Create a new patient (inline validation)
 router.post("/create-patient", createPatient);
@@ -22,5 +22,8 @@ router.delete('/:clerkUserId/reminders/:reminderId', deleteMedicationReminder);
 router.get('/:patientId', getPatientWithEvents);
 
 router.post('/:clerkUserId/language', setPreferredLanguage);
+
+// Update patient location
+router.put('/:clerkUserId/location', updateLocation);
 
 module.exports = router;

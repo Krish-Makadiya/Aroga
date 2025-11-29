@@ -45,4 +45,7 @@ router.get("/:doctorId/slots", doctorController.getAvailableSlotsForDate);
 // PUT /api/doctor/:doctorId/verify - Verify a doctor
 router.put("/:doctorId/verify", doctorController.verifyDoctor);
 
+// PUT /api/doctor/:clerkUserId/location - Update doctor location
+router.put("/:clerkUserId/location", doctorController.updateLocation);
+
 module.exports = router;

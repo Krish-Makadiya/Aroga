@@ -49,6 +49,7 @@ const DoctorDashboardContent = () => {
     const [previewSlots, setPreviewSlots] = useState([]);
     const [loadingPreview, setLoadingPreview] = useState(false);
     const [availValidationMsg, setAvailValidationMsg] = useState("");
+    const [locationSaved, setLocationSaved] = useState(false);
 
     useEffect(() => {
         fetchDoctor();
@@ -107,9 +108,79 @@ const DoctorDashboardContent = () => {
             } catch (error) {
             console.log(error);
             } finally {
-                setLoading(false);
+            setLoading(false);
             }
-    }
+        }
+
+    // Save location once when component renders (only if not already saved)
+    useEffect(() => {
+        const saveLocation = async () => {
+            // Only save if location hasn't been saved yet and doctor data is loaded
+            if (locationSaved || !user || !doctorData) return;
+
+            // Check if location already exists in doctorData
+            if (doctorData.location?.latitude && doctorData.location?.longitude) {
+                setLocationSaved(true);
+                return;
+            }
+
+            // Check if geolocation is available
+            if (!navigator.geolocation) {
+                console.warn("Geolocation is not supported by this browser.");
+                return;
+            }
+
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0, // Don't use cached location
+                    });
+                });
+
+                const { latitude, longitude } = position.coords;
+                console.log("Doctor location obtained:", latitude, longitude);
+
+                // Save to backend
+                const token = await getToken();
+                await axios.put(
+                    `http://localhost:5000/api/doctor/${user.id}/location`,
+                    { latitude, longitude },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                console.log("Doctor location saved successfully");
+                setLocationSaved(true);
+
+                // Update doctorData with new location
+                setDoctorData((prev) => ({
+                    ...prev,
+                    location: { latitude, longitude },
+                }));
+            } catch (error) {
+                if (error.code === error.PERMISSION_DENIED) {
+                    console.warn("User denied geolocation permission");
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    console.warn("Location information unavailable");
+                } else if (error.code === error.TIMEOUT) {
+                    console.warn("Location request timed out");
+                } else {
+                    console.error("Error saving doctor location:", error);
+                }
+            }
+        };
+
+        // Only run if doctorData is loaded and location hasn't been saved
+        if (doctorData && !locationSaved) {
+            saveLocation();
+        }
+    }, [user, doctorData, locationSaved, getToken]);
 
     const openManageSchedule = async () => {
         try {

@@ -133,33 +133,61 @@ export default function OnboardingForm() {
             const token = await getToken();
 
             if (backendUrl) {
-                console.log('----------');
-                console.log(backendBody);
-                const formData = new FormData();
-                console.log("---Roel: ", role);
-                //formdata for doctors
-                if (role === "Doctor") {
-                    console.log("Preparing form data for doctor:", doctor);
-                    formData.append("fullName", doctor.fullName);
-                    formData.append("qualifications", doctor.qualifications);
-                    formData.append("registrationNumber", doctor.registrationNumber);
-                    formData.append("specialty", doctor.specialty);
-                    formData.append("phone", doctor.phone);
-                    formData.append("email", doctor.email);
-                    formData.append("licenseFile", doctor.licenseFile);
-                    formData.append("idProofFile", doctor.idProofFile);
-                    formData.append("affiliation", doctor.affiliation);
-                    formData.append("experience", doctor.experience);
-                    formData.append("telemedicineConsent", doctor.telemedicineConsent);
-                }
-                console.log("Submitting to backend:", backendUrl, formData);
+                console.log("Submitting to backend:", backendUrl, backendBody);
 
-                const response = await axios.post(backendUrl, formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                let response;
+
+                // Only Doctor role needs FormData (has file uploads)
+                if (role === "Doctor") {
+                    const formData = new FormData();
+                    console.log("Preparing form data for doctor:", backendBody);
+                    formData.append("fullName", backendBody.fullName);
+                    formData.append(
+                        "qualifications",
+                        backendBody.qualifications
+                    );
+                    formData.append(
+                        "registrationNumber",
+                        backendBody.registrationNumber
+                    );
+                    formData.append("specialty", backendBody.specialty);
+                    formData.append("phone", backendBody.phone);
+                    formData.append("email", backendBody.email);
+                    if (backendBody.licenseFile) {
+                        formData.append("licenseFile", backendBody.licenseFile);
+                    }
+                    if (backendBody.idProofFile) {
+                        formData.append("idProofFile", backendBody.idProofFile);
+                    }
+                    formData.append(
+                        "affiliation",
+                        backendBody.affiliation || ""
+                    );
+                    formData.append(
+                        "experience",
+                        backendBody.experience || "0"
+                    );
+                    formData.append(
+                        "telemedicineConsent",
+                        backendBody.telemedicineConsent || true
+                    );
+
+                    response = await axios.post(backendUrl, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                } else {
+                    // Patient, Pharmacy, and Admin send JSON
+                    response = await axios.post(backendUrl, backendBody, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                }
+
                 console.log("Backend response:", response.data);
             }
 
@@ -1261,6 +1289,28 @@ export default function OnboardingForm() {
                                         required
                                     />
                                 </div>
+                            </div>
+
+                            {/* // add a 24 7 option */}
+                            <div className="sm:col-span-2 flex items-center mt-2">
+                                <input
+                                    id="pharmacy-24x7"
+                                    name="pharmacy-24x7"
+                                    type="checkbox"
+                                    checked={pharmacy.is24x7 || false}
+                                    onChange={(e) =>
+                                        setPharmacy({
+                                            ...pharmacy,
+                                            is24x7: e.target.checked,
+                                        })
+                                    }
+                                    className="h-5 w-5 rounded border-light-secondary-text/40 dark:border-dark-secondary-text/40 text-light-primary focus:ring-light-primary dark:focus:ring-dark-primary"
+                                />
+                                <p
+                                    htmlFor="pharmacy-24x7"
+                                    className="ml-2 text-lg font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Open 24x7
+                                </p>
                             </div>
                         </div>
                     </div>

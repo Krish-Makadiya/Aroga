@@ -330,6 +330,18 @@ const doctorSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
+
+        // Location
+        location: {
+            latitude: {
+                type: Number,
+                default: null,
+            },
+            longitude: {
+                type: Number,
+                default: null,
+            },
+        },
     },
     {
         timestamps: true,

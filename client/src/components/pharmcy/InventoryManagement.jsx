@@ -368,22 +368,6 @@ export default function InventoryManagement({ ownerId }) {
                             />
 
                             <InputField
-                                label="Minimum Stock Level"
-                                name="minStockLevel"
-                                type="number"
-                                value={formData.minStockLevel}
-                                onChange={handleFormChange}
-                            />
-
-                            <InputField
-                                label="Price"
-                                name="price"
-                                type="number"
-                                value={formData.price}
-                                onChange={handleFormChange}
-                            />
-
-                            <InputField
                                 label="MRP"
                                 name="mrp"
                                 type="number"
@@ -391,15 +375,6 @@ export default function InventoryManagement({ ownerId }) {
                                 onChange={handleFormChange}
                             />
                         </div>
-
-                        <InputField
-                            label="Description"
-                            name="description"
-                            type="textarea"
-                            placeholder="Notes about this medicine"
-                            value={formData.description}
-                            onChange={handleFormChange}
-                        />
 
                         <div className="flex justify-end gap-2 pt-2">
                             <button

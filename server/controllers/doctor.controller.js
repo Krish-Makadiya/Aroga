@@ -552,6 +552,78 @@ exports.verifyDoctor = async (req, res) => {
     }
 };
 
+// Update doctor location (latitude and longitude)
+exports.updateLocation = async (req, res) => {
+    try {
+        const { clerkUserId } = req.params;
+        const { latitude, longitude } = req.body;
+
+        if (!clerkUserId) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing clerkUserId",
+            });
+        }
+
+        if (latitude === undefined || longitude === undefined) {
+            return res.status(400).json({
+                success: false,
+                message: "Latitude and longitude are required",
+            });
+        }
+
+        // Validate latitude and longitude
+        if (
+            typeof latitude !== "number" ||
+            latitude < -90 ||
+            latitude > 90
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Latitude must be a number between -90 and 90",
+            });
+        }
+
+        if (
+            typeof longitude !== "number" ||
+            longitude < -180 ||
+            longitude > 180
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Longitude must be a number between -180 and 180",
+            });
+        }
+
+        const doctor = await Doctor.findOne({ clerkUserId });
+        if (!doctor) {
+            return res.status(404).json({
+                success: false,
+                message: "Doctor not found",
+            });
+        }
+
+        doctor.location = {
+            latitude,
+            longitude,
+        };
+        await doctor.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Location updated successfully",
+            location: doctor.location,
+        });
+    } catch (error) {
+        console.error("[doctor.updateLocation] error", error.message || error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update location",
+            error: error.message,
+        });
+    }
+};
+
 // Return verified doctors with aggregated stats (appointments, ratings, patients count)
 exports.getVerifiedDoctorsWithStats = async (req, res) => {
     try {

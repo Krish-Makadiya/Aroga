@@ -170,7 +170,13 @@ const patientSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
-        // Medication reminders set by the patient (optional)
+        language: {
+            type: String,
+            required: [false, "Preferred language is required"],
+            trim: true,
+            maxlength: [50, "Language cannot exceed 50 characters"],
+            default: "en",
+        },
         medicationReminders: {
             type: [
                 {

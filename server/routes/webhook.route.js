@@ -48,7 +48,7 @@ router.post("/room-closed", async (req, res) => {
             : "+91" + patient.phone;
 
         const message = `Dear ${patient.fullName}, your appointment has been completed. Dont forget to provide feedback to the doctor. Your Prescription will be available in your profile.`;
-        const result = await translate(message, { to: "en" });
+        const result = await translate(message, { to:  patient.language || "en" });
         sendSms(phone, result.text);
 
         return res.status(200).json({ message: "Room closed", roomObjectId });

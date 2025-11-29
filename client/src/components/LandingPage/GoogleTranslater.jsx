@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Languages } from "lucide-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
+import axios from "axios";
 
 const GOOGLE_ELEMENT_URL = import.meta.env.VITE_GOOGLE_TRANSLATE_URL;
 export default function GoogleTranslater() {
@@ -7,6 +9,10 @@ export default function GoogleTranslater() {
     const wrapperRef = useRef(null);
     const scriptLoadedRef = useRef(false);
     const widgetMountedRef = useRef(false);
+
+    const {user} = useUser();
+    const { getToken } = useAuth();
+    const userId = user?.id;
 
     const LANGS = [
         { code: "en", label: "English" },
@@ -76,11 +82,21 @@ export default function GoogleTranslater() {
         scriptLoadedRef.current = true;
     }, []);
 
-    const changeLang = (lang) => {
-        const combo = document.querySelector(".goog-te-combo");
-        if (!combo) return;
+    const changeLang = async (lang) => {
+        try {
+            const token = await getToken();
+            const base = import.meta.env.VITE_SERVER_URL || '';
+            await axios.post(`${base}/api/patient/${userId}/language`, { language: lang }, {
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+        } catch (error) {
+            console.error('Failed to persist language preference:', error?.response?.data || error?.message || error);
+        }
+
+        const combo = document.querySelector('.goog-te-combo');
+        if (!combo) return setOpen(false);
         combo.value = lang;
-        combo.dispatchEvent(new Event("change"));
+        combo.dispatchEvent(new Event('change'));
         setOpen(false);
     };
 

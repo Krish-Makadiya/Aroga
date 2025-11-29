@@ -122,7 +122,7 @@ router.post(
                 : "+91" + patient.phone;
 
             const message = `Dear ${patient.fullName}, your appointment request has been sent successfully, you will be notified once it is confirmed.`;
-            const result = await translate(message, { to: "en" });
+            const result = await translate(message, { to: patient.language || "en" });
 
             sendSms(newPhone, result.text).catch((err) => {
                 console.error("Error sending SMS:", err);
@@ -309,7 +309,7 @@ router.put("/:id/status", async (req, res) => {
             },
             { new: true }
         )
-            .populate("patientId", "fullName email phone")
+            .populate("patientId", "fullName email phone language")
             .populate("doctorId", "fullName email phone");
 
         const newPhone = appointment.patientId.phone.startsWith("+91")
@@ -328,7 +328,7 @@ router.put("/:id/status", async (req, res) => {
                 5
             )} has been ${status}. Link will be shared once doctor joins the meeting.`;
 
-        const result = await translate(message, { to: "en" });
+        const result = await translate(message, { to:    "en" });
 
         sendSms(newPhone, result.text).catch((err) => {
             console.error("Error sending SMS:", err);

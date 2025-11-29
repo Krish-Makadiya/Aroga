@@ -50,7 +50,7 @@ function startReminderCron({
                     ],
                 })
                     .limit(limit)
-                    .populate("patientId", "fullName phone")
+                    .populate("patientId", "fullName phone language")
                     .populate("doctorId", "fullName phone");
 
                 if (!appointments || appointments.length === 0) return;
@@ -101,7 +101,7 @@ function startReminderCron({
                             patient.fullName || "a patient"
                         }.`;
 
-                        const patientResult = await translate(Patientmessage, { to: "en" });
+                        const patientResult = await translate(Patientmessage, { to: patient.language || "en" });
                         const doctorResult = await translate(Doctormessage, { to: "en" });
 
                         await sendSms(patientTo, patientResult.text);

@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Patient = require("../schema/patient.schema");
-const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents } = require("../controllers/patient.controller");
+const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents, getMedicationReminders, addMedicationReminder, updateMedicationReminder, deleteMedicationReminder, setPreferredLanguage } = require("../controllers/patient.controller");
 
 // Create a new patient (inline validation)
 router.post("/create-patient", createPatient);
@@ -14,12 +14,13 @@ router.get("/all-patients", getAllPatients);
 router.get("/get-patient/:clerkUserId", getPatientByClerkId);
 
 // Medication reminders
-router.get('/:clerkUserId/reminders', require('../controllers/patient.controller').getMedicationReminders);
-router.post('/:clerkUserId/reminders', require('../controllers/patient.controller').addMedicationReminder);
-router.put('/:clerkUserId/reminders/:reminderId', require('../controllers/patient.controller').updateMedicationReminder);
-router.delete('/:clerkUserId/reminders/:reminderId', require('../controllers/patient.controller').deleteMedicationReminder);
+router.get('/:clerkUserId/reminders', getMedicationReminders);
+router.post('/:clerkUserId/reminders', addMedicationReminder);
+router.put('/:clerkUserId/reminders/:reminderId', updateMedicationReminder);
+router.delete('/:clerkUserId/reminders/:reminderId', deleteMedicationReminder);
 
 router.get('/:patientId', getPatientWithEvents);
 
+router.post('/:clerkUserId/language', setPreferredLanguage);
 
 module.exports = router;

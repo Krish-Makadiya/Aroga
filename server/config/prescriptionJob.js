@@ -32,7 +32,7 @@ function startPrescriptionCron({ every = "* * * * *", limit = 50 } = {}) {
                     "medicationReminders.active": true,
                 })
                     .limit(limit)
-                    .select("fullName phone medicationReminders");
+                    .select("fullName phone medicationReminders language");
 
                 if (!patients || patients.length === 0) return;
 
@@ -107,7 +107,8 @@ function startPrescriptionCron({ every = "* * * * *", limit = 50 } = {}) {
                                 )}).`;
 
                                 // use api to convert whole messege to marathi
-                                const result = await translate(message, { to: "en" });
+                                const result = await translate(message, { to: patient.language || "en" });
+                                console.log(result.text);
                                 await sendSms(to, result.text);
 
                                 rem.lastNotifiedAt = new Date();

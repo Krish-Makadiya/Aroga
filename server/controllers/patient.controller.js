@@ -134,12 +134,9 @@ exports.createPatient = async (req, res) => {
         const newPhone = phone.startsWith("+91") ? phone : "+91" + phone;
 
         const message = `Dear ${fullName}, your patient profile has been created successfully.`;
-        const result = await translate(message, { to: "en" });
+        const result = await translate(message, { to:  "en" });
 
-        sendSms(
-            newPhone,
-            result.text
-        ).catch((err) => {
+        sendSms(newPhone, result.text).catch((err) => {
             console.error("Error sending SMS:", err);
         });
 
@@ -216,24 +213,20 @@ exports.getMedicationReminders = async (req, res) => {
                 .status(404)
                 .json({ success: false, message: "Patient not found" });
 
-        return res
-            .status(200)
-            .json({
-                success: true,
-                reminders: patient.medicationReminders || [],
-            });
+        return res.status(200).json({
+            success: true,
+            reminders: patient.medicationReminders || [],
+        });
     } catch (err) {
         console.error(
             "[patient.getMedicationReminders] error",
             err.message || err
         );
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Failed to fetch reminders",
-                error: err.message,
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch reminders",
+            error: err.message,
+        });
     }
 };
 
@@ -287,13 +280,11 @@ exports.addMedicationReminder = async (req, res) => {
             "[patient.addMedicationReminder] error",
             err.message || err
         );
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Failed to add reminder",
-                error: err.message,
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Failed to add reminder",
+            error: err.message,
+        });
     }
 };
 
@@ -347,13 +338,11 @@ exports.updateMedicationReminder = async (req, res) => {
             "[patient.updateMedicationReminder] error",
             err.message || err
         );
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Failed to update reminder",
-                error: err.message,
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update reminder",
+            error: err.message,
+        });
     }
 };
 
@@ -411,12 +400,45 @@ exports.deleteMedicationReminder = async (req, res) => {
             "[patient.deleteMedicationReminder] error",
             err.message || err
         );
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete reminder",
+            error: err.message,
+        });
+    }
+};
+
+exports.setPreferredLanguage = async (req, res) => {
+    try {
+        const { clerkUserId } = req.params;
+        const { language } = req.body;
+
+        if (!clerkUserId)
+            return res
+                .status(400)
+                .json({ success: false, message: "Missing clerkUserId" });
+
+        const patient = await Patient.findOne({ clerkUserId });
+        if (!patient)
+            return res
+                .status(404)
+                .json({ success: false, message: "Patient not found" });
+
+        patient.language = String(language).trim() || "en";
+        await patient.save();
+
         return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Failed to delete reminder",
-                error: err.message,
-            });
+            .status(200)
+            .json({ success: true, language: patient.language });
+    } catch (err) {
+        console.error(
+            "[patient.setPreferredLanguage] error",
+            err.message || err
+        );
+        return res.status(500).json({
+            success: false,
+            message: "Failed to set preferred language",
+            error: err.message,
+        });
     }
 };

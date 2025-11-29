@@ -92,6 +92,18 @@ const doctorSchema = new mongoose.Schema(
             },
         },
 
+        licenseFile: {
+            type: String,
+            required: [true, "Medical license file URL is required"],
+            trim: true,
+        },
+
+        idProofFile: {
+            type: String,
+            required: [true, "ID proof file URL is required"],
+            trim: true,
+        },
+
         // Professional Information
         affiliation: {
             type: String,

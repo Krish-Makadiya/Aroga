@@ -1,9 +1,11 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Edit3, Eye, EyeOff, FileText, Save } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const AccountEarningContent = () => {
+    const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showTerms, setShowTerms] = useState(false);
@@ -385,6 +387,12 @@ const AccountEarningContent = () => {
 
                     {/* Action Buttons */}
                     <div className="mt-6 flex items-center justify-end gap-x-6">
+                        <button
+                            type="button"
+                            onClick={() => navigate("/doctor/dashboard?manageSchedule=1")}
+                            className="flex items-center gap-2 rounded-md bg-light-bg dark:bg-dark-surface px-3 py-2 text-sm font-semibold text-light-primary-text dark:text-dark-primary-text border border-light-secondary-text/20 dark:border-dark-secondary-text/20 hover:bg-light-primary/10 dark:hover:bg-dark-primary/10">
+                            Manage Schedule
+                        </button>
                         {!isEditing ? (
                             <button
                                 type="button"

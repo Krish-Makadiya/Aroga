@@ -322,7 +322,6 @@ const womensInfo = [
             },
         ],
     },
-    // Entries continue in this pattern for all diseases you listed.
 ];
 
 const ICONS = {
@@ -332,8 +331,17 @@ const ICONS = {
     Default: <Lightbulb />,
 };
 
-const getPlaceholderImage = (seed) =>
-    `https://picsum.photos/seed/${encodeURIComponent(seed)}/800/600`;
+const getPlaceholderImage = () => "/img.jpeg";
+
+
+
+const getLocalImageFor = (d) => {
+    const name = d.name?.toLowerCase() || "";
+    if (d.id === 1) return "/images (1).jpeg"; // first blog
+    if (name.includes("pcos") || name.includes("pcod")) return "/images (3).jpeg"; // PCOD/PCOS
+    if (name.includes("endometriosis")) return "/img3.jpeg"; // Endometriosis
+    return "/images (1).jpeg"; // remaining
+};
 
 const Section = ({ title, children }) => {
     return (
@@ -363,7 +371,7 @@ const SheReadsContent = () => {
         () =>
             womensInfo.map((d) => ({
                 ...d,
-                image: getPlaceholderImage(d.name),
+                image: getLocalImageFor(d),
             })),
         []
     );
@@ -417,11 +425,11 @@ const SheReadsContent = () => {
                             />
                         </div>
                     </div>
-                    <div className="md:w-1/2 h-40 sm:h-56 md:h-auto">
+                    <div className="md:w-1/2 relative">
                         <img
                             src={getPlaceholderImage("womens-health-hero")}
-                            alt="Women’s Health"
-                            className="w-full h-full object-cover"
+                            alt="Women's Health"
+                            className="absolute top-0 left-0 w-full h-full object-cover object-center"
                             loading="lazy"
                         />
                     </div>
@@ -462,13 +470,11 @@ const SheReadsContent = () => {
                                     ? "bg-light-primary/30 dark:bg-dark-primary/30 text-light-primary-text dark:text-dark-primary-text border-transparent"
                                     : "bg-light-surface dark:bg-dark-bg text-light-primary-text dark:text-dark-primary-text border-black/5 dark:border-white/5"
                             }`}>
-                            <div className="h-24 sm:h-28 w-full overflow-hidden">
+                            <div className="relative w-full pt-[75%] overflow-hidden">
                                 <img
-                                    src={getPlaceholderImage(
-                                        "womens-health-hero"
-                                    )}
+                                    src={item.image}
                                     alt={item.name}
-                                    className={`w-full h-full object-cover ${
+                                    className={`absolute top-0 left-0 w-full h-full object-cover object-center ${
                                         isActive ? "opacity-90" : "opacity-100"
                                     }`}
                                     loading="lazy"
@@ -502,19 +508,17 @@ const SheReadsContent = () => {
             {selected && (
                 <main className="space-y-3">
                     <div className="rounded-2xl overflow-hidden bg-light-surface dark:bg-dark-bg border border-black/5 dark:border-white/5">
-                        <div className="h-36 sm:h-48 md:h-56 w-full overflow-hidden">
+                        <div className="relative w-full pt-[40%] overflow-hidden">
                             <img
-                                src={getPlaceholderImage("womens-health-hero")}
+                                src={selected.image}
                                 alt={selected.name}
-                                className="w-full h-full object-cover"
+                                className="absolute top-0 left-0 w-full h-full object-cover object-center"
                                 loading="lazy"
                             />
                         </div>
                         <div className="p-4 sm:p-6">
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div
-                                    className="text-3xl sm:text-4xl dark:text-dark-primary text-light-primary"
-                                    aria-hidden>
+                            <div className="flex items-start gap-3">
+                                <div className="text-2xl sm:text-3xl">
                                     {ICONS[selected.icon] || ICONS.Default}
                                 </div>
                                 <div className="space-y-2">

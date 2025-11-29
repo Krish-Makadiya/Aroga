@@ -34,6 +34,14 @@ router.get('/verified-doctors/patients', doctorController.getVerifiedDoctorsWith
 // GET /api/doctor/pending-doctors - Get all pending doctors (for admin)
 router.get("/pending-doctors", doctorController.getPendingDoctors);
 
+// Availability & blackout management
+router.post("/availability", doctorController.setAvailability);
+router.get("/availability", doctorController.getAvailability);
+router.post("/blackouts", doctorController.addBlackout);
+router.delete("/blackouts/:index", doctorController.removeBlackout);
+
+// List available 20-min slots for a specific date
+router.get("/:doctorId/slots", doctorController.getAvailableSlotsForDate);
 // PUT /api/doctor/:doctorId/verify - Verify a doctor
 router.put("/:doctorId/verify", doctorController.verifyDoctor);
 

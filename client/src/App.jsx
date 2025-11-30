@@ -15,7 +15,7 @@ import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
 import PharmacyDashboard from "./pages/pharmacyPages/PharmacyDashboard/PharmacyDashboard";
 import VideoAppointment from "./components/Doctor/VideoAppointment"
-
+import MedicalHistory from "./pages/patientPages/MedicalHistory/MedicalHistory";
 const patientTabs = [
     {
         id: 1,
@@ -40,6 +40,12 @@ const patientTabs = [
         name: "Get Appointment",
         icon: Stethoscope,
         path: "/patient/get-appointment",
+    },
+    {
+        id: 5,
+        name: "Medical Records",
+        icon: FileText,
+        path: "/patient/medical-history",
     },
 ];
 
@@ -129,6 +135,15 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="Patient">
                             <GetAppointment tabs={patientTabs}/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/patient/medical-history"
+                    element={
+                        <ProtectedRoute requiredRole="Patient">
+                            <MedicalHistory tabs={patientTabs} />
                         </ProtectedRoute>
                     }
                 />

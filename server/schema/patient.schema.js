@@ -147,6 +147,38 @@ const patientSchema = new mongoose.Schema(
     }
 );
 
+
+const medicalRecordSchema = new mongoose.Schema(
+  {
+    patientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    notes: {
+      type: String,
+      trim: true,
+    },
+    fileUrl: {
+      type: String,
+      trim: true,
+    },
+  },
+  { timestamps: true }
+);
+
+
+const MedicalRecord = mongoose.model("MedicalRecord", medicalRecordSchema);
+module.exports = MedicalRecord;
 // Create and export the model
 const Patient = mongoose.model("Patient", patientSchema);
 module.exports = Patient;

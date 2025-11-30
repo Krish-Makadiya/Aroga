@@ -14,11 +14,14 @@ import {
     Settings,
     Stethoscope,
     TrendingUp,
-    User,
+    User
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Calendar from "../../../components/Dashboard/Calendar";
 import Loader from "../../../components/main/Loader";
+import { Link } from "react-router-dom";
+
+
 
 const PatientDashboardContent = () => {
     const [userData, setUserData] = useState(null);
@@ -241,10 +244,18 @@ const PatientDashboardContent = () => {
                                     label: "Medication Reminder",
                                     color: "bg-orange-500",
                                 },
+                                {
+                                    icon: FileTextIcon,
+                                    label: "Medical History",
+                                    color: "bg-blue-500",
+                                    to: "/patient/medical-history", 
+                                },
                             ].map((action, index) => (
-                                <button
+                                <Link
                                     key={index}
-                                    className="w-full flex items-center space-x-3 p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/5 dark:hover:bg-[var(--color-dark-primary)]/5 transition-colors group">
+                                    to={action.to || "#"}
+                                    className="w-full flex items-center space-x-3 p-3 rounded-xl bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] hover:bg-[var(--color-light-primary)]/5 dark:hover:bg-[var(--color-dark-primary)]/5 transition-colors group"
+                                >
                                     <div
                                         className={`w-8 h-8 ${action.color} rounded-lg flex items-center justify-center text-white`}>
                                         <action.icon className="w-4 h-4" />
@@ -253,7 +264,7 @@ const PatientDashboardContent = () => {
                                         {action.label}
                                     </span>
                                     <ChevronRight className="w-4 h-4 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] ml-auto" />
-                                </button>
+                                </Link>
                             ))}
                         </div>
                     </div>

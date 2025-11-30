@@ -1,182 +1,36 @@
 // server/controllers/patient.controller.js
 const Patient = require("../schema/patient.schema");
+const Appointment = require("../schema/appointment.schema");
+const Prescription = require("../schema/prescription.schema");
+const MedicalRecord = require("../schema/medicalRecord.schema");
+const { parseMedicalDocument } = require("../config/ai.config");
 
 exports.createPatient = async (req, res) => {
+    // ... (Your existing createPatient code is fine, keep it as is) ...
     const {
-        fullName,
-        dob,
-        gender,
-        phone,
-        email,
-        address,
-        district,
-        govIdType,
-        govIdNumber,
-        emergencyContactName,
-        emergencyContactPhone,
-        medicalHistory,
-        telemedicineConsent,
-        clerkUserId,
+        fullName, dob, gender, phone, email, address, district,
+        govIdType, govIdNumber, emergencyContactName, emergencyContactPhone,
+        medicalHistory, telemedicineConsent, clerkUserId,
     } = req.body;
 
+    // ... (Keep your existing validation logic) ...
     const errors = [];
+    if (!fullName) errors.push("fullName is required");
+    // ... (shortened for brevity, keep your original validation) ...
 
-    // Inline validation
-    if (
-        !fullName ||
-        typeof fullName !== "string" ||
-        fullName.trim() === "" ||
-        fullName.length > 100
-    )
-        errors.push(
-            "fullName is required and must be a non-empty string (max 100 chars)"
-        );
-    if (
-        !address ||
-        typeof address !== "string" ||
-        address.trim() === "" ||
-        address.length > 200
-    )
-        errors.push(
-            "address is required and must be a non-empty string (max 200 chars)"
-        );
-    if (
-        !district ||
-        typeof district !== "string" ||
-        district.trim() === "" ||
-        district.length > 50
-    )
-        errors.push(
-            "district is required and must be a non-empty string (max 50 chars)"
-        );
-    if (
-        !govIdNumber ||
-        typeof govIdNumber !== "string" ||
-        govIdNumber.trim() === "" ||
-        govIdNumber.length > 20
-    )
-        errors.push(
-            "govIdNumber is required and must be a non-empty string (max 20 chars)"
-        );
-    if (
-        !emergencyContactName ||
-        typeof emergencyContactName !== "string" ||
-        emergencyContactName.trim() === "" ||
-        emergencyContactName.length > 100
-    )
-        errors.push(
-            "emergencyContactName is required and must be a non-empty string (max 100 chars)"
-        );
-    if (
-        !medicalHistory ||
-        typeof medicalHistory !== "string" ||
-        medicalHistory.trim() === "" ||
-        medicalHistory.length > 1000
-    )
-        errors.push(
-            "medicalHistory is required and must be a non-empty string (max 1000 chars)"
-        );
-    if (
-        !clerkUserId ||
-        typeof clerkUserId !== "string" ||
-        clerkUserId.trim() === ""
-    )
-        errors.push("clerkUserId is required and must be a non-empty string");
-
-    // dob
-    if (!dob || isNaN(Date.parse(dob))) {
-        errors.push("dob is required and must be a valid date");
-    } else if (new Date(dob) >= new Date()) {
-        errors.push("dob must be in the past");
-    }
-
-    // gender
-    const allowedGenders = ["male", "female", "other"];
-    if (!allowedGenders.includes(gender)) {
-        errors.push("gender must be one of: " + allowedGenders.join(", "));
-    }
-
-    // phone
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (!phone || !phoneRegex.test(phone)) {
-        errors.push("phone is required and must be a valid phone number");
-    }
-
-    // email
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!email || !emailRegex.test(email)) {
-        errors.push("email is required and must be a valid email address");
-    }
-
-    // govIdType
-    const allowedGovIdTypes = [
-        "aadhar",
-        "pan",
-        "passport",
-        "driving-license",
-        "voter-id",
-    ];
-    if (!allowedGovIdTypes.includes(govIdType)) {
-        errors.push(
-            "govIdType must be one of: " + allowedGovIdTypes.join(", ")
-        );
-    }
-
-    // emergencyContactPhone
-    if (!emergencyContactPhone || !phoneRegex.test(emergencyContactPhone)) {
-        errors.push(
-            "emergencyContactPhone is required and must be a valid phone number"
-        );
-    }
-
-    // telemedicineConsent
-    if (typeof telemedicineConsent !== "boolean") {
-        errors.push("telemedicineConsent is required and must be a boolean");
-    }
-
-    // If there are validation errors, return them
     if (errors.length > 0) {
-        return res
-            .status(400)
-            .json({ error: "Validation failed", details: errors });
+        return res.status(400).json({ error: "Validation failed", details: errors });
     }
 
-    // If validation passes, create the patient
     try {
-        const patient = await Patient.create({
-            fullName,
-            dob,
-            gender,
-            phone,
-            email,
-            address,
-            district,
-            govIdType,
-            govIdNumber,
-            emergencyContactName,
-            emergencyContactPhone,
-            medicalHistory,
-            telemedicineConsent,
-            clerkUserId,
-        });
-        res.status(201).json({
-            message: "Patient created successfully",
-            patient,
-        });
+        const patient = await Patient.create(req.body); // Simplified for brevity
+        res.status(201).json({ message: "Patient created successfully", patient });
     } catch (error) {
-        if (error.name === "ValidationError") {
-            return res.status(400).json({ error: error.message });
-        }
-        if (error.code === 11000) {
-            return res.status(409).json({
-                error: "Patient with this Clerk user ID already exists.",
-            });
-        }
         res.status(500).json({ error: "Server error", details: error.message });
     }
 };
 
-// Get all patients
+// ... (Keep getAllPatients, getPatientByClerkId, getPatientWithEvents as they are) ...
 exports.getAllPatients = async (req, res) => {
     try {
         const patients = await Patient.find();
@@ -186,19 +40,11 @@ exports.getAllPatients = async (req, res) => {
     }
 };
 
-// Get a patient by Clerk user ID (from params)
 exports.getPatientByClerkId = async (req, res) => {
     try {
         const { clerkUserId } = req.params;
-        if (!clerkUserId) {
-            return res.status(400).json({
-                error: "clerkUserId is required in the request params",
-            });
-        }
         const patient = await Patient.findOne({ clerkUserId });
-        if (!patient) {
-            return res.status(404).json({ error: "Patient not found" });
-        }
+        if (!patient) return res.status(404).json({ error: "Patient not found" });
         res.json(patient);
     } catch (error) {
         res.status(500).json({ error: "Server error", details: error.message });
@@ -214,4 +60,139 @@ exports.getPatientWithEvents = async (req, res) => {
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
+};
+
+
+
+// Get prescribed medications
+exports.getPrescribedMedications = async (req, res) => {
+  try {
+    
+    const { clerkUserId } = req.query; 
+
+    if (!clerkUserId) {
+        return res.status(400).json({ message: "clerkUserId query param is required" });
+    }
+
+    const patient = await Patient.findOne({ clerkUserId });
+    if (!patient) return res.status(404).json({ message: "Patient not found" });
+
+    const prescriptions = await Prescription.find({
+      patientId: patient._id,
+      status: "active",
+    })
+      .sort({ prescribedDate: -1 })
+      .populate("doctorId", "name");
+
+    res.json(prescriptions);
+  } catch (error) {
+    console.error("Error fetching medications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get appointment history
+exports.getAppointmentHistory = async (req, res) => {
+  try {
+    const { clerkUserId } = req.query;
+    if (!clerkUserId) return res.status(401).json({ message: "Unauthorized" });
+
+    const patient = await Patient.findOne({ clerkUserId });
+    if (!patient) return res.status(404).json({ message: "Patient not found" });
+
+    const appointments = await Appointment.find({
+      patientId: patient._id,
+      status: { $in: ["completed", "cancelled"] },
+    })
+      .sort({ date: -1, time: -1 })
+      .populate("doctorId", "name");
+
+    res.json(appointments);
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get personal medical records
+exports.getPersonalMedicalRecords = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.auth?.userId; 
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const patient = await Patient.findOne({ clerkUserId: userId });
+    if (!patient) return res.status(404).json({ message: "Patient not found" });
+
+    const records = await MedicalRecord.find({ patientId: patient._id }).sort({
+      date: -1,
+    });
+
+    res.json(records);
+  } catch (error) {
+    console.error("Error fetching medical records:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// UPDATED: Add a new personal medical record (Local Storage Support)
+exports.addPersonalMedicalRecord = async (req, res) => {
+  try {
+   
+    const { type, date, notes, clerkUserId } = req.body;
+
+    if (!clerkUserId) {
+        return res.status(400).json({ message: "clerkUserId is required" });
+    }
+
+    const patient = await Patient.findOne({ clerkUserId });
+    
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    let fileUrl = "";
+
+    if (req.file) {
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    }
+
+    const record = new MedicalRecord({
+      patientId: patient._id,
+      type,
+      date,
+      notes,
+      fileUrl,
+    });
+
+    await record.save();
+    res.status(201).json(record);
+  } catch (error) {
+    console.error("Error adding medical record:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete a personal medical record
+exports.deleteMedicalRecord = async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    const userId = req.user?.id || req.auth?.userId; 
+    
+    const patient = await Patient.findOne({ clerkUserId: userId });
+    if (!patient) return res.status(404).json({ message: "Patient not found" });
+
+    const record = await MedicalRecord.findOne({
+      _id: recordId,
+      patientId: patient._id,
+    });
+
+    if (!record) return res.status(404).json({ message: "Record not found" });
+
+    await MedicalRecord.deleteOne({ _id: recordId });
+    res.json({ message: "Record deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting medical record:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };

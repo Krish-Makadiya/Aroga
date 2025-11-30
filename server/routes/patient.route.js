@@ -1,19 +1,36 @@
 // server/routes/patient.route.js
 const express = require("express");
 const router = express.Router();
-const Patient = require("../schema/patient.schema");
-const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents } = require("../controllers/patient.controller");
+const {
+    createPatient,
+    getAllPatients,
+    getPatientByClerkId,
+    getPatientWithEvents,
+    getPrescribedMedications,
+    getAppointmentHistory,
+    getPersonalMedicalRecords,
+    addPersonalMedicalRecord,
+    deleteMedicalRecord,
+} = require("../controllers/patient.controller");
+const { upload } = require("../middleware/upload");
 
-// Create a new patient (inline validation)
+// Existing routes
 router.post("/create-patient", createPatient);
-
-// Get all patients
 router.get("/all-patients", getAllPatients);
-
-// Get a patient by Clerk user ID
 router.get("/get-patient/:clerkUserId", getPatientByClerkId);
 
-router.get('/:patientId', getPatientWithEvents);
+// New medical history routes
+router.get("/prescribed-medications", getPrescribedMedications);
+router.get("/appointment-history", getAppointmentHistory);
+router.get("/medical-records", getPersonalMedicalRecords);
+router.post(
+    "/medical-records",
+    upload.single('file'),
+    addPersonalMedicalRecord
+);
+router.delete("/medical-records/:recordId", deleteMedicalRecord);
 
+
+router.get("/:patientId", getPatientWithEvents);
 
 module.exports = router;

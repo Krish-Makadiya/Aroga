@@ -552,6 +552,28 @@ exports.verifyDoctor = async (req, res) => {
     }
 };
 
+// Get all doctors with location data (for admin map)
+exports.getAllDoctorsWithLocation = async (req, res) => {
+    try {
+        const doctors = await Doctor.find({
+            "location.latitude": { $ne: null },
+            "location.longitude": { $ne: null },
+        }).select("fullName specialty phone email location district state address consultationFee");
+        
+        res.json({
+            success: true,
+            data: doctors,
+        });
+    } catch (error) {
+        console.error("Get all doctors with location error:", error);
+        res.status(500).json({
+            success: false,
+            error: "Server error",
+            details: error.message,
+        });
+    }
+};
+
 // Update doctor location (latitude and longitude)
 exports.updateLocation = async (req, res) => {
     try {

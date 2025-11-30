@@ -19,6 +19,9 @@ router.post(
 // GET /api/doctor - Get all doctors
 router.get("/", doctorController.getAllDoctors);
 
+// GET /api/doctor/all-doctors/location - Get all doctors with location (for admin map)
+router.get("/all-doctors/location", doctorController.getAllDoctorsWithLocation);
+
 // GET /api/doctor/get-doctor/:clerkUserId - Get single doctor by clerkUserId
 router.get("/get-doctor/:clerkUserId", doctorController.getDoctorByClerkUserId);
 

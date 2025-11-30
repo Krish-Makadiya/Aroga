@@ -1,125 +1,54 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapPin, Phone, Mail, Navigation } from "lucide-react";
-
-// Static locations data
-const staticLocations = [
-    {
-        id: 1,
-        name: "Lt Gen Shivdev Singh Civil Hospital",
-        address: "Lt Gen Shivdev Singh Civil Hospital, Nabha, Punjab - 147201",
-        latitude: 30.372326,
-        longitude: 76.145926,
-        phone: "+91 98765 41001",
-        email: "civilhospital_nabha@example.com",
-        mapLink: "https://maps.app.goo.gl/AYgeLqTtTDfDL1U66",
-    },
-    {
-        id: 2,
-        name: "Jain Hospital Nabha",
-        address: "Jain Hospital Nabha, Punjab",
-        latitude: 30.369387,
-        longitude: 76.142731,
-        phone: "+91 98765 41002",
-        email: "jainhospital@example.com",
-        mapLink: "https://maps.app.goo.gl/vvUL5h7YMd1AFfVk8",
-    },
-    {
-        id: 3,
-        name: "Raj General Hospital",
-        address: "Raj General Hospital, Nabha, Punjab",
-        latitude: 30.368518,
-        longitude: 76.144431,
-        phone: "+91 98765 41003",
-        email: "rajgeneral@example.com",
-        mapLink: "https://maps.app.goo.gl/5M3R2oRXtZFMHj9E6",
-    },
-    {
-        id: 4,
-        name: "Amardeep Hospital",
-        address: "Amardeep Hospital, Near Land Mortgage Bank, Basant Pura Mohalla, Nabha, Punjab - 147201",
-        latitude: 30.371447,
-        longitude: 76.149195,
-        phone: "+91 98765 41004",
-        email: "amardeep@example.com",
-        mapLink: "https://maps.app.goo.gl/maP6R8xNfxMoxfhM7",
-    },
-    {
-        id: 5,
-        name: "Shreya Hospital",
-        address: "Shreya Hospital, Nabha, Punjab",
-        latitude: 30.372112,
-        longitude: 76.139943,
-        phone: "+91 98765 41005",
-        email: "shreyahospital@example.com",
-        mapLink: "https://maps.app.goo.gl/AQ4X4VAWRXYnsgXM6",
-    },
-    {
-        id: 6,
-        name: "Divine Hospital",
-        address: "Divine Hospital, Nabha, Punjab - 147201",
-        latitude: 30.372731,
-        longitude: 76.142287,
-        phone: "+91 98765 41006",
-        email: "divinehospital@example.com",
-        mapLink: "https://maps.app.goo.gl/7Vd8cja8DCUjDE6K9",
-    },
-    {
-        id: 7,
-        name: "Sawhney Hospital and Maternity Home",
-        address: "Sawhney Hospital and Maternity Home, Nabha, Punjab",
-        latitude: 30.375419,
-        longitude: 76.155166,
-        phone: "+91 98765 41007",
-        email: "sawhneyhospital@example.com",
-        mapLink: "https://maps.app.goo.gl/k6ynDABgEv43VQ7V8",
-    },
-    {
-        id: 8,
-        name: "Nabha Medicare Hospital",
-        address: "Nabha Medicare Hospital, Nabha, Punjab",
-        latitude: 30.386675,
-        longitude: 76.1511,
-        phone: "+91 98765 41008",
-        email: "nabhamedicare@example.com",
-        mapLink: "https://maps.app.goo.gl/TXxzbYyXa36yNqYc6",
-    },
-    {
-        id: 9,
-        name: "Jiwan Nursing Home",
-        address: "Jiwan Nursing Home, Nabha, Punjab",
-        latitude: 30.376967,
-        longitude: 76.148051,
-        phone: "+91 98765 41009",
-        email: "jiwannursinghome@example.com",
-        mapLink: "https://maps.app.goo.gl/VFE41bWoNrQaDAEZ6",
-    },
-    {
-        id: 10,
-        name: "Sukhmani Hospital (Orthopedic & General Hospital)",
-        address: "Sukhmani Hospital, Nabha, Punjab",
-        latitude: 30.36662,
-        longitude: 76.152303,
-        phone: "+91 98765 41010",
-        email: "sukhmanihospital@example.com",
-        mapLink: "https://maps.app.goo.gl/3bEoDbz3A2uWDFY17",
-    }
-];
-
+import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
+import { MapPin, Users, Stethoscope, RefreshCw } from "lucide-react";
 
 const LocationMapContent = () => {
     const mapRef = useRef(null);
     const map = useRef(null);
-    const markersRef = useRef([]);
+    const patientMarkersRef = useRef([]);
+    const doctorMarkersRef = useRef([]);
+    const [patients, setPatients] = useState([]);
+    const [doctors, setDoctors] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showPatients, setShowPatients] = useState(true);
+    const [showDoctors, setShowDoctors] = useState(true);
+    const { getToken } = useAuth();
 
-    // Calculate center point of all locations
-    const centerLat =
-        staticLocations.reduce((sum, loc) => sum + loc.latitude, 0) /
-        staticLocations.length;
-    const centerLng =
-        staticLocations.reduce((sum, loc) => sum + loc.longitude, 0) /
-        staticLocations.length;
+    // Custom marker icons for patients (green) and doctors (blue)
+    const createCustomIcon = (color, type) => {
+        return L.divIcon({
+            className: "custom-marker",
+            html: `
+                <div style="
+                    background-color: ${color};
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <div style="
+                        transform: rotate(45deg);
+                        color: white;
+                        font-weight: bold;
+                        font-size: 16px;
+                    ">${type === "patient" ? "P" : "D"}</div>
+                </div>
+            `,
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+        });
+    };
+
+    const patientIcon = createCustomIcon("#10b981", "patient"); // Green
+    const doctorIcon = createCustomIcon("#3b82f6", "doctor"); // Blue
 
     // Fix Leaflet default marker icons
     useEffect(() => {
@@ -134,12 +63,59 @@ const LocationMapContent = () => {
         });
     }, []);
 
-    // Initialize map with static markers
+    // Fetch patients and doctors with location
+    const fetchLocations = async () => {
+        try {
+            setLoading(true);
+            const token = await getToken();
+            const baseUrl = "http://localhost:5000";
+
+            // Fetch patients and doctors in parallel
+            const [patientsRes, doctorsRes] = await Promise.all([
+                axios.get(`${baseUrl}/api/patient/all-patients/location`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                }),
+                axios.get(`${baseUrl}/api/doctor/all-doctors/location`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                }),
+            ]);
+
+            const patientsData = patientsRes.data?.data || [];
+            const doctorsData = doctorsRes.data?.data || [];
+
+            // Filter out entries without valid location
+            const validPatients = patientsData.filter(
+                (p) =>
+                    p.location?.latitude &&
+                    p.location?.longitude &&
+                    typeof p.location.latitude === "number" &&
+                    typeof p.location.longitude === "number"
+            );
+            const validDoctors = doctorsData.filter(
+                (d) =>
+                    d.location?.latitude &&
+                    d.location?.longitude &&
+                    typeof d.location.latitude === "number" &&
+                    typeof d.location.longitude === "number"
+            );
+
+            setPatients(validPatients);
+            setDoctors(validDoctors);
+        } catch (error) {
+            console.error("Error fetching locations:", error);
+            setPatients([]);
+            setDoctors([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Initialize map
     useEffect(() => {
         if (!mapRef.current || map.current) return;
 
-        // Initialize map centered on average of all locations
-        map.current = L.map(mapRef.current).setView([centerLat, centerLng], 12);
+        // Default center (India - can be adjusted based on your data)
+        map.current = L.map(mapRef.current).setView([20.5937, 78.9629], 5);
 
         // Add tile layer
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -147,36 +123,6 @@ const LocationMapContent = () => {
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19,
         }).addTo(map.current);
-
-        // Create markers for each static location
-        staticLocations.forEach((location) => {
-            const marker = L.marker([location.latitude, location.longitude], {
-                draggable: false, // Static markers - not draggable
-            }).addTo(map.current);
-
-            // Create popup content
-            const popupContent = `
-                <div style="min-width: 200px;">
-                    <b style="font-size: 14px; color: #2563eb;">${
-                        location.name
-                    }</b><br/>
-                    <p style="margin: 5px 0; font-size: 12px; color: #666;">${
-                        location.address
-                    }</p>
-                    <div style="margin-top: 8px; font-size: 11px;">
-                        <div style="margin: 3px 0;">📞 ${location.phone}</div>
-                        <div style="margin: 3px 0;">✉️ ${location.email}</div>
-                        <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ddd; color: #888;">
-                            Lat: ${location.latitude.toFixed(6)}<br/>
-                            Lng: ${location.longitude.toFixed(6)}
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            marker.bindPopup(popupContent);
-            markersRef.current.push(marker);
-        });
 
         // Ensure map renders correctly
         const invalidate = () => {
@@ -193,35 +139,215 @@ const LocationMapContent = () => {
                 map.current.remove();
                 map.current = null;
             }
-            markersRef.current = [];
         };
     }, []);
 
-    // Function to focus on a specific location
-    const focusOnLocation = (location) => {
-        if (map.current) {
-            map.current.setView([location.latitude, location.longitude], 15);
-            // Open popup for the selected marker
-            const marker = markersRef.current.find(
-                (m) =>
-                    m.getLatLng().lat === location.latitude &&
-                    m.getLatLng().lng === location.longitude
-            );
-            if (marker) {
-                marker.openPopup();
+    // Update markers when data or visibility changes
+    useEffect(() => {
+        if (!map.current || loading) return;
+
+        // Clear existing markers
+        patientMarkersRef.current.forEach((marker) => {
+            map.current.removeLayer(marker);
+        });
+        doctorMarkersRef.current.forEach((marker) => {
+            map.current.removeLayer(marker);
+        });
+        patientMarkersRef.current = [];
+        doctorMarkersRef.current = [];
+
+        // Add patient markers if visible
+        if (showPatients) {
+            patients.forEach((patient) => {
+                const marker = L.marker(
+                    [patient.location.latitude, patient.location.longitude],
+                    { icon: patientIcon }
+                ).addTo(map.current);
+
+                const popupContent = `
+                    <div style="min-width: 200px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <div style="width: 12px; height: 12px; background-color: #10b981; border-radius: 50%;"></div>
+                            <b style="font-size: 14px; color: #10b981;">Patient</b>
+                        </div>
+                        <b style="font-size: 14px; color: #1f2937;">${
+                            patient.fullName || "N/A"
+                        }</b><br/>
+                        ${
+                            patient.phone
+                                ? `<div style="margin: 5px 0; font-size: 12px; color: #666;">📞 ${patient.phone}</div>`
+                                : ""
+                        }
+                        ${
+                            patient.email
+                                ? `<div style="margin: 5px 0; font-size: 12px; color: #666;">✉️ ${patient.email}</div>`
+                                : ""
+                        }
+                        ${
+                            patient.address
+                                ? `<p style="margin: 5px 0; font-size: 12px; color: #666;">📍 ${patient.address}</p>`
+                                : ""
+                        }
+                        ${
+                            patient.district || patient.state
+                                ? `<div style="margin-top: 5px; font-size: 11px; color: #888;">${
+                                      patient.district || ""
+                                  }${
+                                      patient.district && patient.state
+                                          ? ", "
+                                          : ""
+                                  }${patient.state || ""}</div>`
+                                : ""
+                        }
+                        <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ddd; font-size: 10px; color: #888;">
+                            Lat: ${patient.location.latitude.toFixed(6)}<br/>
+                            Lng: ${patient.location.longitude.toFixed(6)}
+                        </div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                patientMarkersRef.current.push(marker);
+            });
+        }
+
+        // Add doctor markers if visible
+        if (showDoctors) {
+            doctors.forEach((doctor) => {
+                const marker = L.marker(
+                    [doctor.location.latitude, doctor.location.longitude],
+                    { icon: doctorIcon }
+                ).addTo(map.current);
+
+                const popupContent = `
+                    <div style="min-width: 200px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <div style="width: 12px; height: 12px; background-color: #3b82f6; border-radius: 50%;"></div>
+                            <b style="font-size: 14px; color: #3b82f6;">Doctor</b>
+                        </div>
+                        <b style="font-size: 14px; color: #1f2937;">${
+                            doctor.fullName || "N/A"
+                        }</b><br/>
+                        ${
+                            doctor.specialty
+                                ? `<div style="margin: 5px 0; font-size: 12px; color: #666;">🏥 ${doctor.specialty}</div>`
+                                : ""
+                        }
+                        ${
+                            doctor.phone
+                                ? `<div style="margin: 5px 0; font-size: 12px; color: #666;">📞 ${doctor.phone}</div>`
+                                : ""
+                        }
+                        ${
+                            doctor.email
+                                ? `<div style="margin: 5px 0; font-size: 12px; color: #666;">✉️ ${doctor.email}</div>`
+                                : ""
+                        }
+                        ${
+                            doctor.consultationFee
+                                ? `<div style="margin: 5px 0; font-size: 12px; color: #666;">💰 ₹${doctor.consultationFee}</div>`
+                                : ""
+                        }
+                        ${
+                            doctor.address
+                                ? `<p style="margin: 5px 0; font-size: 12px; color: #666;">📍 ${doctor.address}</p>`
+                                : ""
+                        }
+                        ${
+                            doctor.district || doctor.state
+                                ? `<div style="margin-top: 5px; font-size: 11px; color: #888;">${
+                                      doctor.district || ""
+                                  }${
+                                      doctor.district && doctor.state
+                                          ? ", "
+                                          : ""
+                                  }${doctor.state || ""}</div>`
+                                : ""
+                        }
+                        <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ddd; font-size: 10px; color: #888;">
+                            Lat: ${doctor.location.latitude.toFixed(6)}<br/>
+                            Lng: ${doctor.location.longitude.toFixed(6)}
+                        </div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+                doctorMarkersRef.current.push(marker);
+            });
+        }
+
+        // Fit map to show all markers if there are any
+        if (
+            (showPatients && patients.length > 0) ||
+            (showDoctors && doctors.length > 0)
+        ) {
+            const allMarkers = [
+                ...(showPatients ? patientMarkersRef.current : []),
+                ...(showDoctors ? doctorMarkersRef.current : []),
+            ];
+            if (allMarkers.length > 0) {
+                const group = new L.featureGroup(allMarkers);
+                map.current.fitBounds(group.getBounds().pad(0.1));
             }
         }
-    };
+    }, [patients, doctors, showPatients, showDoctors, loading]);
+
+    // Fetch locations on mount
+    useEffect(() => {
+        fetchLocations();
+    }, [getToken]);
 
     return (
-        <div className="">
-            <div className="">
-                <div
-                    ref={mapRef}
-                    className="w-full h-screen "
-                    style={{ zIndex: 0 }}
-                />
+        <div className="relative w-full h-screen">
+            {/* Control Panel */}
+            <div className="absolute top-4 left-4 z-[1000] bg-white dark:bg-dark-surface rounded-lg shadow-lg p-4 min-w-[250px]">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                        Location Map
+                    </h3>
+                    <button
+                        onClick={fetchLocations}
+                        disabled={loading}
+                        className="p-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        title="Refresh locations">
+                        <RefreshCw
+                            className={`w-4 h-4 ${
+                                loading ? "animate-spin" : ""
+                            }`}
+                        />
+                    </button>
+                </div>
+
+                {loading && (
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        Loading locations...
+                    </div>
+                )}
+
+                {/* Toggle Controls */}
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Patients ({patients.length})
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Doctors ({doctors.length})
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {/* Map Container */}
+            <div ref={mapRef} className="w-full h-full" style={{ zIndex: 0 }} />
         </div>
     );
 };

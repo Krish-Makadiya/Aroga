@@ -167,6 +167,28 @@ exports.getAllPatients = async (req, res) => {
     }
 };
 
+// Get all patients with location data (for admin map)
+exports.getAllPatientsWithLocation = async (req, res) => {
+    try {
+        const patients = await Patient.find({
+            "location.latitude": { $ne: null },
+            "location.longitude": { $ne: null },
+        }).select("fullName phone email location district state address");
+        
+        res.json({
+            success: true,
+            data: patients,
+        });
+    } catch (error) {
+        console.error("Get all patients with location error:", error);
+        res.status(500).json({
+            success: false,
+            error: "Server error",
+            details: error.message,
+        });
+    }
+};
+
 // Get a patient by Clerk user ID (from params)
 exports.getPatientByClerkId = async (req, res) => {
     try {

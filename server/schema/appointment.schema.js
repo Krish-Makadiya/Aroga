@@ -122,6 +122,22 @@ const appointmentSchema = new mongoose.Schema(
             ref: "Rating",
             default: null,
         },
+        emergency: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
+        emergencyDetails: {
+            phone: { type: String, trim: true },
+            fullName: { type: String, trim: true },
+            emergencyContact: { type: String, trim: true },
+            emergencyPhone: { type: String, trim: true },
+            urgency: { type: String, enum: ["high", "critical"], default: "high" },
+            location: {
+                latitude: { type: Number },
+                longitude: { type: Number },
+            },
+        },
     },
     {
         timestamps: true,

@@ -12,22 +12,22 @@ import Loader from "../components/main/Loader";
 import { BackgroundRippleEffect } from "../components/UI/BackgroundRippleEffect";
 import { ContainerScroll } from "../components/UI/ContainerScroll";
 import { useEffect } from "react";
-
+import EmergencySOSButton from "../components/SOS/EmergencySOSButton";
 
 function LandingPage() {
     const { isLoaded } = useUser();
     const { getToken } = useAuth();
 
     useEffect(() => {
-        
         fetchSessionToken();
     }, [isLoaded, getToken]); // Dependencies: re-run if isLoaded changes or getToken reference changes
-    
+
     const fetchSessionToken = async () => {
-        if (isLoaded) { // Ensure Clerk user data is loaded before attempting to get a token
+        if (isLoaded) {
+            // Ensure Clerk user data is loaded before attempting to get a token
             try {
                 const token = await getToken();
-                console.log(token); 
+                console.log(token);
             } catch (error) {
                 console.error("Error fetching Clerk session token:", error);
             }
@@ -97,6 +97,9 @@ function LandingPage() {
             <ContactSection />
 
             <Footer />
+
+            {/* Emergency SOS Button */}
+            <EmergencySOSButton />
         </div>
     );
 }

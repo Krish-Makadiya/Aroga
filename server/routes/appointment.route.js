@@ -662,4 +662,139 @@ router.get("/admin/all", async (req, res) => {
     }
 });
 
+// POST /api/appointment/create-emergency - Create emergency appointment (fast-track)
+router.post("/create-emergency", async (req, res) => {
+    try {
+        const {
+            doctorId,
+            patientId, // This is clerkUserId for emergency cases
+            scheduledAt,
+            amount,
+            symptoms = [],
+            reports = "",
+            aiSummary = "",
+            emergency = true,
+            emergencyDetails = {},
+        } = req.body;
+
+        if (!patientId || !doctorId || !scheduledAt) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing required fields: patientId (clerkUserId), doctorId, scheduledAt",
+            });
+        }
+
+        // Find or create patient by clerkUserId
+        let patient = await Patient.findOne({ clerkUserId: patientId });
+        
+        if (!patient) {
+            // Create a minimal patient record for emergency cases
+            const { fullName, phone } = emergencyDetails;
+            if (!fullName || !phone) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Patient not found. Please provide fullName and phone in emergencyDetails.",
+                });
+            }
+            
+            patient = await Patient.create({
+                clerkUserId: patientId,
+                fullName: fullName,
+                phone: phone,
+                telemedicineConsent: true,
+            });
+        }
+
+        let when = new Date(scheduledAt);
+        if (isNaN(when.getTime())) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid scheduledAt datetime",
+            });
+        }
+
+        // For emergency appointments, try to create immediately
+        // If there's a conflict with unique index, try next 20-minute slot
+        let appointment;
+        let attempts = 0;
+        const maxAttempts = 10; // Try up to 10 slots (200 minutes ahead)
+
+        while (attempts < maxAttempts) {
+            try {
+                appointment = await Appointment.create({
+                    patientId: patient._id,
+                    doctorId,
+                    scheduledAt: when,
+                    amount: amount || 0,
+                    appointmentType: "online",
+                    status: "pending", // Will be confirmed by doctor/admin
+                    symptoms: Array.isArray(symptoms) ? symptoms : [symptoms],
+                    reports: reports || "",
+                    aiSummary: aiSummary || "Emergency appointment request",
+                    emergency: true,
+                    emergencyDetails: emergencyDetails,
+                });
+                break; // Success, exit loop
+            } catch (error) {
+                if (error.code === 11000 && attempts < maxAttempts - 1) {
+                    // Duplicate key error - try next 20-minute slot
+                    when = new Date(when.getTime() + 20 * 60 * 1000);
+                    attempts++;
+                    continue;
+                } else {
+                    throw error; // Re-throw if not a duplicate key error or max attempts reached
+                }
+            }
+        }
+
+        if (!appointment) {
+            return res.status(409).json({
+                success: false,
+                message: "Could not find available slot. Please try again later.",
+            });
+        }
+
+        // Create corresponding event
+        const event = await Event.create({
+            patientId: patient._id,
+            doctorId,
+            title: "Emergency Appointment",
+            description: "Emergency medical appointment request.",
+            date: when.toISOString().split("T")[0],
+            time: when.toTimeString().split(" ")[0].substring(0, 5),
+            type: "appointment",
+        });
+
+        // Send SMS notification if phone is available
+        if (patient.phone) {
+            const newPhone = patient.phone.startsWith("+91")
+                ? patient.phone
+                : "+91" + patient.phone;
+
+            const message = `Emergency appointment request submitted. A doctor will contact you shortly at ${patient.phone}.`;
+            const result = await translate(message, { to: patient.language || "en" });
+
+            sendSms(newPhone, result.text).catch((err) => {
+                console.error("Error sending SMS:", err);
+            });
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: "Emergency appointment request created successfully",
+            data: {
+                appointment,
+                event,
+            },
+        });
+    } catch (error) {
+        console.error("Create emergency appointment error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create emergency appointment",
+            error: error.message,
+        });
+    }
+});
+
 module.exports = router;

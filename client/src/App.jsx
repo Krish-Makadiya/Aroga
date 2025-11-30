@@ -23,6 +23,7 @@ import {
     History,
     MapPin,
     Settings2,
+    AlertTriangle,
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
@@ -55,6 +56,8 @@ import AdminDashboard from "./pages/adminPages/Dashboard/AdminDashboard";
 import ManageDoctors from "./pages/adminPages/ManageDoctors/ManageDoctors";
 import AdminAppointments from "./pages/adminPages/AdminAppointments/AdminAppointments";
 import LocationMap from "./pages/adminPages/LocationMap/LocationMap";
+import Emergencies from "./pages/adminPages/Emergencies/Emergencies";
+import EmergencyVideo from "./pages/adminPages/Emergencies/EmergencyVideo";
 
 const patientTabs = [
     {
@@ -138,31 +141,31 @@ const pharmacyTabs = [
     {
         id: 2,
         name: "Manage Inventory",
-        icon: PackageSearch,       // inventory icon
+        icon: PackageSearch, // inventory icon
         path: "/pharmacy/manage-inventory",
     },
     {
         id: 3,
         name: "Create Bill",
-        icon: FilePlus2,           // bill creation icon
+        icon: FilePlus2, // bill creation icon
         path: "/pharmacy/create-bill",
     },
     {
         id: 4,
         name: "Billing History",
-        icon: History,             // history icon
+        icon: History, // history icon
         path: "/pharmacy/billing-history",
     },
     {
         id: 5,
         name: "My Location",
-        icon: MapPin,              // map/location icon
+        icon: MapPin, // map/location icon
         path: "/pharmacy/my-location",
     },
     {
         id: 6,
         name: "Settings",
-        icon: Settings2,            // settings icon
+        icon: Settings2, // settings icon
         path: "/pharmacy/settings",
     },
 ];
@@ -191,7 +194,13 @@ const adminTabs = [
         name: "Location Map",
         icon: Map,
         path: "/admin/location-map",
-    }
+    },
+    {
+        id: 5,
+        name: "Emergencies",
+        icon: AlertTriangle,
+        path: "/admin/emergencies",
+    },
 ];
 
 const VideoAppointmentEntry = () => {
@@ -368,7 +377,10 @@ function App() {
                     path="/pharmacy/manage-inventory"
                     element={
                         <ProtectedRoute requiredRole="Pharmacy">
-                            <PharmacyDashboard tabs={pharmacyTabs} view="inventory" />
+                            <PharmacyDashboard
+                                tabs={pharmacyTabs}
+                                view="inventory"
+                            />
                         </ProtectedRoute>
                     }
                 />
@@ -376,7 +388,10 @@ function App() {
                     path="/pharmacy/create-bill"
                     element={
                         <ProtectedRoute requiredRole="Pharmacy">
-                            <PharmacyDashboard tabs={pharmacyTabs} view="create-bill" />
+                            <PharmacyDashboard
+                                tabs={pharmacyTabs}
+                                view="create-bill"
+                            />
                         </ProtectedRoute>
                     }
                 />
@@ -384,7 +399,10 @@ function App() {
                     path="/pharmacy/billing-history"
                     element={
                         <ProtectedRoute requiredRole="Pharmacy">
-                            <PharmacyDashboard tabs={pharmacyTabs} view="bills" />
+                            <PharmacyDashboard
+                                tabs={pharmacyTabs}
+                                view="bills"
+                            />
                         </ProtectedRoute>
                     }
                 />
@@ -392,7 +410,10 @@ function App() {
                     path="/pharmacy/my-location"
                     element={
                         <ProtectedRoute requiredRole="Pharmacy">
-                            <PharmacyDashboard tabs={pharmacyTabs} view="location" />
+                            <PharmacyDashboard
+                                tabs={pharmacyTabs}
+                                view="location"
+                            />
                         </ProtectedRoute>
                     }
                 />
@@ -400,7 +421,10 @@ function App() {
                     path="/pharmacy/settings"
                     element={
                         <ProtectedRoute requiredRole="Pharmacy">
-                            <PharmacyDashboard tabs={pharmacyTabs} view="settings" />
+                            <PharmacyDashboard
+                                tabs={pharmacyTabs}
+                                view="settings"
+                            />
                         </ProtectedRoute>
                     }
                 />
@@ -438,6 +462,19 @@ function App() {
                             <LocationMap tabs={adminTabs} />
                         </ProtectedRoute>
                     }
+                />
+                <Route
+                    path="/admin/emergencies"
+                    element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <Emergencies tabs={adminTabs} />
+                        </ProtectedRoute>
+                    }
+                />
+                
+                <Route
+                    path="/emergency-appointment"
+                    element={<EmergencyVideo />}
                 />
 
                 {/* Fallback */}

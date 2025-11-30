@@ -4,11 +4,15 @@ import { useUser } from "@clerk/clerk-react";
 export default function RoleRedirect() {
 	const { isLoaded, user } = useUser();
 	if (!isLoaded) return null;
-	const role = user?.publicMetadata?.role || user?.unsafeMetadata?.role;
+	const rawRole = user?.publicMetadata?.role || user?.unsafeMetadata?.role;
+	const role = typeof rawRole === "string" ? rawRole.trim().toLowerCase() : null;
 	if (!role) return <Navigate to="/onboarding" replace />;
-	if (role === "Patient") return <Navigate to="/dashboard/patient" replace />;
-	if (role === "Doctor") return <Navigate to="/dashboard/doctor" replace />;
-	if (role === "Admin") return <Navigate to="/dashboard/admin" replace />;
+
+	// Map known roles to the routes used in App.jsx
+	if (role === "patient") return <Navigate to="/patient/dashboard" replace />;
+	if (role === "doctor") return <Navigate to="/doctor/dashboard" replace />;
+	if (role === "pharmacy") return <Navigate to="/pharmacy/dashboard" replace />;
+	if (role === "admin") return <Navigate to="/dashboard/admin" replace />;
 	return <Navigate to="/onboarding" replace />;
 }
 

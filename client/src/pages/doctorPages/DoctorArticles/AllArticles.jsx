@@ -15,11 +15,17 @@ import {
     User,
     Stethoscope,
     GraduationCap,
-    MapPin
+    MapPin,
+    AlertTriangle,
+    Megaphone,
+    FileText
 } from 'lucide-react';
+import PostCard from "../../../components/Doctor/PostCard";
 
 const AllArticles = () => {
     const [articles, setArticles] = useState([]);
+    const [typeFilter, setTypeFilter] = useState('All');
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { user } = useUser();
@@ -36,7 +42,7 @@ const AllArticles = () => {
             setLoading(true);
             const token = await getToken();
             const response = await axios.get(
-                `http://localhost:5000/api/articles/exclude/${user.id}`,
+                `http://localhost:5000/api/articles/all`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -45,11 +51,11 @@ const AllArticles = () => {
             );
 
             if (response.data.success) {
-                setArticles(response.data.data.articles);
+                setArticles(response.data.data);
             }
         } catch (err) {
             console.error('Error fetching articles:', err);
-            setError('Failed to load articles');
+            setError('Failed to load posts');
         } finally {
             setLoading(false);
         }
@@ -97,6 +103,8 @@ const AllArticles = () => {
         if (content.length <= maxLength) return content;
         return content.substring(0, maxLength) + '...';
     };
+
+    const filteredArticles = typeFilter === 'All' ? articles : articles.filter(a => a.type === typeFilter);
 
     if (loading) {
         return (
@@ -150,134 +158,43 @@ const AllArticles = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-light-primary-text dark:text-dark-primary-text mb-2">
-                        All Articles
+                        Community
                     </h1>
                     <p className="text-light-secondary-text dark:text-dark-secondary-text">
-                        Discover articles from medical professionals around the platform
+                        Discover posts from medical professionals around the platform
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {['All', 'Article', 'Alert', 'Announcement'].map(k => (
+                            <button
+                                key={k}
+                                onClick={() => setTypeFilter(k)}
+                                className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                                    typeFilter === k
+                                        ? 'bg-light-primary dark:bg-dark-primary text-white border-transparent'
+                                        : 'bg-transparent text-light-primary-text dark:text-dark-primary-text border-light-border dark:border-dark-border hover:bg-light-bg dark:hover:bg-dark-surface'
+                                }`}
+                            >
+                                {k}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Articles Grid */}
-                {articles.length === 0 ? (
+                {/* Posts Grid with Type Filter */}
+                {filteredArticles.length === 0 ? (
                     <div className="text-center py-12">
                         <Stethoscope className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                            No Articles Available
+                            No Posts Available
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                            There are currently no articles from other doctors to display
+                            There are currently no posts from other doctors to display
                         </p>
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {articles.map((article) => (
-                            <div
-                                key={article._id}
-                                className="bg-light-surface dark:bg-dark-bg rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden border border-gray-100 dark:border-gray-700"
-                            >
-                                {/* Article Content */}
-                                <div className="p-6">
-                                    {/* Status and Pin */}
-                                    <div className="flex items-start justify-between mb-4">
-                                        {article.isPinned && (
-                                            <Pin className="w-4 h-4 text-light-primary dark:text-dark-primary" />
-                                        )}
-                                    </div>
-
-                                    {/* Title and Subtitle */}
-                                    <h3 className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text mb-2 line-clamp-2 leading-tight">
-                                        {article.title}
-                                    </h3>
-                                    {article.subtitle && (
-                                        <p className="text-base text-light-secondary-text dark:text-dark-secondary-text mb-3 line-clamp-1">
-                                            {article.subtitle}
-                                        </p>
-                                    )}
-
-                                    {/* Content Preview */}
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 leading-relaxed">
-                                        {article.content}
-                                    </p>
-
-                                    {/* Category */}
-                                    <div className="mb-4">
-                                        <span className="inline-block px-3 py-1 bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary text-xs font-medium rounded-full">
-                                            {article.category}
-                                        </span>
-                                    </div>
-
-                                    {/* Stats */}
-                                    <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-gray-700">
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-1">
-                                                <Eye className="w-4 h-4" />
-                                                <span>{article.views}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Heart className="w-4 h-4" />
-                                                <span>{article.likes}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <MessageCircle className="w-4 h-4" />
-                                                <span>{article.comments}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Bookmark className="w-4 h-4" />
-                                                <span>{article.bookmarks}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Author Information */}
-                                    <div className="mb-4">
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-light-primary/10 dark:bg-dark-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                                {article.authorAvatar ? (
-                                                    <img
-                                                        src={article.authorAvatar}
-                                                        alt={article.authorId?.fullName}
-                                                        className="w-10 h-10 rounded-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <User className="w-5 h-5 text-light-primary dark:text-dark-primary" />
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="text-sm font-semibold text-light-primary-text dark:text-dark-primary-text truncate">
-                                                    {article.authorId?.fullName || 'Unknown Author'}
-                                                </h4>
-                                                {article.authorId?.qualification && (
-                                                    <div className="flex items-center gap-1 mt-1">
-                                                        <GraduationCap className="w-3 h-3 text-gray-500" />
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                                            {article.authorId.qualification}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {article.authorId?.specialty && (
-                                                    <div className="flex items-center gap-1 mt-1">
-                                                        <Stethoscope className="w-3 h-3 text-gray-500" />
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                                            {article.authorId.specialty}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Date */}
-                                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                        <Calendar className="w-3 h-3" />
-                                        <span>
-                                            {article.publishedAt
-                                                ? `Published ${formatDate(article.publishedAt)}`
-                                                : `Created ${formatDate(article.createdAt)}`
-                                            }
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                        {filteredArticles.map((article) => (
+                            <PostCard key={article._id} post={article} showAuthor={true} />
                         ))}
                     </div>
                 )}

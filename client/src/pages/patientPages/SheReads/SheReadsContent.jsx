@@ -322,7 +322,6 @@ const womensInfo = [
             },
         ],
     },
-    // Entries continue in this pattern for all diseases you listed.
 ];
 
 const ICONS = {
@@ -332,16 +331,25 @@ const ICONS = {
     Default: <Lightbulb />,
 };
 
-const getPlaceholderImage = (seed) =>
-    `https://picsum.photos/seed/${encodeURIComponent(seed)}/800/600`;
+const getPlaceholderImage = () => "/img.jpeg";
+
+
+
+const getLocalImageFor = (d) => {
+    const name = d.name?.toLowerCase() || "";
+    if (d.id === 1) return "/images (1).jpeg"; // first blog
+    if (name.includes("pcos") || name.includes("pcod")) return "/images (3).jpeg"; // PCOD/PCOS
+    if (name.includes("endometriosis")) return "/img3.jpeg"; // Endometriosis
+    return "/images (1).jpeg"; // remaining
+};
 
 const Section = ({ title, children }) => {
     return (
-        <section className="rounded-xl bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] p-4 sm:p-6 shadow-sm border border-black/5 dark:border-white/5">
-            <h3 className="text-lg sm:text-xl font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-3">
+        <section className="rounded-xl bg-light-surface dark:bg-dark-bg p-4 sm:p-6 shadow-sm border border-black/5 dark:border-white/5">
+            <h3 className="text-lg sm:text-xl font-semibold text-light-primary-text dark:text-dark-primary-text mb-3">
                 {title}
             </h3>
-            <div className="text-sm sm:text-base text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] leading-relaxed">
+            <div className="text-sm sm:text-base text-light-secondary-text dark:text-dark-secondary-text leading-relaxed">
                 {children}
             </div>
         </section>
@@ -349,12 +357,12 @@ const Section = ({ title, children }) => {
 };
 
 const Pill = ({ text }) => (
-    <span className="inline-flex items-center rounded-full bg-[var(--color-light-bg)] dark:bg-[var(--color-dark-surface)] text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] px-3 py-1 text-xs sm:text-sm">
+    <span className="inline-flex items-center rounded-full bg-light-bg dark:bg-dark-surface text-light-secondary-text dark:text-dark-secondary-text px-3 py-1 text-xs sm:text-sm">
         {text}
     </span>
 );
 
-const WomensHealthContent = () => {
+const SheReadsContent = () => {
     const [query, setQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("All");
     const [selectedId, setSelectedId] = useState(null);
@@ -363,7 +371,7 @@ const WomensHealthContent = () => {
         () =>
             womensInfo.map((d) => ({
                 ...d,
-                image: getPlaceholderImage(d.name),
+                image: getLocalImageFor(d),
             })),
         []
     );
@@ -396,13 +404,13 @@ const WomensHealthContent = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 space-y-6 sm:space-y-8">
-            <div className="rounded-2xl overflow-hidden bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] border border-black/5 dark:border-white/5">
+            <div className="rounded-2xl overflow-hidden bg-light-surface dark:bg-dark-bg border border-black/5 dark:border-white/5">
                 <div className="flex flex-col md:flex-row">
                     <div className="p-5 sm:p-8 md:w-1/2">
-                        <h2 className="text-2xl sm:text-3xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-light-primary-text dark:text-dark-primary-text">
                             Women’s Health Guide
                         </h2>
-                        <p className="mt-2 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                        <p className="mt-2 text-light-secondary-text dark:text-dark-secondary-text">
                             Find simple information about women’s health
                             conditions. Search and tap to learn more.
                         </p>
@@ -412,16 +420,16 @@ const WomensHealthContent = () => {
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="Search diseases (e.g., PCOS, pain)"
-                                className="w-full rounded-xl bg-[var(--color-light-bg)] dark:bg-[var(--color-dark-surface)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] placeholder:text-[var(--color-light-secondary-text)] dark:placeholder:text-[var(--color-dark-secondary-text)] border border-black/5 dark:border-white/5 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                className="w-full rounded-xl bg-light-bg dark:bg-dark-surface text-light-primary-text dark:text-dark-primary-text placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text border border-black/5 dark:border-white/5 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
                                 aria-label="Search diseases"
                             />
                         </div>
                     </div>
-                    <div className="md:w-1/2 h-40 sm:h-56 md:h-auto">
+                    <div className="md:w-1/2 relative">
                         <img
                             src={getPlaceholderImage("womens-health-hero")}
-                            alt="Women’s Health"
-                            className="w-full h-full object-cover"
+                            alt="Women's Health"
+                            className="absolute top-0 left-0 w-full h-full object-cover object-center"
                             loading="lazy"
                         />
                     </div>
@@ -435,8 +443,8 @@ const WomensHealthContent = () => {
                         onClick={() => setActiveCategory(cat)}
                         className={`px-3 py-2 rounded-xl text-sm whitespace-nowrap border border-black/5 dark:border-white/5 ${
                             activeCategory === cat
-                                ? "bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white"
-                                : "bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]"
+                                ? "bg-light-primary dark:bg-dark-primary text-white"
+                                : "bg-light-surface dark:bg-dark-bg text-light-secondary-text dark:text-dark-secondary-text"
                         }`}
                         aria-pressed={activeCategory === cat}>
                         {cat}
@@ -459,16 +467,14 @@ const WomensHealthContent = () => {
                             onClick={() => setSelectedId(item.id)}
                             className={`text-left rounded-2xl overflow-hidden flex flex-col  border shadow-sm transition-colors ${
                                 isActive
-                                    ? "bg-[var(--color-light-primary)]/30 dark:bg-[var(--color-dark-primary)]/30 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] border-transparent"
-                                    : "bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] border-black/5 dark:border-white/5"
+                                    ? "bg-light-primary/30 dark:bg-dark-primary/30 text-light-primary-text dark:text-dark-primary-text border-transparent"
+                                    : "bg-light-surface dark:bg-dark-bg text-light-primary-text dark:text-dark-primary-text border-black/5 dark:border-white/5"
                             }`}>
-                            <div className="h-24 sm:h-28 w-full overflow-hidden">
+                            <div className="relative w-full pt-[75%] overflow-hidden">
                                 <img
-                                    src={getPlaceholderImage(
-                                        "womens-health-hero"
-                                    )}
+                                    src={item.image}
                                     alt={item.name}
-                                    className={`w-full h-full object-cover ${
+                                    className={`absolute top-0 left-0 w-full h-full object-cover object-center ${
                                         isActive ? "opacity-90" : "opacity-100"
                                     }`}
                                     loading="lazy"
@@ -481,7 +487,7 @@ const WomensHealthContent = () => {
                                     {icon}
                                 </span>
                                 <div>
-                                    <div className="text-xs text-[var(--color-light-primary-text)]/80 dark:text-[var(--color-dark-primary-text)]/80">
+                                    <div className="text-xs text-light-primary-text/80 dark:text-dark-primary-text/80">
                                         {item.category}
                                     </div>
                                     <div className="text-base font-medium line-clamp-2">
@@ -493,7 +499,7 @@ const WomensHealthContent = () => {
                     );
                 })}
                 {filtered.length === 0 && (
-                    <div className="col-span-full text-center text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                    <div className="col-span-full text-center text-light-secondary-text dark:text-dark-secondary-text">
                         No results. Try a different word.
                     </div>
                 )}
@@ -501,24 +507,22 @@ const WomensHealthContent = () => {
 
             {selected && (
                 <main className="space-y-3">
-                    <div className="rounded-2xl overflow-hidden bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] border border-black/5 dark:border-white/5">
-                        <div className="h-36 sm:h-48 md:h-56 w-full overflow-hidden">
+                    <div className="rounded-2xl overflow-hidden bg-light-surface dark:bg-dark-bg border border-black/5 dark:border-white/5">
+                        <div className="relative w-full pt-[40%] overflow-hidden">
                             <img
-                                src={getPlaceholderImage("womens-health-hero")}
+                                src={selected.image}
                                 alt={selected.name}
-                                className="w-full h-full object-cover"
+                                className="absolute top-0 left-0 w-full h-full object-cover object-center"
                                 loading="lazy"
                             />
                         </div>
                         <div className="p-4 sm:p-6">
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div
-                                    className="text-3xl sm:text-4xl dark:text-dark-primary text-light-primary"
-                                    aria-hidden>
+                            <div className="flex items-start gap-3">
+                                <div className="text-2xl sm:text-3xl">
                                     {ICONS[selected.icon] || ICONS.Default}
                                 </div>
                                 <div className="space-y-2">
-                                    <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                    <h2 className="text-xl sm:text-2xl font-bold text-light-primary-text dark:text-dark-primary-text">
                                         {selected.name}
                                     </h2>
                                     <div className="flex flex-wrap gap-2">
@@ -566,10 +570,10 @@ const WomensHealthContent = () => {
                             <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
                                 {selected.symptoms.mild?.length > 0 && (
                                     <div className="bg-green-600/20 rounded-xl p-3">
-                                        <h4 className="font-semibold text-xl text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2 pl-3">
+                                        <h4 className="font-semibold text-xl text-light-primary-text dark:text-dark-primary-text mb-2 pl-3">
                                             Mild
                                         </h4>
-                                        <ul className="list-disc pl-5 text-base space-y-1 text-[var(--color-light-primary-text)]/80 dark:text-[var(--color-dark-primary-text)]/80">
+                                        <ul className="list-disc pl-5 text-base space-y-1 text-light-primary-text/80 dark:text-dark-primary-text/80">
                                             {selected.symptoms.mild.map(
                                                 (s, i) => (
                                                     <li key={i}>{s}</li>
@@ -580,10 +584,10 @@ const WomensHealthContent = () => {
                                 )}
                                 {selected.symptoms.moderate?.length > 0 && (
                                     <div className="bg-yellow-600/20 rounded-xl p-3">
-                                        <h4 className="font-semibold text-xl text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2 pl-3">
+                                        <h4 className="font-semibold text-xl text-light-primary-text dark:text-dark-primary-text mb-2 pl-3">
                                             Moderate
                                         </h4>
-                                        <ul className="list-disc pl-5 text-base space-y-1 text-[var(--color-light-primary-text)]/80 dark:text-[var(--color-dark-primary-text)]/80">
+                                        <ul className="list-disc pl-5 text-base space-y-1 text-light-primary-text/80 dark:text-dark-primary-text/80">
                                             {selected.symptoms.moderate.map(
                                                 (s, i) => (
                                                     <li key={i}>{s}</li>
@@ -594,10 +598,10 @@ const WomensHealthContent = () => {
                                 )}
                                 {selected.symptoms.severe?.length > 0 && (
                                     <div className="bg-red-600/20 rounded-xl p-3">
-                                        <h4 className="font-semibold text-xl text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] mb-2 pl-3">
+                                        <h4 className="font-semibold text-xl text-light-primary-text dark:text-dark-primary-text mb-2 pl-3">
                                             Severe
                                         </h4>
-                                        <ul className="list-disc pl-5 text-base space-y-1 text-[var(--color-light-primary-text)]/80 dark:text-[var(--color-dark-primary-text)]/80">
+                                        <ul className="list-disc pl-5 text-base space-y-1 text-light-primary-text/80 dark:text-dark-primary-text/80">
                                             {selected.symptoms.severe.map(
                                                 (s, i) => (
                                                     <li key={i}>{s}</li>
@@ -698,10 +702,10 @@ const WomensHealthContent = () => {
                                         key={i}
                                         className="flex items-center justify-between gap-3">
                                         <div>
-                                            <p className="font-medium text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                            <p className="font-medium text-light-primary-text dark:text-dark-primary-text">
                                                 {a.title}
                                             </p>
-                                            <p className="text-xs text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                                            <p className="text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                 {a.source} • {a.type}
                                             </p>
                                         </div>
@@ -709,7 +713,7 @@ const WomensHealthContent = () => {
                                             href={a.url}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="px-3 py-2 rounded-lg text-sm bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white">
+                                            className="px-3 py-2 rounded-lg text-sm bg-light-primary dark:bg-dark-primary text-white">
                                             Open
                                         </a>
                                     </li>
@@ -729,4 +733,4 @@ const WomensHealthContent = () => {
     );
 };
 
-export default WomensHealthContent;
+export default SheReadsContent;

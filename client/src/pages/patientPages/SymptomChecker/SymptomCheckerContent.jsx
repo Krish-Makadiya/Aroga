@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import {
     Stethoscope,
     HeartPulse,
@@ -56,6 +56,7 @@ const SymptomCheckerContent = () => {
     const [language, setLanguage] = useState("en");
     const [recording, setRecording] = useState(false);
     const [aiInsight, setAiInsight] = useState(null);
+    const recognitionRef = useRef(null);
 
     const user = useUser().user.unsafeMetadata.patientData;
 
@@ -102,70 +103,27 @@ const SymptomCheckerContent = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const prompt = `
-                You are an AI-based medical assistant (not a doctor) that helps users understand their health based on their symptoms and personal details.
-                Your role is to analyze the input and provide clear, structured, and simple health insights.
-                Always use non-technical, easy-to-understand language.
-
-                ### User Input:
-                - Full Name: ${user.fullName || "N/A"}
-                - Date of Birth (DOB): ${user.dob || "N/A"} ${
-            user.dob ? `→ Age: ${age}` : ""
-        }
-                - Gender: ${user.gender || "N/A"}
-                - Previous Medical History: ${user.medicalHistory || "N/A"}
-                - Reported Symptoms: ${
-                    Array.isArray(symptoms) && symptoms.length
-                        ? symptoms.join(", ")
-                        : "N/A"
-                }
-                - Description of Feelings: ${input.trim() || "N/A"}
-
-                ### Your Tasks:
-                1. Health State Analysis: Provide an overall health condition assessment: Good / Mild / Moderate / Severe.
-                2. Possible Diseases: List 2–4 possible conditions with a confidence percentage (e.g., Flu – 75%) and a short reason that matches the symptoms.
-                3. Simple Remedies: Provide safe home remedies or lifestyle tips.
-                4. OTC Medicine Suggestions: Suggest safe over-the-counter medicines (e.g., paracetamol, antihistamines) when appropriate.
-                5. Urgent Care Alert: Clearly mention if symptoms indicate emergency medical attention is needed.
-                6. Lifestyle Advice: Suggest general health-improving actions (hydration, rest, diet, exercise).
-                7. Medical Disclaimer: Always end with: "This is not a medical diagnosis. Please consult a licensed doctor for professional advice."
-
-                ### Output Format (JSON only):
-                {
-                "healthState": "Good | Mild | Moderate | Severe",
-                "possibleDiseases": [
-                    {
-                    "name": "Disease Name",
-                    "confidence": "75%",
-                    "reason": "Explanation in simple words"
-                    }
-                ],
-                "remedies": [
-                    "Simple home remedy 1",
-                    "Simple home remedy 2"
-                ],
-                "otcMedicines": [
-                    "Medicine name with purpose"
-                ],
-                "urgentCare": "Yes/No, with explanation",
-                "lifestyleAdvice": [
-                    "Tip 1",
-                    "Tip 2"
-                ],
-                "disclaimer": "This is not a medical diagnosis. Please consult a licensed doctor for professional advice."
-                }
-                `.trim();
-
         if (!canSubmit) return;
+
+        const parts = [];
+        if (Array.isArray(symptoms) && symptoms.length) {
+            parts.push(symptoms.join(", "));
+        }
+        if (input.trim()) {
+            parts.push(input.trim());
+        }
+
+        const symptomsText = parts.join(". ");
+
+        if (!symptomsText) return;
 
         await toast.promise(
             (async () => {
                 try {
-                    const res = await axios.get(
-                        `http://localhost:5000/api/ai/generate-questions`,
+                    const res = await axios.post(
+                        "http://localhost:5000/api/health-analyze",
                         {
-                            params: { prompt },
+                            symptoms: symptomsText,
                         }
                     );
                     console.log(res.data);
@@ -177,49 +135,86 @@ const SymptomCheckerContent = () => {
                     return res.data;
                 } catch (e) {
                     console.log(e);
+                    throw e;
                 }
             })(),
             {
                 loading: "AI is analyzing your symptoms...",
                 success: (data) =>
-                    `Analysis complete! Found ${
-                        data.possibleDiseases?.length || 0
+                    `Analysis complete! Found ${data.possibleDiseases?.length || 0
                     } possible conditions.`,
-                error: (err) => `Failed to analyze symptoms.`,
+                error: () => `Failed to analyze symptoms.`,
             }
         );
     };
 
     const toggleVoice = () => {
         // Simple demo: simulates starting/stopping voice capture
-        setRecording((r) => !r);
+        if (
+            !("webkitSpeechRecognition" in window) &&
+            !("SpeechRecognition" in window)
+        ) {
+            toast.error("Voice input is not supported in this browser.");
+            return;
+        }
+
+        if (recording && recognitionRef.current) {
+            recognitionRef.current.stop();
+            return;
+        }
+
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        const langMap = {
+            en: "en-US",
+            hi: "hi-IN",
+            bn: "bn-IN",
+            te: "te-IN",
+            ta: "ta-IN",
+        };
+
+        recognition.lang = langMap[language] || "en-US";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            setRecording(true);
+        };
+
+        recognition.onend = () => {
+            setRecording(false);
+        };
+
+        recognition.onerror = () => {
+            setRecording(false);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInput((prev) =>
+                prev ? `${prev} ${transcript}` : transcript
+            );
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
     };
 
     return (
         <div className="w-full max-w-8xl mx-auto ">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Input Card */}
-                <div className="lg:col-span-2 bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] rounded-2xl shadow p-5">
+                <div className="lg:col-span-2 bg-light-surface dark:bg-dark-bg rounded-2xl shadow p-5">
                     <div className="flex items-start justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <HeartPulse className="w-7 h-7 text-[var(--color-light-primary)] dark:text-[var(--color-dark-primary)]" />
-                            <h3 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <HeartPulse className="w-7 h-7 text-light-primary dark:text-dark-primary" />
+                            <h3 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 Describe your symptoms
                             </h3>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Languages className="w-4 h-4 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]" />
-                            <select
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                                className="text-sm bg-transparent border rounded-lg px-2 py-1 border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
-                                <option value="en">English</option>
-                                <option value="hi">Hindi</option>
-                                <option value="bn">Bengali</option>
-                                <option value="te">Telugu</option>
-                                <option value="ta">Tamil</option>
-                            </select>
-                        </div>
+
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -230,16 +225,15 @@ const SymptomCheckerContent = () => {
                                 onKeyDown={handleKeyDown}
                                 rows={4}
                                 placeholder="Describe how you feel or press Enter to add..."
-                                className="w-full rounded-xl border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)] px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-[var(--color-light-primary)] dark:focus:ring-[var(--color-dark-primary)]"
+                                className="w-full rounded-xl border border-light-secondary-text/20 dark:border-dark-secondary-text/20 bg-light-background dark:bg-dark-background text-light-primary-text dark:text-dark-primary-text px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
                             />
                             <button
                                 type="button"
                                 onClick={toggleVoice}
-                                className={`absolute right-3 bottom-3 p-2 rounded-lg transition ${
-                                    recording
-                                        ? "bg-red-100 text-red-600 dark:bg-red-900/30"
-                                        : "bg-[var(--color-light-background)] dark:bg-[var(--color-dark-background)] text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]"
-                                }`}
+                                className={`absolute right-3 bottom-3 p-2 rounded-lg transition ${recording
+                                    ? "bg-red-100 text-red-600 dark:bg-red-900/30"
+                                    : "bg-light-background dark:bg-dark-background text-light-secondary-text dark:text-dark-secondary-text"
+                                    }`}
                                 title="Voice Input"
                                 aria-pressed={recording}>
                                 <Mic className="w-4 h-4" />
@@ -268,10 +262,10 @@ const SymptomCheckerContent = () => {
                             </div>
                         )}
 
-                        <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded-2xl  p-5">
+                        <div className="bg-light-surface dark:bg-dark-surface rounded-2xl  p-5">
                             <div className="flex items-center gap-2 mb-3">
                                 <AlertTriangle className="w-5 h-5 text-amber-500" />
-                                <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                                <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                     Common symptoms
                                 </h4>
                             </div>
@@ -281,7 +275,7 @@ const SymptomCheckerContent = () => {
                                         key={s}
                                         onClick={() => handleCommonClick(s)}
                                         type="button"
-                                        className="px-3 py-1.5 rounded-full  text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] hover:bg-[var(--color-light-bg)]/50 dark:hover:bg-[var(--color-dark-bg)]/50 bg-light-bg dark:bg-dark-bg text-sm">
+                                        className="px-3 py-1.5 rounded-full  text-light-secondary-text dark:text-dark-secondary-text hover:bg-light-bg/50 dark:hover:bg-dark-bg/50 bg-light-bg dark:bg-dark-bg text-sm">
                                         {s}
                                     </button>
                                 ))}
@@ -292,14 +286,14 @@ const SymptomCheckerContent = () => {
                             <button
                                 type="button"
                                 onClick={handleClear}
-                                className="px-4 py-2 rounded-xl border border-[var(--color-light-secondary-text)]/20 dark:border-[var(--color-dark-secondary-text)]/20 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] hover:bg-[var(--color-light-background)] dark:hover:bg-[var(--color-dark-background)]">
+                                className="px-4 py-2 rounded-xl border border-light-secondary-text/20 dark:border-dark-secondary-text/20 text-light-secondary-text dark:text-dark-secondary-text hover:bg-light-background dark:hover:bg-dark-background">
                                 <RefreshCcw className="w-4 h-4 inline mr-2" />{" "}
                                 Reset
                             </button>
                             <button
                                 type="submit"
                                 disabled={!canSubmit}
-                                className="px-4 py-2 rounded-xl bg-[var(--color-light-primary)] dark:bg-[var(--color-dark-primary)] text-white hover:bg-[var(--color-light-primary-dark)] dark:hover:bg-[var(--color-dark-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="px-4 py-2 rounded-xl bg-light-primary dark:bg-dark-primary text-white hover:bg-light-primary-dark dark:hover:bg-dark-primary-dark disabled:opacity-50 disabled:cursor-not-allowed">
                                 <CheckCircle2 className="w-4 h-4 inline mr-2" />{" "}
                                 Check Health
                             </button>
@@ -311,14 +305,14 @@ const SymptomCheckerContent = () => {
 
                 {/* Common Symptoms & Info */}
                 <div className="space-y-6">
-                    <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] rounded-2xl shadow p-5">
+                    <div className="bg-light-surface dark:bg-dark-bg rounded-2xl shadow p-5">
                         <div className="flex items-center gap-2 mb-3">
                             <Pill className="w-5 h-5 text-fuchsia-600" />
-                            <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 What you get
                             </h4>
                         </div>
-                        <ul className="list-disc pl-5 text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)] space-y-1">
+                        <ul className="list-disc pl-5 text-sm text-light-secondary-text dark:text-dark-secondary-text space-y-1">
                             <li>
                                 AI analysis: Good / Mild / Moderate / Severe
                             </li>
@@ -333,18 +327,18 @@ const SymptomCheckerContent = () => {
                         </ul>
                     </div>
 
-                    <div className="bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-bg)] rounded-2xl shadow p-5">
+                    <div className="bg-light-surface dark:bg-dark-bg rounded-2xl shadow p-5">
                         <div className="flex items-center gap-2 mb-2">
                             <Leaf className="w-5 h-5 text-emerald-600" />
-                            <h4 className="font-semibold text-[var(--color-light-primary-text)] dark:text-[var(--color-dark-primary-text)]">
+                            <h4 className="font-semibold text-light-primary-text dark:text-dark-primary-text">
                                 Accessibility
                             </h4>
                         </div>
-                        <p className="text-sm text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                        <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
                             Voice input, large icons, adjustable font size,
                             multilingual support.
                         </p>
-                        <div className="flex items-center gap-2 text-xs mt-2 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+                        <div className="flex items-center gap-2 text-xs mt-2 text-light-secondary-text dark:text-dark-secondary-text">
                             <Clock className="w-4 h-4" /> Results will appear in
                             the browser console after submitting.
                         </div>

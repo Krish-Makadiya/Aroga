@@ -1,4 +1,6 @@
 // server/controllers/patient.controller.js
+const { translate } = require("@vitalets/google-translate-api");
+const { sendSms } = require("../config/sms.config");
 const Patient = require("../schema/patient.schema");
 const Appointment = require("../schema/appointment.schema");
 const Prescription = require("../schema/prescription.schema");
@@ -54,8 +56,9 @@ exports.getPatientByClerkId = async (req, res) => {
 exports.getPatientWithEvents = async (req, res) => {
     try {
         const { patientId } = req.params;
-        const patient = await Patient.findById(patientId).populate('events');
-        if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        const patient = await Patient.findById(patientId).populate("events");
+        if (!patient)
+            return res.status(404).json({ error: "Patient not found" });
         res.json(patient);
     } catch (err) {
         res.status(400).json({ error: err.message });

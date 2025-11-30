@@ -92,6 +92,18 @@ const doctorSchema = new mongoose.Schema(
             },
         },
 
+        licenseFile: {
+            type: String,
+            required: [true, "Medical license file URL is required"],
+            trim: true,
+        },
+
+        idProofFile: {
+            type: String,
+            required: [true, "ID proof file URL is required"],
+            trim: true,
+        },
+
         // Professional Information
         affiliation: {
             type: String,
@@ -153,6 +165,34 @@ const doctorSchema = new mongoose.Schema(
                             return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(
                                 value
                             );
+                        },
+                        message: "Time must be in HH:MM format (24-hour)",
+                    },
+                },
+            },
+        ],
+
+        // Date-specific blackout windows where no appointments are allowed
+        blackouts: [
+            {
+                date: {
+                    type: String, // YYYY-MM-DD
+                    trim: true,
+                },
+                startTime: {
+                    type: String, // HH:MM
+                    validate: {
+                        validator: function (value) {
+                            return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+                        },
+                        message: "Time must be in HH:MM format (24-hour)",
+                    },
+                },
+                endTime: {
+                    type: String, // HH:MM
+                    validate: {
+                        validator: function (value) {
+                            return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
                         },
                         message: "Time must be in HH:MM format (24-hour)",
                     },
@@ -289,6 +329,18 @@ const doctorSchema = new mongoose.Schema(
             required: [true, "Clerk user ID is required"],
             unique: true,
             trim: true,
+        },
+
+        // Location
+        location: {
+            latitude: {
+                type: Number,
+                default: null,
+            },
+            longitude: {
+                type: Number,
+                default: null,
+            },
         },
     },
     {

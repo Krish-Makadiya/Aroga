@@ -1,36 +1,25 @@
 // server/routes/patient.route.js
 const express = require("express");
 const router = express.Router();
-const {
-    createPatient,
-    getAllPatients,
-    getPatientByClerkId,
-    getPatientWithEvents,
-    getPrescribedMedications,
-    getAppointmentHistory,
-    getPersonalMedicalRecords,
-    addPersonalMedicalRecord,
-    deleteMedicalRecord,
-} = require("../controllers/patient.controller");
-const { upload } = require("../middleware/upload");
+const Patient = require("../schema/patient.schema");
+const { createPatient, getAllPatients, getPatientByClerkId, getPatientWithEvents, getMedicationReminders, addMedicationReminder, updateMedicationReminder, deleteMedicationReminder, setPreferredLanguage, updateLocation } = require("../controllers/patient.controller");
 
 // Existing routes
 router.post("/create-patient", createPatient);
 router.get("/all-patients", getAllPatients);
 router.get("/get-patient/:clerkUserId", getPatientByClerkId);
 
-// New medical history routes
-router.get("/prescribed-medications", getPrescribedMedications);
-router.get("/appointment-history", getAppointmentHistory);
-router.get("/medical-records", getPersonalMedicalRecords);
-router.post(
-    "/medical-records",
-    upload.single('file'),
-    addPersonalMedicalRecord
-);
-router.delete("/medical-records/:recordId", deleteMedicalRecord);
+// Medication reminders
+router.get('/:clerkUserId/reminders', getMedicationReminders);
+router.post('/:clerkUserId/reminders', addMedicationReminder);
+router.put('/:clerkUserId/reminders/:reminderId', updateMedicationReminder);
+router.delete('/:clerkUserId/reminders/:reminderId', deleteMedicationReminder);
 
+router.get('/:patientId', getPatientWithEvents);
 
-router.get("/:patientId", getPatientWithEvents);
+router.post('/:clerkUserId/language', setPreferredLanguage);
+
+// Update patient location
+router.put('/:clerkUserId/location', updateLocation);
 
 module.exports = router;

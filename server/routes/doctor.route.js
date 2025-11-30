@@ -1,9 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const doctorController = require("../controllers/doctor.controller");
+const multer = require("multer");
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // POST /api/doctor/create-doctor - Create a new doctor
-router.post("/create-doctor", doctorController.createDoctor);
+// accept two files: licenseFile and idProofFile
+router.post(
+	"/create-doctor",
+	upload.fields([
+		{ name: 'licenseFile', maxCount: 1 },
+		{ name: 'idProofFile', maxCount: 1 },
+	]),
+	doctorController.createDoctor
+);
 
 // GET /api/doctor - Get all doctors
 router.get("/", doctorController.getAllDoctors);
@@ -15,6 +26,26 @@ router.get("/get-doctor/:clerkUserId", doctorController.getDoctorByClerkUserId);
 router.post("/profile", doctorController.upsertDoctorProfile);
 
 router.get("/verified-doctors", doctorController.getVerifiedDoctors);
+// detailed verified doctors with stats
+router.get('/verified-doctors/detailed', doctorController.getVerifiedDoctorsWithStats);
+// GET /api/doctor/verified-doctors/patients - list verified doctors + their unique patients
+router.get('/verified-doctors/patients', doctorController.getVerifiedDoctorsWithPatients);
 
+// GET /api/doctor/pending-doctors - Get all pending doctors (for admin)
+router.get("/pending-doctors", doctorController.getPendingDoctors);
+
+// Availability & blackout management
+router.post("/availability", doctorController.setAvailability);
+router.get("/availability", doctorController.getAvailability);
+router.post("/blackouts", doctorController.addBlackout);
+router.delete("/blackouts/:index", doctorController.removeBlackout);
+
+// List available 20-min slots for a specific date
+router.get("/:doctorId/slots", doctorController.getAvailableSlotsForDate);
+// PUT /api/doctor/:doctorId/verify - Verify a doctor
+router.put("/:doctorId/verify", doctorController.verifyDoctor);
+
+// PUT /api/doctor/:clerkUserId/location - Update doctor location
+router.put("/:clerkUserId/location", doctorController.updateLocation);
 
 module.exports = router;

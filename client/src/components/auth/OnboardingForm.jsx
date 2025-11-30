@@ -20,12 +20,9 @@ export default function OnboardingForm() {
         address: "",
         district: "",
         phone: "",
-        email: "",
         govIdType: "",
-        govIdNumber: "",
         emergencyContactName: "",
         emergencyContactPhone: "",
-        medicalHistory: "",
         clerkUserId: user.id,
         telemedicineConsent: true,
     });
@@ -66,6 +63,30 @@ export default function OnboardingForm() {
         password: "",
     });
 
+    // Helper functions to manage repeatable optional patient fields
+    const addPatientFieldItem = (field) => {
+        setPatient((prev) => ({
+            ...prev,
+            [field]: [...(prev[field] || []), ""],
+        }));
+    };
+
+    const updatePatientFieldItem = (field, index, value) => {
+        setPatient((prev) => {
+            const arr = [...(prev[field] || [])];
+            arr[index] = value;
+            return { ...prev, [field]: arr };
+        });
+    };
+
+    const removePatientFieldItem = (field, index) => {
+        setPatient((prev) => {
+            const arr = [...(prev[field] || [])];
+            arr.splice(index, 1);
+            return { ...prev, [field]: arr };
+        });
+    };
+
     // Check if user has already completed onboarding
     useEffect(() => {
         if (isLoaded && user && user.unsafeMetadata?.onboardingCompleted) {
@@ -82,6 +103,15 @@ export default function OnboardingForm() {
 
         setSaving(true);
         try {
+            // Log full onboarding payload for debugging/testing
+            console.log("Onboarding payload:", {
+                role,
+                patient,
+                doctor,
+                pharmacy,
+                admin,
+                clerkUserId: user?.id,
+            });
             let backendUrl = "";
             let backendBody = {};
 
@@ -92,7 +122,8 @@ export default function OnboardingForm() {
                 backendUrl = "http://localhost:5000/api/doctor/create-doctor";
                 backendBody = doctor;
             } else if (role === "Pharmacy") {
-                backendUrl = "http://localhost:5000/api/pharmacy/create-pharmacy";
+                backendUrl =
+                    "http://localhost:5000/api/pharmacy/create-pharmacy";
                 backendBody = pharmacy;
             } else if (role === "Admin") {
                 backendUrl = "http://localhost:5000/api/admin/create-admin";
@@ -102,13 +133,61 @@ export default function OnboardingForm() {
             const token = await getToken();
 
             if (backendUrl) {
-                console.log(backendBody);
-                const response = await axios.post(backendUrl, backendBody, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                console.log("Submitting to backend:", backendUrl, backendBody);
+
+                let response;
+
+                // Only Doctor role needs FormData (has file uploads)
+                if (role === "Doctor") {
+                    const formData = new FormData();
+                    console.log("Preparing form data for doctor:", backendBody);
+                    formData.append("fullName", backendBody.fullName);
+                    formData.append(
+                        "qualifications",
+                        backendBody.qualifications
+                    );
+                    formData.append(
+                        "registrationNumber",
+                        backendBody.registrationNumber
+                    );
+                    formData.append("specialty", backendBody.specialty);
+                    formData.append("phone", backendBody.phone);
+                    formData.append("email", backendBody.email);
+                    if (backendBody.licenseFile) {
+                        formData.append("licenseFile", backendBody.licenseFile);
+                    }
+                    if (backendBody.idProofFile) {
+                        formData.append("idProofFile", backendBody.idProofFile);
+                    }
+                    formData.append(
+                        "affiliation",
+                        backendBody.affiliation || ""
+                    );
+                    formData.append(
+                        "experience",
+                        backendBody.experience || "0"
+                    );
+                    formData.append(
+                        "telemedicineConsent",
+                        backendBody.telemedicineConsent || true
+                    );
+
+                    response = await axios.post(backendUrl, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                } else {
+                    // Patient, Pharmacy, and Admin send JSON
+                    response = await axios.post(backendUrl, backendBody, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                }
+
                 console.log("Backend response:", response.data);
             }
 
@@ -422,31 +501,6 @@ export default function OnboardingForm() {
 
                             <div className="sm:col-span-3">
                                 <label
-                                    htmlFor="patient-email"
-                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
-                                    Email Address
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        id="patient-email"
-                                        name="patient-email"
-                                        type="email"
-                                        value={patient.email}
-                                        onChange={(e) =>
-                                            setPatient({
-                                                ...patient,
-                                                email: e.target.value,
-                                            })
-                                        }
-                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
-                                        placeholder="Enter your email address"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="sm:col-span-3">
-                                <label
                                     htmlFor="patient-govIdType"
                                     className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
                                     Government ID Type
@@ -468,42 +522,10 @@ export default function OnboardingForm() {
                                         <option value="aadhar">
                                             Aadhar Card
                                         </option>
-                                        <option value="pan">PAN Card</option>
-                                        <option value="passport">
-                                            Passport
-                                        </option>
-                                        <option value="driving-license">
-                                            Driving License
-                                        </option>
                                         <option value="voter-id">
                                             Voter ID
                                         </option>
                                     </select>
-                                </div>
-                            </div>
-
-                            <div className="sm:col-span-3">
-                                <label
-                                    htmlFor="patient-govIdNumber"
-                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
-                                    Government ID Number
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        id="patient-govIdNumber"
-                                        name="patient-govIdNumber"
-                                        type="text"
-                                        value={patient.govIdNumber}
-                                        onChange={(e) =>
-                                            setPatient({
-                                                ...patient,
-                                                govIdNumber: e.target.value,
-                                            })
-                                        }
-                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
-                                        placeholder="Enter your ID number"
-                                        required
-                                    />
                                 </div>
                             </div>
 
@@ -554,31 +576,6 @@ export default function OnboardingForm() {
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
                                         placeholder="Enter emergency contact phone"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="col-span-full">
-                                <label
-                                    htmlFor="patient-medicalHistory"
-                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
-                                    Medical History
-                                </label>
-                                <div className="mt-2">
-                                    <textarea
-                                        id="patient-medicalHistory"
-                                        name="patient-medicalHistory"
-                                        rows={4}
-                                        value={patient.medicalHistory}
-                                        onChange={(e) =>
-                                            setPatient({
-                                                ...patient,
-                                                medicalHistory: e.target.value,
-                                            })
-                                        }
-                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
-                                        placeholder="Please describe any relevant medical history, allergies, or ongoing conditions"
                                         required
                                     />
                                 </div>
@@ -1040,7 +1037,8 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                licenseNumber: e.target.value.toUpperCase(),
+                                                licenseNumber:
+                                                    e.target.value.toUpperCase(),
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
@@ -1064,16 +1062,27 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                registrationType: e.target.value,
+                                                registrationType:
+                                                    e.target.value,
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
                                         required>
-                                        <option value="">Select Registration Type</option>
-                                        <option value="Sole Proprietorship">Sole Proprietorship</option>
-                                        <option value="Partnership">Partnership</option>
-                                        <option value="Private Limited">Private Limited</option>
-                                        <option value="Public Limited">Public Limited</option>
+                                        <option value="">
+                                            Select Registration Type
+                                        </option>
+                                        <option value="Sole Proprietorship">
+                                            Sole Proprietorship
+                                        </option>
+                                        <option value="Partnership">
+                                            Partnership
+                                        </option>
+                                        <option value="Private Limited">
+                                            Private Limited
+                                        </option>
+                                        <option value="Public Limited">
+                                            Public Limited
+                                        </option>
                                         <option value="LLP">LLP</option>
                                         <option value="Other">Other</option>
                                     </select>
@@ -1169,7 +1178,8 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                gstNumber: e.target.value.toUpperCase(),
+                                                gstNumber:
+                                                    e.target.value.toUpperCase(),
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
@@ -1268,7 +1278,9 @@ export default function OnboardingForm() {
                                         onChange={(e) =>
                                             setPharmacy({
                                                 ...pharmacy,
-                                                pincode: e.target.value.replace(/\D/g, '').slice(0, 6),
+                                                pincode: e.target.value
+                                                    .replace(/\D/g, "")
+                                                    .slice(0, 6),
                                             })
                                         }
                                         className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
@@ -1279,28 +1291,26 @@ export default function OnboardingForm() {
                                 </div>
                             </div>
 
-                            <div className="col-span-full">
-                                <label
-                                    htmlFor="pharmacy-description"
-                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
-                                    Description (Optional)
-                                </label>
-                                <div className="mt-2">
-                                    <textarea
-                                        id="pharmacy-description"
-                                        name="pharmacy-description"
-                                        rows={4}
-                                        value={pharmacy.description}
-                                        onChange={(e) =>
-                                            setPharmacy({
-                                                ...pharmacy,
-                                                description: e.target.value,
-                                            })
-                                        }
-                                        className="block w-full rounded-md bg-light-surface/50 dark:bg-dark-surface/50 px-3 py-1.5 text-base text-light-primary-text dark:text-dark-primary-text outline-1 -outline-offset-1 outline-light-secondary-text/20 dark:outline-dark-secondary-text/20 placeholder:text-light-secondary-text dark:placeholder:text-dark-secondary-text focus:outline-2 focus:-outline-offset-2 focus:outline-light-primary dark:focus:outline-dark-primary sm:text-sm/6"
-                                        placeholder="Provide a brief description about your pharmacy"
-                                    />
-                                </div>
+                            {/* // add a 24 7 option */}
+                            <div className="sm:col-span-2 flex items-center mt-2">
+                                <input
+                                    id="pharmacy-24x7"
+                                    name="pharmacy-24x7"
+                                    type="checkbox"
+                                    checked={pharmacy.is24x7 || false}
+                                    onChange={(e) =>
+                                        setPharmacy({
+                                            ...pharmacy,
+                                            is24x7: e.target.checked,
+                                        })
+                                    }
+                                    className="h-5 w-5 rounded border-light-secondary-text/40 dark:border-dark-secondary-text/40 text-light-primary focus:ring-light-primary dark:focus:ring-dark-primary"
+                                />
+                                <p
+                                    htmlFor="pharmacy-24x7"
+                                    className="ml-2 text-lg font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Open 24x7
+                                </p>
                             </div>
                         </div>
                     </div>

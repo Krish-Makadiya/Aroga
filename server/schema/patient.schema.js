@@ -45,7 +45,7 @@ const patientSchema = new mongoose.Schema(
 
         email: {
             type: String,
-            required: [true, "Email is required"],
+            required: [false, "Email is required"],
             trim: true,
             lowercase: true,
             unique: true,
@@ -90,7 +90,7 @@ const patientSchema = new mongoose.Schema(
 
         govIdNumber: {
             type: String,
-            required: [true, "Government ID number is required"],
+            required: [false, "Government ID number is required"],
             trim: true,
             uppercase: true,
             unique: true,
@@ -121,9 +121,40 @@ const patientSchema = new mongoose.Schema(
 
         medicalHistory: {
             type: String,
-            required: [true, "Medical history is required"],
+            required: [false, "Medical history is required"],
             trim: true,
             maxlength: [1000, "Medical history cannot exceed 1000 characters"],
+        },
+
+        // Optional repeatable medical details
+        alergies: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        operations: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        ongoingMedications: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        permanentMedications: {
+            type: [String],
+            default: [],
+            trim: true,
+        },
+
+        majorDiseases: {
+            type: [String],
+            default: [],
+            trim: true,
         },
 
         telemedicineConsent: {
@@ -138,6 +169,41 @@ const patientSchema = new mongoose.Schema(
             required: [true, "Clerk user ID is required"],
             unique: true,
             trim: true,
+        },
+        language: {
+            type: String,
+            required: [false, "Preferred language is required"],
+            trim: true,
+            maxlength: [50, "Language cannot exceed 50 characters"],
+            default: "en",
+        },
+        medicationReminders: {
+            type: [
+                {
+                    medicine: { type: String, trim: true },
+                    dosage: { type: String, trim: true },
+                    frequency: { type: String, trim: true },
+                    // time is stored as HH:MM (24-hour) string for simplicity
+                    time: { type: String, trim: true },
+                    // optional note the patient wants included in reminders
+                    note: { type: String, trim: true, default: '' },
+                    // last time this reminder was notified (used to avoid duplicates)
+                    lastNotifiedAt: { type: Date, default: null },
+                    active: { type: Boolean, default: true },
+                    createdAt: { type: Date, default: Date.now },
+                },
+            ],
+            default: [],
+        },
+        location: {
+            latitude: {
+                type: Number,
+                default: null,
+            },
+            longitude: {
+                type: Number,
+                default: null,
+            },
         },
     },
     {

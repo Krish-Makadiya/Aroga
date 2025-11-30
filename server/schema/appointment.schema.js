@@ -29,7 +29,6 @@ const appointmentSchema = new mongoose.Schema(
             default: "pending",
             index: true,
         },
-
         appointmentType: {
             type: String,
             enum: ["online", "offline"],
@@ -40,6 +39,22 @@ const appointmentSchema = new mongoose.Schema(
             type: String, // video link when telemedicine
             trim: true,
             default: "",
+        },
+        roomStartedAt: {
+            type: Date,
+            default: null,
+        },
+        roomEndedAt: {
+            type: Date,
+            default: null,
+        },
+        patientJoinedAt: {
+            type: Date,
+            default: null,
+        },
+        patientLeftAt: {
+            type: Date,
+            default: null,
         },
         symptoms: {
             type: [
@@ -72,10 +87,25 @@ const appointmentSchema = new mongoose.Schema(
             maxlength: 2000,
             default: "",
         },
+        cloudinaryFileUrl: {
+            type: String,
+            trim: true,
+            default: "",
+        },
         amount: {
             type: Number,
             required: true,
             min: 0,
+        },
+        // Reminder tracking
+        reminderSent: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
+        reminderSentAt: {
+            type: Date,
+            default: null,
         },
         payment: {
             status: {
@@ -87,19 +117,10 @@ const appointmentSchema = new mongoose.Schema(
             orderId: { type: String, trim: true, default: "" },
             paidAt: { type: Date, default: null },
         },
-
-        // Post-appointment
-        rating: {
-            type: Number, // 1-5
-            min: 1,
-            max: 5,
+        ratingId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Rating",
             default: null,
-        },
-        review: {
-            type: String,
-            trim: true,
-            maxlength: 2000,
-            default: "",
         },
     },
     {
@@ -108,7 +129,8 @@ const appointmentSchema = new mongoose.Schema(
 );
 
 // // Helpful compound indexes
-// appointmentSchema.index({ doctorId: 1, scheduledAt: 1 });
+// Ensure a doctor cannot be booked twice at the same start time
+appointmentSchema.index({ doctorId: 1, scheduledAt: 1 }, { unique: true });
 // appointmentSchema.index({ patientId: 1, scheduledAt: 1 });
 // appointmentSchema.index({ "payment.status": 1 });
 // appointmentSchema.index({ status: 1, isTelemedicine: 1 });

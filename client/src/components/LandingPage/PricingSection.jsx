@@ -49,7 +49,7 @@ export default function PricingSection() {
                         clipPath:
                             "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
                     }}
-                    className="mx-auto aspect-1155/678 w-288.75 bg-gradient-to-tr from-[var(--color-light-secondary)] to-[var(--color-light-primary)] dark:from-[var(--color-dark-secondary)] dark:to-[var(--color-dark-primary)] opacity-20"
+                    className="mx-auto aspect-1155/678 w-288.75 bg-gradient-to-tr from-light-secondary to-light-primary dark:from-dark-secondary dark:to-dark-primary opacity-20"
                 />
             </div>
             <div className="mx-auto max-w-4xl text-center">

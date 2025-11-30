@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,13 +14,19 @@
     "@clerk/clerk-sdk-node": "^5.1.6",
     "@clerk/express": "^1.7.29",
     "@google/generative-ai": "^0.24.1",
+    "@vitalets/google-translate-api": "^9.2.1",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "groq-sdk": "^0.36.0",
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "razorpay": "^2.9.6",
     "uuid": "^13.0.0"
+    "node-cron": "^4.2.1",
+    "razorpay": "^2.9.6",
+    "twilio": "^5.10.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

@@ -17,6 +17,8 @@ import {
     Info,
 } from "lucide-react";
 import AppointmentsList from "../../../components/patient/AppointmentsList";
+import RatingDialog from "../../../components/patient/RatingDialog";
+import Loader from "../../../components/main/Loader";
 
 const PatientCompletedAppointments = () => {
     const { user } = useUser();
@@ -24,6 +26,9 @@ const PatientCompletedAppointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    // new for rating dialog
+    const [showRatingModal, setShowRatingModal] = useState(false);
+    const [selectedRatingAppt, setSelectedRatingAppt] = useState(null);
 
     useEffect(() => {
         if (!user) return;
@@ -46,6 +51,15 @@ const PatientCompletedAppointments = () => {
                     )
                     : [];
                 setAppointments(completed);
+
+                // rating popup logic
+                const unrated = completed.find(
+                  appt => appt.status === "completed" && (!appt.rating && !appt.review)
+                );
+                if (unrated) {
+                  setSelectedRatingAppt(unrated);
+                  setShowRatingModal(true);
+                }
             } catch (err) {
                 setError("Failed to load completed appointments");
                 console.error(err?.response?.data || err);
@@ -58,8 +72,25 @@ const PatientCompletedAppointments = () => {
         };
     }, [user, getToken]);
 
+    const handleRatingSubmit = async (rating, review) => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
+        await axios.post(`${API_BASE_URL}/api/appointment/${selectedRatingAppt._id}/rating`, {
+          patientId: user.id,
+          doctorId: selectedRatingAppt.doctorId?._id || selectedRatingAppt.doctorId,
+          rating,
+          review,
+        });
+        setShowRatingModal(false);
+        // Optionally: reload appointments to update UI
+        window.location.reload();
+      } catch (err) {
+        alert("Failed to submit rating. Please try again.");
+      }
+    };
+
     if (loading) {
-        return <div className="p-6">Loading completed appointments…</div>;
+        return <Loader/>;
     }
     if (error) {
         return (
@@ -68,13 +99,23 @@ const PatientCompletedAppointments = () => {
     }
     if (appointments.length === 0) {
         return (
-            <div className="p-6 text-[var(--color-light-secondary-text)] dark:text-[var(--color-dark-secondary-text)]">
+            <div className="p-6 text-light-secondary-text dark:text-dark-secondary-text">
                 No completed appointments found.
             </div>
         );
     }
 
-    return <AppointmentsList appointments={appointments} />;
+    return <>
+        <AppointmentsList appointments={appointments} />
+        {/* Rating dialog */}
+        {/* {showRatingModal && selectedRatingAppt && (
+          <RatingDialog
+            appointment={selectedRatingAppt}
+            onSubmit={handleRatingSubmit}
+            onClose={() => setShowRatingModal(false)}
+          />
+        )} */}
+    </>;
 };
 
 export default PatientCompletedAppointments;

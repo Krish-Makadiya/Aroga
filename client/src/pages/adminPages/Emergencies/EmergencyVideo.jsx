@@ -1,7 +1,8 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useParams, useSearchParams } from "react-router-dom";
+
+const ZegoUIKitPrebuilt = window.ZegoUIKitPrebuilt;
 
 function randomID(len) {
     let result = "";
@@ -57,6 +58,8 @@ export default function EmergencyVideo() {
 
         const initializeMeeting = async () => {
             try {
+                const { ZegoUIKitPrebuilt } = await import("@zegocloud/zego-uikit-prebuilt");
+
                 // Generate Kit Token with consistent roomID
                 const appID = parseInt(
                     import.meta.env.VITE_ZEGOCCLOUD_EMERGENCY_APP_ID

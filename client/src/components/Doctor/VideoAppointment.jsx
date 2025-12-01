@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import axios from "axios";
 import PatientDetailsDialog from "./PatientDetailsDialog";
 import PatientPrescriptionDialog from "./PatientPrescriptionDialog";
 import { useParams } from "react-router-dom";
+
+const ZegoUIKitPrebuilt = window.ZegoUIKitPrebuilt;
 
 function randomID(len) {
     let result = "";
@@ -127,6 +128,7 @@ export default function VideoAppointment() {
 
         const initializeMeeting = async () => {
             try {
+                const { ZegoUIKitPrebuilt } = await import("@zegocloud/zego-uikit-prebuilt");
                 // generate Kit Token
                 const appID = parseInt(import.meta.env.VITE_ZEGOCCLOUD_APP_ID);
                 const serverSecret = import.meta.env.VITE_ZEGOCLOUD_SERVER_SECRET;

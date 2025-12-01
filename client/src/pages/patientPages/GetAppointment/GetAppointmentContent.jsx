@@ -202,7 +202,7 @@ const GetAppointmentContent = () => {
                 appointmentForm.symptoms
             );
             const summary = await axios.get(
-                `${API_BASE_URL}/api/ai/generate-questions`,
+                `${import.meta.env.VITE_SERVER_URL}/api/ai/generate-questions`,
                 {
                     params: { prompt },
                 }
@@ -225,7 +225,7 @@ const GetAppointmentContent = () => {
 
             const token = await getToken();
             const res = await axios.post(
-                `${API_BASE_URL}/api/appointment/create-appointment`,
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/create-appointment`,
                 formData,
                 token
                     ? {
@@ -250,7 +250,7 @@ const GetAppointmentContent = () => {
                     setAppointmentForm((prev) => ({ ...prev, time: "" }));
                     const token2 = await getToken();
                     const res2 = await axios.get(
-                        `${API_BASE_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                        `${import.meta.env.VITE_SERVER_URL}/api/doctor/${selectedDoctor._id}/slots`,
                         {
                             params: { date: appointmentForm.date },
                             headers: token2 ? { Authorization: `Bearer ${token2}` } : undefined,
@@ -303,7 +303,7 @@ const GetAppointmentContent = () => {
                 setLoadingSlots(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `${API_BASE_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${selectedDoctor._id}/slots`,
                     {
                         params: { date: value },
                         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -330,7 +330,7 @@ const GetAppointmentContent = () => {
             try {
                 const token = await getToken();
                 const res = await axios.get(
-                    `${API_BASE_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${selectedDoctor._id}/slots`,
                     {
                         params: { date: appointmentForm.date },
                         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -346,7 +346,7 @@ const GetAppointmentContent = () => {
             cancelled = true;
             clearInterval(id);
         };
-    }, [bookingModalOpen, selectedDoctor, appointmentForm.date, getToken, API_BASE_URL]);
+    }, [bookingModalOpen, selectedDoctor, appointmentForm.date, getToken]);
 
     const handleAddSymptom = () => {
         const value = appointmentForm.symptomInput.trim();

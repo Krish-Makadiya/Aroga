@@ -41,7 +41,6 @@ import Onboarding from "./pages/auth/Onboarding";
 import PostDetail from "./pages/community/PostDetail";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
-import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
@@ -58,6 +57,7 @@ import AdminAppointments from "./pages/adminPages/AdminAppointments/AdminAppoint
 import LocationMap from "./pages/adminPages/LocationMap/LocationMap";
 import Emergencies from "./pages/adminPages/Emergencies/Emergencies";
 import EmergencyVideo from "./pages/adminPages/Emergencies/EmergencyVideo";
+import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard"
 
 const patientTabs = [
     {

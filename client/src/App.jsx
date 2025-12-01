@@ -325,14 +325,6 @@ function App() {
                 />
 
                 <Route
-                    path="/doctor/dashboard"
-                    element={
-                        <ProtectedRoute requiredRole="Doctor">
-                            <DocDashboard tabs={doctorTabs} />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
                     path="/doctor/account-earning"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
@@ -340,6 +332,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                {/* <Route
+                    path="/doctor/dashboard"
+                    element={
+                        <ProtectedRoute requiredRole="Doctor">
+                            <DocDashboard tabs={doctorTabs} />
+                        </ProtectedRoute>
+                    }
+                /> */}
                 <Route
                     path="/doctor/my-appointments"
                     element={

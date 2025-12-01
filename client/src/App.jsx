@@ -57,7 +57,7 @@ import AdminAppointments from "./pages/adminPages/AdminAppointments/AdminAppoint
 import LocationMap from "./pages/adminPages/LocationMap/LocationMap";
 import Emergencies from "./pages/adminPages/Emergencies/Emergencies";
 import EmergencyVideo from "./pages/adminPages/Emergencies/EmergencyVideo";
-import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard"
+import DocDashboard from "./pages/doctorPages/DoctorDashboard/DocDashboard";
 
 const patientTabs = [
     {
@@ -328,7 +328,7 @@ function App() {
                     path="/doctor/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
-                            <DoctorDashboard tabs={doctorTabs} />
+                            <DocDashboard tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
                 />

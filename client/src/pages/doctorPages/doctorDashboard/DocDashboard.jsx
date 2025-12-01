@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import Sidebar from "../../../components/Sidebar";
 import DoctorDashboardContent from "./DoctorDashboardContent";
 
-const DoctorDashboard = ({tabs}) => {
+const DocDashboard = ({tabs}) => {
     const location = useLocation();
 
     const getActiveTab = () => {
@@ -24,4 +24,4 @@ const DoctorDashboard = ({tabs}) => {
     );
 };
 
-export default DoctorDashboard;
+export default DocDashboard;

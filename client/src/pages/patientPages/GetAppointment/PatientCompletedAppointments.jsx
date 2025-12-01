@@ -38,7 +38,7 @@ const PatientCompletedAppointments = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `http://localhost:5000/api/appointment/patient/${user.id}`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/patient/${user.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 if (!mounted) return;
@@ -74,8 +74,7 @@ const PatientCompletedAppointments = () => {
 
     const handleRatingSubmit = async (rating, review) => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
-        await axios.post(`${API_BASE_URL}/api/appointment/${selectedRatingAppt._id}/rating`, {
+        await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/appointment/${selectedRatingAppt._id}/rating`, {
           patientId: user.id,
           doctorId: selectedRatingAppt.doctorId?._id || selectedRatingAppt.doctorId,
           rating,

@@ -27,9 +27,6 @@ const PatientAppointments = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const API_BASE_URL =
-        import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
-
     useEffect(() => {
         if (!user) return;
         let mounted = true;
@@ -38,7 +35,7 @@ const PatientAppointments = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `${API_BASE_URL}/api/appointment/patient/${user.id}`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/patient/${user.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

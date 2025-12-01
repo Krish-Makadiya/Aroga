@@ -96,7 +96,7 @@ export default function PostCard({
 
             if (!previousLiked) {
                 const res = await axios.put(
-                    `http://localhost:5000/api/articles/${post._id}/like`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/articles/${post._id}/like`,
                     {},
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -104,7 +104,7 @@ export default function PostCard({
                 if (typeof newLikes === "number") setLikeCount(newLikes);
             } else {
                 const res = await axios.put(
-                    `http://localhost:5000/api/articles/${post._id}/unlike`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/articles/${post._id}/unlike`,
                     {},
                     { headers: { Authorization: `Bearer ${token}` } }
                 );

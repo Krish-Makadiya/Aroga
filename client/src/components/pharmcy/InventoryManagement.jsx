@@ -113,7 +113,7 @@ export default function InventoryManagement({ ownerId }) {
         try {
             console.log("[Inventory] fetching medicines...", { ownerId });
             const token = await getToken();
-            const response = await axios.get("http://localhost:5000/api/medicine", {
+            const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/medicine`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -220,13 +220,13 @@ export default function InventoryManagement({ ownerId }) {
             let res;
             if (editingMedicine) {
                 const id = editingMedicine._id || editingMedicine.id;
-                res = await axios.put(`http://localhost:5000/api/medicine/${id}`, medicineData, {
+                res = await axios.put(`${import.meta.env.VITE_SERVER_URL}/api/medicine/${id}`, medicineData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
             } else {
-                res = await axios.post("http://localhost:5000/api/medicine", medicineData, {
+                res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/medicine`, medicineData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -283,7 +283,7 @@ export default function InventoryManagement({ ownerId }) {
         try {
             const token = await getToken();
             console.log("[Inventory] deleting medicine", id);
-            const res = await axios.delete(`http://localhost:5000/api/medicine/${id}`, {
+            const res = await axios.delete(`${import.meta.env.VITE_SERVER_URL}/api/medicine/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

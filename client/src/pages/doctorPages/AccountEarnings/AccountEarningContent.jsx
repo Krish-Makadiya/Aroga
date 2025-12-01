@@ -54,7 +54,7 @@ const AccountEarningContent = () => {
         try {
             const token = await getToken();
             const res = await axios.get(
-                `http://localhost:5000/api/doctor/get-doctor/${user.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/doctor/get-doctor/${user.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ const AccountEarningContent = () => {
             const token = await getToken();
             console.log("FORMDATA: ", formData);
             const res = await axios.post(
-                "http://localhost:5000/api/doctor/profile",
+                `${import.meta.env.VITE_SERVER_URL}/api/doctor/profile`,
                 {
                     ...formData,
                     bankAccount: {

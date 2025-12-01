@@ -67,7 +67,7 @@ const MedicineSearchContent = () => {
                 setMedLoading(true);
                 setMedError("");
                 const token = await getToken();
-                const res = await axios.get("http://localhost:5000/api/medicine", {
+                const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/medicine`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -96,7 +96,7 @@ const MedicineSearchContent = () => {
     const ensurePharmaciesLoaded = async () => {
         if (Object.keys(pharmaciesById).length > 0) return;
         const token = await getToken();
-        const res = await axios.get("http://localhost:5000/api/pharmacy", {
+        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/pharmacy`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -130,7 +130,7 @@ const MedicineSearchContent = () => {
                     await ensurePharmaciesLoaded();
                     const token = await getToken();
                     const res = await axios.get(
-                        `http://localhost:5000/api/pharmacyLocation/nearby`,
+                        `${import.meta.env.VITE_SERVER_URL}/api/pharmacyLocation/nearby`,
                         {
                             params: {
                                 lat: coords.lat,

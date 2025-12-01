@@ -66,12 +66,9 @@ export default function VideoAppointment() {
                     selectedAppointment._id;
 
                 console.log(meetingUrl);
-                
-                const API_BASE_URL =
-                    import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
 
                 const response = await axios.put(
-                    `${API_BASE_URL}/api/appointment/${selectedAppointment._id}/meeting-link`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/${selectedAppointment._id}/meeting-link`,
                     {
                         meetingLink: meetingUrl,
                     }
@@ -101,10 +98,8 @@ export default function VideoAppointment() {
             }
             try {
                 setLoadingDetails(true);
-                const API_BASE_URL =
-                    import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
                 const { data } = await axios.get(
-                    `${API_BASE_URL}/api/appointment/${appointmentIdFromUrl}`
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/${appointmentIdFromUrl}`
                 );
 
                 if (data?.success) {

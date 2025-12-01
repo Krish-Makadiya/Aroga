@@ -75,7 +75,9 @@ const PatientDashboardContent = () => {
                 // Save to backend
                 const token = await getToken();
                 await axios.put(
-                    `http://localhost:5000/api/patient/${user.id}/location`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/patient/${
+                        user.id
+                    }/location`,
                     { latitude, longitude },
                     {
                         headers: {
@@ -118,7 +120,9 @@ const PatientDashboardContent = () => {
             setLoading(true);
             const token = await getToken();
             const response = await axios.get(
-                `http://localhost:5000/api/patient/get-patient/${user.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/patient/get-patient/${
+                    user.id
+                }`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -174,9 +178,9 @@ const PatientDashboardContent = () => {
 
             // Fetch appointments (to collect prescriptions)
             const apptRes = await axios.get(
-                `${
-                    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-                }/api/appointment/patient/${user.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/patient/${
+                    user.id
+                }`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -210,9 +214,9 @@ const PatientDashboardContent = () => {
 
             // Fetch already saved reminders
             const rRes = await axios.get(
-                `${
-                    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-                }/api/patient/${user.id}/reminders`,
+                `${import.meta.env.VITE_SERVER_URL}/api/patient/${
+                    user.id
+                }/reminders`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -471,8 +475,7 @@ const PatientDashboardContent = () => {
                                                                         `${
                                                                             import.meta
                                                                                 .env
-                                                                                .VITE_API_BASE_URL ||
-                                                                            "http://localhost:5000"
+                                                                                .VITE_SERVER_URL
                                                                         }/api/patient/${
                                                                             user.id
                                                                         }/reminders`,
@@ -498,8 +501,7 @@ const PatientDashboardContent = () => {
                                                                             `${
                                                                                 import.meta
                                                                                     .env
-                                                                                    .VITE_API_BASE_URL ||
-                                                                                "http://localhost:5000"
+                                                                                    .VITE_SERVER_URL
                                                                             }/api/patient/${
                                                                                 user.id
                                                                             }/reminders`,
@@ -585,8 +587,7 @@ const PatientDashboardContent = () => {
                                                                         `${
                                                                             import.meta
                                                                                 .env
-                                                                                .VITE_API_BASE_URL ||
-                                                                            "http://localhost:5000"
+                                                                                .VITE_SERVER_URL
                                                                         }/api/patient/${
                                                                             user.id
                                                                         }/reminders/${

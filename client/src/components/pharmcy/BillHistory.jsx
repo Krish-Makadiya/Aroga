@@ -20,7 +20,7 @@ export default function BillHistory({ ownerId }) {
                 setLoading(true);
                 setError("");
                 const token = await getToken();
-                const res = await axios.get("http://localhost:5000/api/pharmacyBill", {
+                const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/pharmacyBill`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

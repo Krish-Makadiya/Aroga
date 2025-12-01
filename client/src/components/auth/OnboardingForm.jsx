@@ -116,17 +116,16 @@ export default function OnboardingForm() {
             let backendBody = {};
 
             if (role === "Patient") {
-                backendUrl = "http://localhost:5000/api/patient/create-patient";
+                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/patient/create-patient`;
                 backendBody = patient;
             } else if (role === "Doctor") {
-                backendUrl = "http://localhost:5000/api/doctor/create-doctor";
+                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/doctor/create-doctor`;
                 backendBody = doctor;
             } else if (role === "Pharmacy") {
-                backendUrl =
-                    "http://localhost:5000/api/pharmacy/create-pharmacy";
+                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/pharmacy/create-pharmacy`;
                 backendBody = pharmacy;
             } else if (role === "Admin") {
-                backendUrl = "http://localhost:5000/api/admin/create-admin";
+                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/admin/create-admin`;
                 backendBody = admin;
             }
 

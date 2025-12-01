@@ -53,7 +53,7 @@ const PharmacyDashboardContent = (props) => {
             setLoading(true);
             const token = await getToken();
             const response = await axios.get(
-                `http://localhost:5000/api/pharmacy/get-pharmacy/${user.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/pharmacy/get-pharmacy/${user.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -72,7 +72,7 @@ const PharmacyDashboardContent = (props) => {
 
                 try {
                     const locationRes = await axios.get(
-                        `http://localhost:5000/api/pharmacyLocation/${pharmacy._id}/location`,
+                        `${import.meta.env.VITE_SERVER_URL}/api/pharmacyLocation/${pharmacy._id}/location`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
 

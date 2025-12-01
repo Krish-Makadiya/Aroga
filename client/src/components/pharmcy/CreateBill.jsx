@@ -59,7 +59,7 @@ export default function CreateBill({ ownerId, pharmacyName }) {
             setSuggestionsLoading(true);
             const token = await getToken();
             const res = await axios.get(
-                "http://localhost:5000/api/pharmacyBill/medicine/suggestions",
+                `${import.meta.env.VITE_SERVER_URL}/api/pharmacyBill/medicine/suggestions`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                     params: { q: trimmed, ownerId },
@@ -170,7 +170,7 @@ export default function CreateBill({ ownerId, pharmacyName }) {
             };
 
             const res = await axios.post(
-                "http://localhost:5000/api/pharmacyBill",
+                `${import.meta.env.VITE_SERVER_URL}/api/pharmacyBill`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

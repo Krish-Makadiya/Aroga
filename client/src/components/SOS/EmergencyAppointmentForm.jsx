@@ -67,7 +67,7 @@ const EmergencyAppointmentForm = ({
             };
 
             const response = await axios.post(
-                "http://localhost:5000/api/emergency/",
+                `${import.meta.env.VITE_SERVER_URL}/api/emergency/`,
                 appointmentData,
                 {
                     headers: {

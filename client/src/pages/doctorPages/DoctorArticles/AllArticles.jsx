@@ -42,7 +42,7 @@ const AllArticles = () => {
             setLoading(true);
             const token = await getToken();
             const response = await axios.get(
-                `http://localhost:5000/api/articles/all`,
+                `${import.meta.env.VITE_SERVER_URL}/api/articles/all`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

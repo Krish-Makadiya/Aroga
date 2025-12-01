@@ -238,7 +238,7 @@ const VerifiedDoctorsContent = () => {
         const fetchDoctors = async () => {
             try {
                 const { data } = await axios.get(
-                    "http://localhost:5000/api/doctor/verified-doctors?full=true"
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/verified-doctors?full=true`
                 );
                 setDoctors(data.data || []);
             } catch (err) {

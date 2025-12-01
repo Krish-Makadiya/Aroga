@@ -28,7 +28,7 @@ const MyArticles = () => {
         if (!confirmed) return;
         try {
             const token = await getToken();
-            await axios.delete(`http://localhost:5000/api/articles/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_SERVER_URL}/api/articles/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             refresh();
@@ -59,7 +59,7 @@ const MyArticles = () => {
             }
             const token = await getToken();
             await axios.put(
-                `http://localhost:5000/api/articles/${editData.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/articles/${editData.id}`,
                 {
                     title: editData.title.trim(),
                     content: editData.content.trim(),
@@ -83,7 +83,7 @@ const MyArticles = () => {
             setLoading(true);
             const token = await getToken();
             const response = await axios.get(
-                `http://localhost:5000/api/articles/doctor/${user.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/articles/doctor/${user.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

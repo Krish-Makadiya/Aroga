@@ -94,7 +94,7 @@ const UpcomingAppointments = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `http://localhost:5000/api/appointment/doctor/${user.id}`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/doctor/${user.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 if (!mounted) return;

@@ -59,7 +59,7 @@ const AppointmentsList = ({ appointments }) => {
         paymentId,
     }) => {
         const response = await axios.post(
-            `http://localhost:5000/api/payment/save-payment`,
+            `${import.meta.env.VITE_SERVER_URL}/api/payment/save-payment`,
             {
                 appointmentId,
                 status,
@@ -76,7 +76,7 @@ const AppointmentsList = ({ appointments }) => {
     const paymentClickHandler = async (appointmentId, amount) => {
         try {
             const res = await axios.post(
-                "http://localhost:5000/api/payment/create-order",
+                `${import.meta.env.VITE_SERVER_URL}/payment/create-order`,
                 { amount },
                 { headers: { "Content-Type": "application/json" } }
             );
@@ -144,7 +144,7 @@ const AppointmentsList = ({ appointments }) => {
         );
         try {
             await axios.post(
-                `http://localhost:5000/api/appointment/${appointment._id}/rating`,
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/${appointment._id}/rating`,
                 {
                     patientId: user.id,
                     doctorId: appointment.doctorId?._id || appointment.doctorId,
@@ -612,7 +612,7 @@ const AppointmentsList = ({ appointments }) => {
                                                     if (!url) {
                                                         const resp =
                                                             await axios.get(
-                                                                `http://localhost:5000/api/appointment/${appt._id}`
+                                                                `${import.meta.env.VITE_SERVER_URL}/api/appointment/${appt._id}`
                                                             );
                                                         url =
                                                             resp.data?.data

@@ -40,10 +40,8 @@ const PatientDetailsDialog = ({ appointment, isOpen, onClose }) => {
         try {
             setLoadingPrevious(true);
             const token = await getToken();
-            const API_BASE_URL =
-                import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
             const res = await axios.get(
-                `${API_BASE_URL}/api/appointment/patient/${appointment.patientId.clerkUserId}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/patient/${appointment.patientId.clerkUserId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             // Filter out current appointment and sort by date

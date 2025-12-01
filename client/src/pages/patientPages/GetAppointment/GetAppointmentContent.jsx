@@ -124,9 +124,6 @@ const GetAppointmentContent = () => {
     const [userMetadata, setUserMetadata] = useState(user.unsafeMetadata || {});
     const [isBooking, setIsBooking] = useState(false);
 
-    const API_BASE_URL =
-        import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
-
     useEffect(() => {
         if (!user) return;
         let mounted = true;
@@ -136,7 +133,7 @@ const GetAppointmentContent = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `${API_BASE_URL}/api/doctor/verified-doctors`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/verified-doctors`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }

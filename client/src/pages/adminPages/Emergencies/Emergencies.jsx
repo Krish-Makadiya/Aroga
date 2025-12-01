@@ -25,7 +25,7 @@ export default function Emergencies({ tabs }) {
             setLoadingDoctors(true);
             const token = await getToken();
             const response = await axios.get(
-                "http://localhost:5000/api/government-doctors",
+                `${import.meta.env.VITE_SERVER_URL}/api/government-doctors`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }

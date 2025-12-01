@@ -39,7 +39,7 @@ const CreateArticleButton = ({ onArticleCreated }) => {
             };
 
             const response = await axios.post(
-                'http://localhost:5000/api/articles',
+                `${import.meta.env.VITE_SERVER_URL}/api/articles`,
                 articleData,
                 {
                     headers: {

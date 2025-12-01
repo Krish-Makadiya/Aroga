@@ -259,7 +259,7 @@ const ManageDoctorsContent = () => {
             try {
                 // Fetch pending doctors for admin verification
                 const { data } = await axios.get(
-                    "http://localhost:5000/api/doctor/pending-doctors?full=true"
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/pending-doctors?full=true`
                 );
                 console.log(data.data);
                 setDoctors(data.data || []);
@@ -275,7 +275,7 @@ const ManageDoctorsContent = () => {
         setVerifyingId(doctorId);
         try {
             const { data } = await axios.put(
-                `http://localhost:5000/api/doctor/${doctorId}/verify`
+                `${import.meta.env.VITE_SERVER_URL}/api/doctor/${doctorId}/verify`
             );
             if (data.success) {
                 toast.success("Doctor verified successfully!");

@@ -68,14 +68,13 @@ const LocationMapContent = () => {
         try {
             setLoading(true);
             const token = await getToken();
-            const baseUrl = "http://localhost:5000";
 
             // Fetch patients and doctors in parallel
             const [patientsRes, doctorsRes] = await Promise.all([
-                axios.get(`${baseUrl}/api/patient/all-patients/location`, {
+                axios.get(`${import.meta.env.VITE_SERVER_URL}/api/patient/all-patients/location`, {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
-                axios.get(`${baseUrl}/api/doctor/all-doctors/location`, {
+                axios.get(`${import.meta.env.VITE_SERVER_URL}/api/doctor/all-doctors/location`, {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
             ]);

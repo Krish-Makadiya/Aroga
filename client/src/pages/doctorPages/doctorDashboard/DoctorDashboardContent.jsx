@@ -80,7 +80,7 @@ const DoctorDashboardContent = () => {
                 setLoadingPreview(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `http://localhost:5000/api/doctor/${doctorData._id}/slots`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${doctorData._id}/slots`,
                     {
                         params: { date: selectedDate },
                         headers: { Authorization: `Bearer ${token}` },
@@ -100,7 +100,7 @@ const DoctorDashboardContent = () => {
             try {
                 const token = await getToken();
             const res = await axios.get(
-                    `http://localhost:5000/api/doctor/get-doctor/${user.id}`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/get-doctor/${user.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             console.log(res.data.data);
@@ -145,7 +145,7 @@ const DoctorDashboardContent = () => {
                 // Save to backend
                 const token = await getToken();
                 await axios.put(
-                    `http://localhost:5000/api/doctor/${user.id}/location`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${user.id}/location`,
                     { latitude, longitude },
                     {
                         headers: {
@@ -185,7 +185,7 @@ const DoctorDashboardContent = () => {
     const openManageSchedule = async () => {
         try {
             const token = await getToken();
-            const res = await axios.get(`http://localhost:5000/api/doctor/availability`, {
+            const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/doctor/availability`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { clerkUserId: user.id },
             });
@@ -257,7 +257,7 @@ const DoctorDashboardContent = () => {
                 return;
             }
             setAvailValidationMsg("");
-            const res = await axios.post(`http://localhost:5000/api/doctor/availability`, { availableSlots: payload, clerkUserId: user.id }, {
+            const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/doctor/availability`, { availableSlots: payload, clerkUserId: user.id }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             // Update local state from response (array of {day,startTime,endTime})
@@ -282,7 +282,7 @@ const DoctorDashboardContent = () => {
         try {
             setSavingBlk(true);
             const token = await getToken();
-            const res = await axios.post(`http://localhost:5000/api/doctor/blackouts`, { ...blackoutForm, clerkUserId: user.id }, {
+            const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/doctor/blackouts`, { ...blackoutForm, clerkUserId: user.id }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setBlackouts(res.data?.data || []);
@@ -297,7 +297,7 @@ const DoctorDashboardContent = () => {
     const removeBlackout = async (index) => {
         try {
             const token = await getToken();
-            const res = await axios.delete(`http://localhost:5000/api/doctor/blackouts/${index}`, {
+            const res = await axios.delete(`${import.meta.env.VITE_SERVER_URL}/api/doctor/blackouts/${index}`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { clerkUserId: user.id },
             });

@@ -119,7 +119,7 @@ VITE_SERVER_URL=http://localhost:5000
   3. Copy the Publishable Key (starts with `pk_test_` or `pk_live_`)
 
 - **VITE_SERVER_URL**: 
-  - For development: `http://localhost:5000`
+  - For development: `${import.meta.env.VITE_SERVER_URL}`
   - For production: Your deployed backend server URL
 
 
@@ -132,7 +132,7 @@ cd server
 npm start
 ```
 
-The server will start on `http://localhost:5000` (or the PORT specified in your `.env` file).
+The server will start on `${import.meta.env.VITE_SERVER_URL}` (or the PORT specified in your `.env` file).
 
 #### Start the Frontend Development Server
 

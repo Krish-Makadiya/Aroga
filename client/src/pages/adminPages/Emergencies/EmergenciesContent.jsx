@@ -44,7 +44,7 @@ const EmergenciesContent = ({ doctors = [] }) => {
 
             // Fetch emergency records
             const emergenciesRes = await axios.get(
-                "http://localhost:5000/api/emergency",
+                `${import.meta.env.VITE_SERVER_URL}/api/emergency`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -52,7 +52,7 @@ const EmergenciesContent = ({ doctors = [] }) => {
 
             // Fetch all appointments and filter for emergency ones
             const appointmentsRes = await axios.get(
-                "http://localhost:5000/api/appointment/admin/all",
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/admin/all`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -105,7 +105,7 @@ const EmergenciesContent = ({ doctors = [] }) => {
             };
 
             const response = await axios.post(
-                "http://localhost:5000/api/emergency/send-sms",
+                `${import.meta.env.VITE_SERVER_URL}/api/emergency/send-sms`,
                 appointmentData,
                 {
                     headers: {

@@ -22,7 +22,7 @@ const NewAppointments = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `http://localhost:5000/api/appointment/doctor/${user.id}`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/doctor/${user.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 if (!mounted) return;
@@ -51,7 +51,7 @@ const NewAppointments = () => {
 
             // Make API call to update appointment status
             const response = await axios.put(
-                `http://localhost:5000/api/appointment/${appointment._id}/status`,
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/${appointment._id}/status`,
                 { status: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

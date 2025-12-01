@@ -79,12 +79,10 @@ export default function PatientPrescriptionDialog({
         if (!appointmentId) return;
         setSubmitting(true);
         try {
-            const API_BASE_URL =
-                import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
             const payload = rows.filter((row) => row.medicine.trim());
 
             const { data } = await axios.put(
-                `${API_BASE_URL}/api/appointment/${appointmentId}/prescription`,
+                `${import.meta.env.VITE_SERVER_URL}/api/appointment/${appointmentId}/prescription`,
                 {
                     prescription: payload,
                 }

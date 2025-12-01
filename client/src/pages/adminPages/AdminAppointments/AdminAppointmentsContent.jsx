@@ -29,7 +29,7 @@ const AdminAppointmentsContent = () => {
             try {
                 setLoading(true);
                 const { data } = await axios.get(
-                    "http://localhost:5000/api/appointment/admin/all"
+                    `${import.meta.env.VITE_SERVER_URL}/api/appointment/admin/all`
                 );
                 setAppointments(data.data || []);
             } catch (err) {

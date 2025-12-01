@@ -1,6 +1,5 @@
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { cn } from "../../config/utils";
-import { div } from "motion/react-client";
 
 export const BackgroundRippleEffect = ({
     rows = 14,

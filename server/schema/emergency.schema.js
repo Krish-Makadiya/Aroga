@@ -53,6 +53,19 @@ const emergencySchema = new mongoose.Schema(
             ref: "Doctor",
             default: null,
         },
+
+        isActive: {
+            type: Boolean,
+            default: false,
+        },
+        isCompleted: {
+            type: Boolean,
+            default: false,
+        },
+        completedAt: {
+            type: Date,
+            default: null,
+        },
     },
     {
         timestamps: true,
@@ -68,4 +81,3 @@ emergencySchema.index({ "location.latitude": 1, "location.longitude": 1 });
 // Create and export the model
 const Emergency = mongoose.model("Emergency", emergencySchema);
 module.exports = Emergency;
-

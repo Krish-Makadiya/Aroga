@@ -107,7 +107,7 @@ const EmergencyAppointmentForm = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4">
             <div className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="sticky top-0 bg-red-600 text-white p-6 rounded-t-2xl flex items-center justify-between">
@@ -183,7 +183,7 @@ const EmergencyAppointmentForm = ({
                             ) : (
                                 <>
                                     <Send className="w-5 h-5" />
-                                    Submit Emergency Request
+                                    Send Emergency Request
                                 </>
                             )}
                         </button>

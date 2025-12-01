@@ -1,6 +1,9 @@
 // server/controllers/emergency.controller.js
 
 const Emergency = require("../schema/emergency.schema");
+const { sendSms } = require("../config/sms.config");
+const dotenv = require("dotenv");
+dotenv.config();
 
 // Create a new emergency record
 exports.createEmergency = async (req, res) => {
@@ -8,7 +11,11 @@ exports.createEmergency = async (req, res) => {
         const { fullName, phone, location } = req.body;
 
         // Validation
-        if (!fullName || typeof fullName !== "string" || fullName.trim() === "") {
+        if (
+            !fullName ||
+            typeof fullName !== "string" ||
+            fullName.trim() === ""
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Full name is required and must be a non-empty string",
@@ -18,12 +25,14 @@ exports.createEmergency = async (req, res) => {
         if (!phone || typeof phone !== "string" || phone.trim() === "") {
             return res.status(400).json({
                 success: false,
-                message: "Phone number is required and must be a non-empty string",
+                message:
+                    "Phone number is required and must be a non-empty string",
             });
         }
 
         // Validate phone format
-        const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+        const phoneRegex =
+            /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
         if (!phoneRegex.test(phone)) {
             return res.status(400).json({
                 success: false,
@@ -35,7 +44,8 @@ exports.createEmergency = async (req, res) => {
         if (!location || typeof location !== "object") {
             return res.status(400).json({
                 success: false,
-                message: "Location is required and must be an object with latitude and longitude",
+                message:
+                    "Location is required and must be an object with latitude and longitude",
             });
         }
 
@@ -46,7 +56,8 @@ exports.createEmergency = async (req, res) => {
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Latitude is required and must be a number between -90 and 90",
+                message:
+                    "Latitude is required and must be a number between -90 and 90",
             });
         }
 
@@ -57,7 +68,8 @@ exports.createEmergency = async (req, res) => {
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Longitude is required and must be a number between -180 and 180",
+                message:
+                    "Longitude is required and must be a number between -180 and 180",
             });
         }
 
@@ -71,6 +83,16 @@ exports.createEmergency = async (req, res) => {
             },
         });
 
+        //sending message to admin
+        const message = `New Emergency SOS Alert: ${fullName} - ${phone}. Please check the emergency record and assign a doctor to the patient.`;
+
+        sendSms(
+            process.env.TEST_PHONE_NUMBER,
+            message
+        ).catch((err) => {
+            console.error("Error sending SMS:", err);
+        });
+
         return res.status(201).json({
             success: true,
             message: "Emergency record created successfully",
@@ -78,7 +100,7 @@ exports.createEmergency = async (req, res) => {
         });
     } catch (error) {
         console.error("Create emergency error:", error);
-        
+
         if (error.name === "ValidationError") {
             return res.status(400).json({
                 success: false,
@@ -98,8 +120,11 @@ exports.createEmergency = async (req, res) => {
 // Get all emergency records
 exports.getAllEmergencies = async (req, res) => {
     try {
-        const emergencies = await Emergency.find({}, '-videoCallLink')
-            .populate("doctorId", "fullName specialty phone email consultationFee availableSlots")
+        const emergencies = await Emergency.find({}, "-videoCallLink")
+            .populate(
+                "doctorId",
+                "fullName specialty phone email consultationFee availableSlots"
+            )
             .sort({ createdAt: -1 });
 
         return res.status(200).json({
@@ -154,7 +179,8 @@ exports.updateEmergency = async (req, res) => {
         const { videoCallLink, doctorId, location } = req.body;
 
         const updateData = {};
-        if (videoCallLink !== undefined) updateData.videoCallLink = videoCallLink;
+        if (videoCallLink !== undefined)
+            updateData.videoCallLink = videoCallLink;
         if (doctorId !== undefined) updateData.doctorId = doctorId;
         if (location !== undefined) {
             // Validate location
@@ -215,7 +241,7 @@ exports.generateVideoCallLink = async (req, res) => {
     try {
         const { id } = req.params;
         const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-        
+
         const emergency = await Emergency.findById(id);
         if (!emergency) {
             return res.status(404).json({
@@ -282,4 +308,3 @@ exports.deleteEmergency = async (req, res) => {
         });
     }
 };
-

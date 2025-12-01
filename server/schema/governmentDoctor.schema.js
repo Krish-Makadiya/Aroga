@@ -21,6 +21,19 @@ const governmentDoctorsSchema = new mongoose.Schema(
             min: [0, "Experience cannot be negative"],
             max: [100, "Experience cannot exceed 100 years"],
         },
+        phone: {
+            type: String,
+            required: [true, "Phone number is required"],
+            trim: true,
+            minlength: [10, "Phone number must be at least 10 digits"],
+            maxlength: [15, "Phone number cannot exceed 15 digits"],
+            match: [/^[0-9+\-\s()]+$/, "Please fill a valid phone number"],
+            unique: true,
+        },
+        isActive: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

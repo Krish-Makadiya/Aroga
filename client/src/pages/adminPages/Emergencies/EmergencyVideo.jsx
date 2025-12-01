@@ -20,26 +20,30 @@ function randomID(len) {
 // Helper function to get URL parameters
 function getUrlParams(url = window.location.href) {
     let urlStr = url.split("?")[1];
+    console.log("URL Parameters:", url);
     return new URLSearchParams(urlStr || "");
 }
 
 export default function EmergencyVideo() {
     const [searchParams] = useSearchParams();
-    
+    console.log("Search Params:", searchParams);
     // Get roomID from URL parameter - this ensures both users use the same ID
-    const roomIDFromUrl = searchParams.get("roomID") || getUrlParams().get("roomID");
-    
+    const roomIDFromUrl =
+        searchParams.get("roomID") || getUrlParams().get("roomID");
+
     // Use the roomID from URL, or show error if not provided
     const [roomID, setRoomID] = useState(roomIDFromUrl);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         if (!roomIDFromUrl) {
-            setError("Room ID is required. Please provide roomID in the URL: ?roomID=YOUR_ROOM_ID");
+            setError(
+                "Room ID is required. Please provide roomID in the URL: ?roomID=YOUR_ROOM_ID"
+            );
             console.error("Room ID is required in URL");
             return;
         }
-        
+
         setRoomID(roomIDFromUrl);
         console.log("Using Room ID from URL:", roomIDFromUrl);
     }, [roomIDFromUrl]);
@@ -54,9 +58,12 @@ export default function EmergencyVideo() {
         const initializeMeeting = async () => {
             try {
                 // Generate Kit Token with consistent roomID
-                const appID = parseInt(import.meta.env.VITE_ZEGOCCLOUD_APP_ID);
-                const serverSecret = import.meta.env.VITE_ZEGOCLOUD_SERVER_SECRET;
-                
+                const appID = parseInt(
+                    import.meta.env.VITE_ZEGOCCLOUD_EMERGENCY_APP_ID
+                );
+                const serverSecret = import.meta.env
+                    .VITE_ZEGOCLOUD_EMERGENCY_SERVER_SECRET;
+
                 // Use consistent roomID from URL - both users will use the same ID
                 const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
                     appID,
@@ -70,7 +77,7 @@ export default function EmergencyVideo() {
 
                 // Create instance object from Kit Token
                 const zp = ZegoUIKitPrebuilt.create(kitToken);
-                
+
                 // Start the call
                 zp.joinRoom({
                     container: container,
@@ -82,9 +89,11 @@ export default function EmergencyVideo() {
                                 window.location.protocol +
                                 "//" +
                                 window.location.host +
-                                window.location.pathname +
+                                "/emergency-appointment" +
                                 "?roomID=" +
-                                roomID,
+                                roomID.toString() +
+                                "%" +
+                                Date.now().toString(),
                         },
                     ],
                     scenario: {
@@ -117,8 +126,7 @@ export default function EmergencyVideo() {
                     flexDirection: "column",
                     gap: "20px",
                     backgroundColor: "#f3f4f6",
-                }}
-            >
+                }}>
                 <div
                     style={{
                         padding: "20px",
@@ -127,8 +135,7 @@ export default function EmergencyVideo() {
                         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                         maxWidth: "500px",
                         textAlign: "center",
-                    }}
-                >
+                    }}>
                     <h2 style={{ color: "#ef4444", marginBottom: "10px" }}>
                         Error
                     </h2>
@@ -136,7 +143,8 @@ export default function EmergencyVideo() {
                         {error}
                     </p>
                     <p style={{ color: "#9ca3af", fontSize: "14px" }}>
-                        Make sure the URL includes: <code>?roomID=YOUR_ROOM_ID</code>
+                        Make sure the URL includes:{" "}
+                        <code>?roomID=YOUR_ROOM_ID</code>
                     </p>
                 </div>
             </div>
@@ -146,7 +154,6 @@ export default function EmergencyVideo() {
     return (
         <div
             className="myCallContainer"
-            style={{ width: "100vw", height: "100vh" }}
-        ></div>
+            style={{ width: "100vw", height: "100vh" }}></div>
     );
 }

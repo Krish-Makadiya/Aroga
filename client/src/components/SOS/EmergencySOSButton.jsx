@@ -18,7 +18,7 @@ const EmergencySOSButton = () => {
             setIsChecking(true);
             
             // Use Overpass API to find hospitals within 10km
-            const radius = 1000; // 8km in meters
+            const radius = 80000; // 8km in meters
             const overpassUrl = "https://overpass-api.de/api/interpreter";
             
             const query = `
@@ -92,14 +92,16 @@ const EmergencySOSButton = () => {
                 <button
                     onClick={handleSOSClick}
                     disabled={isChecking}
-                    className="fixed bottom-6 left-6 z-50 bg-red-600 hover:bg-red-700 text-white rounded-full p-4 shadow-2xl transform transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 animate-pulse"
+                    className="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white rounded-full p-4 shadow-2xl transform transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 animate-pulse"
                     style={{
                         boxShadow: "0 4px 20px rgba(220, 38, 38, 0.6)",
                     }}
                     title="Emergency SOS - No hospitals nearby"
                 >
                     <AlertTriangle className="w-6 h-6" />
-                    <span className="font-bold text-lg">SOS</span>
+                    <span className="font-bold text-lg">
+                        Emergency
+                    </span>
                 </button>
             )}
 

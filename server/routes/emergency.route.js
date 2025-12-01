@@ -70,7 +70,7 @@ router.post("/send-sms", async (req, res) => {
         // Save the video link in the emergency schema
         const done = await Emergencies.findByIdAndUpdate(
             emergencyId,
-            { videoCallLink: link },
+            { videoCallLink: link, doctorId: selectedDoctor._id },
             { new: true }
         );
 
@@ -79,20 +79,6 @@ router.post("/send-sms", async (req, res) => {
         console.log("=============");
         console.log("Doctor SMS:", smsDoc ? "Success" : "Failed");
         console.log("=============");
-
-        // Always delete the emergency record after attempting to send SMS
-        // This ensures the emergency disappears from the UI after processing
-        try {
-            await Emergencies.findByIdAndDelete(emergencyId);
-            console.log(`Emergency record ${emergencyId} deleted after SMS processing`);
-        } catch (deleteError) {
-            console.error("Error deleting emergency record:", deleteError);
-            return res.status(500).json({
-                success: false,
-                message: "Failed to delete emergency record",
-                error: deleteError.message,
-            });
-        }
 
         // Return success even if some SMS failed, as long as deletion succeeded
         return res.json({

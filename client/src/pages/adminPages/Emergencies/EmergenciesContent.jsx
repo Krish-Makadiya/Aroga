@@ -19,13 +19,11 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-const EmergenciesContent = () => {
+const EmergenciesContent = ({ doctors = [] }) => {
     const [emergencies, setEmergencies] = useState([]);
     const [emergencyAppointments, setEmergencyAppointments] = useState([]);
-    const [doctors, setDoctors] = useState([]);
-    const [showDoctors, setShowDoctors] = useState(false);
+
     const [loading, setLoading] = useState(true);
-    const [loadingDoctors, setLoadingDoctors] = useState(false);
     const [selectedEmergency, setSelectedEmergency] = useState(null);
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -75,34 +73,6 @@ const EmergenciesContent = () => {
         }
     };
 
-    // Fetch verified doctors
-    const fetchDoctors = async () => {
-        if (doctors.length > 0) {
-            setShowDoctors(!showDoctors);
-            return;
-        }
-
-        try {
-            setLoadingDoctors(true);
-            const token = await getToken();
-            const response = await axios.get(
-                "http://localhost:5000/api/government-doctors",
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-
-            console.log(response);
-            setDoctors(response.data.data || []);
-            setShowDoctors(true);
-        } catch (error) {
-            console.error("Error fetching doctors:", error);
-            toast.error("Failed to load doctors");
-        } finally {
-            setLoadingDoctors(false);
-        }
-    };
-
     // Handle booking emergency appointment
     const handleBookAppointment = async () => {
         if (!selectedDoctor) {
@@ -125,6 +95,7 @@ const EmergenciesContent = () => {
                 window.location.host +
                 "/emergency-appointment" +
                 "?roomID=" +
+                selectedDoctor._id.toString() +
                 currentTimeString;
 
             const appointmentData = {
@@ -145,18 +116,20 @@ const EmergenciesContent = () => {
             );
 
             if (response.data.success) {
-                toast.success("SMS sent successfully! Emergency contact removed.");
+                toast.success(
+                    "SMS sent successfully! Emergency contact removed."
+                );
                 setBookingModalOpen(false);
                 setSelectedEmergency(null);
                 setSelectedDoctor(null);
                 setSelectedSlot("");
                 setSelectedDate("");
-                
+
                 // Remove the emergency from the UI immediately
                 setEmergencies((prev) =>
                     prev.filter((e) => e._id !== selectedEmergency._id)
                 );
-                
+
                 // Also refresh the list to ensure consistency
                 fetchEmergencies();
             }
@@ -200,8 +173,14 @@ const EmergenciesContent = () => {
         );
     }
 
+    // Only show emergencies that are not completed
+    const activeEmergencyRecords = emergencies.filter((e) => !e.isCompleted);
+
     const allEmergencies = [
-        ...emergencies.map((e) => ({ ...e, type: "emergency_record" })),
+        ...activeEmergencyRecords.map((e) => ({
+            ...e,
+            type: "emergency_record",
+        })),
         ...emergencyAppointments.map((apt) => ({
             ...apt,
             type: "emergency_appointment",
@@ -228,89 +207,6 @@ const EmergenciesContent = () => {
                 </p>
             </div>
 
-            {/* Show Doctors Button */}
-            <div className="mb-6">
-                <button
-                    onClick={fetchDoctors}
-                    disabled={loadingDoctors}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    {loadingDoctors ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : showDoctors ? (
-                        <>
-                            <ChevronUp className="w-5 h-5" />
-                            Hide Verified Doctors
-                        </>
-                    ) : (
-                        <>
-                            <Users className="w-5 h-5" />
-                            Show Verified Doctors
-                        </>
-                    )}
-                </button>
-            </div>
-
-            {/* Doctors List */}
-            {showDoctors && (
-                <div className="mb-8 bg-white dark:bg-dark-surface rounded-lg shadow-md p-6">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                        Verified Doctors
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {doctors.map((doctor) => (
-                            <div
-                                key={doctor._id}
-                                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition">
-                                <div className="flex items-start justify-between mb-2">
-                                    <div>
-                                        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-                                            {doctor.fullName}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            {doctor.specialty}
-                                        </p>
-                                    </div>
-                                    {doctor.rating?.average && (
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-yellow-500">
-                                                ★
-                                            </span>
-                                            <span className="text-sm font-medium">
-                                                {doctor.rating.average.toFixed(
-                                                    1
-                                                )}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                                {doctor.availableSlots &&
-                                    doctor.availableSlots.length > 0 && (
-                                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                            <p className="font-semibold mb-1">
-                                                Availability:
-                                            </p>
-                                            {doctor.availableSlots.map(
-                                                (slot, idx) => (
-                                                    <p key={idx}>
-                                                        {slot.day}:{" "}
-                                                        {slot.startTime} -{" "}
-                                                        {slot.endTime}
-                                                    </p>
-                                                )
-                                            )}
-                                        </div>
-                                    )}
-                                {doctor.consultationFee && (
-                                    <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                                        ₹{doctor.consultationFee}
-                                    </p>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             {/* Emergency Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {allEmergencies.length === 0 ? (
@@ -334,16 +230,36 @@ const EmergenciesContent = () => {
                                             : "EMERGENCY APPOINTMENT"}
                                     </span>
                                 </div>
-                                {emergency.status && (
+
+                                {/* Status badge based on type */}
+                                {emergency.type === "emergency_appointment" &&
+                                    emergency.status && (
+                                        <span
+                                            className={`text-xs px-2 py-1 rounded ${
+                                                emergency.status === "completed"
+                                                    ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                                                    : emergency.status ===
+                                                      "active"
+                                                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                                                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                                            }`}>
+                                            {emergency.status.toUpperCase()}
+                                        </span>
+                                    )}
+                                {emergency.type === "emergency_record" && (
                                     <span
                                         className={`text-xs px-2 py-1 rounded ${
-                                            emergency.status === "completed"
+                                            emergency.isCompleted
                                                 ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                                                : emergency.status === "active"
+                                                : emergency.isActive
                                                 ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
                                                 : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                                         }`}>
-                                        {emergency.status.toUpperCase()}
+                                        {emergency.isCompleted
+                                            ? "COMPLETED"
+                                            : emergency.isActive
+                                            ? "ACTIVE"
+                                            : "PENDING"}
                                     </span>
                                 )}
                             </div>
@@ -474,24 +390,34 @@ const EmergenciesContent = () => {
                                     value={selectedDoctor || ""}
                                     onChange={(e) => {
                                         const doctorId = e.target.value;
-                                        const chosenDoctor = doctors.find(
-                                            (doc) => doc._id === doctorId
-                                        );
+                                        const chosenDoctor =
+                                            doctors && doctors.length > 0
+                                                ? doctors.find(
+                                                      (doc) =>
+                                                          doc._id === doctorId
+                                                  )
+                                                : null;
                                         setSelectedDoctor(chosenDoctor);
                                     }}
                                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-dark-bg dark:text-white">
                                     <option value="">Choose a doctor</option>
-                                    {doctors.map((doctor) => (
-                                        <option
-                                            key={doctor._id}
-                                            value={doctor._id}>
-                                            {doctor.fullName} -{" "}
-                                            {doctor.specialty}{" "}
-                                            {doctor.consultationFee
-                                                ? `(₹${doctor.consultationFee})`
-                                                : ""}
+                                    {doctors && doctors.length > 0 ? (
+                                        doctors.map((doctor) => (
+                                            <option
+                                                key={doctor._id}
+                                                value={doctor._id}>
+                                                {doctor.fullName} -{" "}
+                                                {doctor.specialty}{" "}
+                                                {doctor.consultationFee
+                                                    ? `(₹${doctor.consultationFee})`
+                                                    : ""}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value="" disabled>
+                                            No doctors available
                                         </option>
-                                    ))}
+                                    )}
                                 </select>
                             </div>
 

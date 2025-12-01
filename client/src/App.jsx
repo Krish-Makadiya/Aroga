@@ -57,7 +57,7 @@ import AdminAppointments from "./pages/adminPages/AdminAppointments/AdminAppoint
 import LocationMap from "./pages/adminPages/LocationMap/LocationMap";
 import Emergencies from "./pages/adminPages/Emergencies/Emergencies";
 import EmergencyVideo from "./pages/adminPages/Emergencies/EmergencyVideo";
-import DocDashboard from "./pages/doctorPages/DoctorDashboard/DocDashboard";
+// import DocDashboard from "./pages/doctorPages/DoctorDashboard/DocDashboard";
 
 const patientTabs = [
     {

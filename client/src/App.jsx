@@ -41,7 +41,7 @@ import Onboarding from "./pages/auth/Onboarding";
 import PostDetail from "./pages/community/PostDetail";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
-// import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
+import DoctorDashboard from "./pages/doctorPages/DoctorDashboard/DoctorDashboard";
 import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
@@ -324,14 +324,14 @@ function App() {
                     }
                 />
 
-                {/* <Route
+                <Route
                     path="/doctor/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <DoctorDashboard tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
-                /> */}
+                />
                 <Route
                     path="/doctor/account-earning"
                     element={

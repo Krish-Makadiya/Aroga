@@ -41,7 +41,7 @@ import Onboarding from "./pages/auth/Onboarding";
 import PostDetail from "./pages/community/PostDetail";
 import AccountEarning from "./pages/doctorPages/AccountEarnings/AccountEarning";
 import DoctorArticles from "./pages/doctorPages/DoctorArticles/DoctorArticles";
-// import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
+import MyAppointments from "./pages/doctorPages/MyAppointments/MyAppointments";
 import PatientCommunity from "./pages/patientPages/CommunityHealth/PatientCommunity";
 import GetAppointment from "./pages/patientPages/GetAppointment/GetAppointment";
 import MenstrualHealth from "./pages/patientPages/MenstrualHealth/MenstrualHealth";
@@ -57,7 +57,7 @@ import AdminAppointments from "./pages/adminPages/AdminAppointments/AdminAppoint
 import LocationMap from "./pages/adminPages/LocationMap/LocationMap";
 import Emergencies from "./pages/adminPages/Emergencies/Emergencies";
 import EmergencyVideo from "./pages/adminPages/Emergencies/EmergencyVideo";
-import DocDashboard from "./pages/doctorPages/DoctorDashboard/DocDashboard";
+import Doc from "./pages/doctorPages/Doc/Doc"
 
 const patientTabs = [
     {
@@ -336,18 +336,18 @@ function App() {
                     path="/doctor/dashboard"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
-                            <DocDashboard tabs={doctorTabs} />
+                            <Doc tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
                 />
-                {/* <Route
+                <Route
                     path="/doctor/my-appointments"
                     element={
                         <ProtectedRoute requiredRole="Doctor">
                             <MyAppointments tabs={doctorTabs} />
                         </ProtectedRoute>
                     }
-                /> */}
+                />
 
                 <Route
                     path="/video-appointment/:role"

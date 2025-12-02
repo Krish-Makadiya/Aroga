@@ -116,6 +116,7 @@ exports.createPatient = async (req, res) => {
     }
 
     // If validation passes, create the patient
+    // console.log(clerkUserId);
     try {
         const patient = await Patient.create({
             fullName,
@@ -130,6 +131,7 @@ exports.createPatient = async (req, res) => {
             telemedicineConsent,
             clerkUserId,
         });
+        console.log(patient);
 
         const newPhone = phone.startsWith("+91") ? phone : "+91" + phone;
 
@@ -145,6 +147,7 @@ exports.createPatient = async (req, res) => {
             patient,
         });
     } catch (error) {
+        console.log(error);
         if (error.name === "ValidationError") {
             return res.status(400).json({ error: error.message });
         }

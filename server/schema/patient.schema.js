@@ -43,22 +43,6 @@ const patientSchema = new mongoose.Schema(
             },
         },
 
-        email: {
-            type: String,
-            required: [false, "Email is required"],
-            trim: true,
-            lowercase: true,
-            unique: true,
-            validate: {
-                validator: function (value) {
-                    return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
-                        value
-                    );
-                },
-                message: "Please enter a valid email address",
-            },
-        },
-
         address: {
             type: String,
             required: [true, "Address is required"],
@@ -150,7 +134,6 @@ const patientSchema = new mongoose.Schema(
             default: [],
             trim: true,
         },
-
         majorDiseases: {
             type: [String],
             default: [],

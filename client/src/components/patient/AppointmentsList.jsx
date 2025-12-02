@@ -119,7 +119,7 @@ const AppointmentsList = ({ appointments }) => {
                 alert(response.error.step);
                 alert(response.error.reason);
                 alert(response.error.metadata.order_id);
-                alert(response.error.metadata.payment_id);
+                alert(response.error.metadata.payment_id);  
             });
 
             rzp1.open();
@@ -197,7 +197,7 @@ const AppointmentsList = ({ appointments }) => {
                                                     size={26}
                                                     color="amber-400"
                                                 />
-                                                <div className="flex gap-1 items-center">
+                                            <div className="flex gap-1 items-center">
                                                     <span className="text-xl font-medium">
                                                         {(
                                                             doc.rating
@@ -211,7 +211,7 @@ const AppointmentsList = ({ appointments }) => {
                                                     </span>
                                                 </div>
                                             </div>
-                                        )}
+                                    )}
                                 </div>
                                 <div className="flex gap-2 mt-1">
                                     {doc?.qualifications && (
@@ -412,14 +412,14 @@ const AppointmentsList = ({ appointments }) => {
                                                     {appt.payment.paymentId}
                                                 </span>
                                             </div>
-                                        )}
-                                        {appt.payment.paidAt && (
+                                    )}
+                                    {appt.payment.paidAt && (
                                             <div className="flex items-center gap-1 text-xs text-light-secondary-text dark:text-dark-secondary-text">
                                                 <Calendar className="w-3.5 h-3.5 mr-0.5" />
                                                 <span>
                                                     Paid on:{" "}
-                                                    {new Date(
-                                                        appt.payment.paidAt
+                                            {new Date(
+                                                appt.payment.paidAt
                                                     ).toLocaleDateString(
                                                         "en-IN",
                                                         {
@@ -430,9 +430,9 @@ const AppointmentsList = ({ appointments }) => {
                                                             minute: "2-digit",
                                                         }
                                                     )}
-                                                </span>
+                                        </span>
                                             </div>
-                                        )}
+                                    )}
                                     </div>
                                 </div>
                             )}
@@ -576,15 +576,15 @@ const AppointmentsList = ({ appointments }) => {
                             <div className="w-full flex items-center gap-3 justify-end">
                                 {appt.status === "confirmed" &&
                                     appt.payment?.status !== "paid" && (
-                                        <button
-                                            onClick={() =>
-                                                paymentClickHandler(
-                                                    appt._id,
-                                                    appt.amount ??
-                                                        doc?.consultationFee ??
-                                                        0
-                                                )
-                                            }
+                                <button
+                                    onClick={() =>
+                                        paymentClickHandler(
+                                            appt._id,
+                                            appt.amount ??
+                                                doc?.consultationFee ??
+                                                0
+                                        )
+                                    }
                                             disabled={
                                                 processingPaymentId === appt._id
                                             }
@@ -674,7 +674,7 @@ const AppointmentsList = ({ appointments }) => {
                                                 className="inline-flex items-center gap-1 py-2 px-4 rounded-md  font-medium text-light-primary-text dark:text-dark-primary-text hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 ml-2 bg-light-surface dark:bg-dark-surface">
                                                 <Pill size={20} />
                                                 <p>Prescriptions</p>
-                                            </button>
+                                </button>
                                         )}
                                 </div>
                                 {appt.payment?.status === "paid" &&
@@ -684,15 +684,15 @@ const AppointmentsList = ({ appointments }) => {
                                             <CheckCircle2 className="w-4 h-4 text-green-500" />
                                             Paid
                                         </span>
-                                    )}
-                                <button
+                            )}
+                            <button
                                     className="bg-light-primary dark:bg-dark-primary hover:bg-light-primary-hover dark:hover:bg-dark-primary-hover text-dark-primary-text font-semibold py-2 px-4 rounded-md"
-                                    onClick={() => {
-                                        setSelectedDoctor(doc);
-                                        setOpen(true);
-                                    }}>
-                                    View Doctor
-                                </button>
+                                onClick={() => {
+                                    setSelectedDoctor(doc);
+                                    setOpen(true);
+                                }}>
+                                View Doctor
+                            </button>
                             </div>
                         </div>
                         {open && selectedDoctor && (

@@ -116,16 +116,24 @@ export default function OnboardingForm() {
             let backendBody = {};
 
             if (role === "Patient") {
-                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/patient/create-patient`;
+                backendUrl = `${
+                    import.meta.env.VITE_SERVER_URL
+                }/api/patient/create-patient`;
                 backendBody = patient;
             } else if (role === "Doctor") {
-                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/doctor/create-doctor`;
+                backendUrl = `${
+                    import.meta.env.VITE_SERVER_URL
+                }/api/doctor/create-doctor`;
                 backendBody = doctor;
             } else if (role === "Pharmacy") {
-                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/pharmacy/create-pharmacy`;
+                backendUrl = `${
+                    import.meta.env.VITE_SERVER_URL
+                }/api/pharmacy/create-pharmacy`;
                 backendBody = pharmacy;
             } else if (role === "Admin") {
-                backendUrl = `${import.meta.env.VITE_SERVER_URL}/api/admin/create-admin`;
+                backendUrl = `${
+                    import.meta.env.VITE_SERVER_URL
+                }/api/admin/create-admin`;
                 backendBody = admin;
             }
 
@@ -135,7 +143,6 @@ export default function OnboardingForm() {
                 console.log("Submitting to backend:", backendUrl, backendBody);
 
                 let response;
-
                 // Only Doctor role needs FormData (has file uploads)
                 if (role === "Doctor") {
                     const formData = new FormData();
@@ -179,6 +186,7 @@ export default function OnboardingForm() {
                     });
                 } else {
                     // Patient, Pharmacy, and Admin send JSON
+                    console.log("Token:", token);
                     response = await axios.post(backendUrl, backendBody, {
                         headers: {
                             "Content-Type": "application/json",
@@ -188,6 +196,7 @@ export default function OnboardingForm() {
                 }
 
                 console.log("Backend response:", response.data);
+                console.log("Backend response Detailed:", response);
             }
 
             // Update Clerk metadata as before

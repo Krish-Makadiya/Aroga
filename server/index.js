@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config({ path: "/.env" });
+// Load env from project root; hosting platforms usually inject env vars directly anyway
+require("dotenv").config({ path: "./.env" });
 const { clerkMiddleware } = require("@clerk/express");
 const connectDB = require("./config/mongoDB");
 const patientRoute = require("./routes/patient.route");
@@ -29,11 +30,28 @@ const PORT = process.env.PORT || 5000;
 
 connectDB();
 
+// Allow configured frontend(s) to talk to this API from any device
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    "https://arogya-raksha.vercel.app",
+    "http://localhost:5173",
+].filter(Boolean);
+
 const corsOptions = {
-  origin: "https://arogya-raksha.vercel.app",
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    origin: (origin, callback) => {
+        // Allow non-browser tools / same-origin requests with no Origin header
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        console.warn(`Blocked CORS request from origin: ${origin}`);
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
 };
 
 app.use(cors(corsOptions));

@@ -98,7 +98,7 @@ export default function Navbar() {
             case "Doctor":
                 return "/doctor/dashboard";
             case "Admin":
-                return "/dashboard/admin";
+                return "/admin/dashboard";
             case "Pharmacy":
                 return "/pharmacy/dashboard";
             default:

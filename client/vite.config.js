@@ -42,6 +42,11 @@ export default defineConfig({
                     },
                 ],
             },
+            workbox: {
+                maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // (optional) increase limit
+                globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+                globIgnores: ['**/zego-uikit-prebuilt-*.js'],  // ⛔ exclude large Zego file
+            }
         }),
     ],
 });

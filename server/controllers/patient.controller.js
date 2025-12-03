@@ -2,6 +2,7 @@
 const { translate } = require("@vitalets/google-translate-api");
 const { sendSms } = require("../config/sms.config");
 const Patient = require("../schema/patient.schema");
+const cloudinary = require("../config/cloudinary");
 
 exports.createPatient = async (req, res) => {
     const {
@@ -12,6 +13,7 @@ exports.createPatient = async (req, res) => {
         address,
         district,
         govIdType,
+        governmentIdProof,
         emergencyContactName,
         emergencyContactPhone,
         telemedicineConsent,
@@ -35,6 +37,13 @@ exports.createPatient = async (req, res) => {
         errors.push(
             "fullName is required and must be a non-empty string (max 100 chars)"
         );
+    // Validate governmentIdProof file (from multer)
+    if (
+        !req.files ||
+        !req.files.governmentIdProof ||
+        !req.files.governmentIdProof[0]
+    )
+        errors.push("governmentIdProof file is required");
     if (
         !address ||
         typeof address !== "string" ||
@@ -103,11 +112,6 @@ exports.createPatient = async (req, res) => {
         );
     }
 
-    // telemedicineConsent
-    if (typeof telemedicineConsent !== "boolean") {
-        errors.push("telemedicineConsent is required and must be a boolean");
-    }
-
     // If there are validation errors, return them
     if (errors.length > 0) {
         return res
@@ -115,8 +119,44 @@ exports.createPatient = async (req, res) => {
             .json({ error: "Validation failed", details: errors });
     }
 
-    // If validation passes, create the patient
-    // console.log(clerkUserId);
+    // upload governmentIdProof to cloudinary
+    let governmentIdProofUrl = "";
+    console.log("req.files", req.files);
+
+    async function uploadBufferToCloud(buffer, folder = "patient_docs") {
+        const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { resource_type: "auto", folder },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                }
+            );
+            stream.end(buffer);
+        });
+        return uploadResult?.secure_url || "";
+    }
+
+    if (
+        req.files &&
+        req.files.governmentIdProof &&
+        req.files.governmentIdProof[0]
+    ) {
+        try {
+            governmentIdProofUrl = await uploadBufferToCloud(
+                req.files.governmentIdProof[0].buffer,
+                "patient_docs"
+            );
+        } catch (err) {
+            console.error(
+                "[patient.createPatient] governmentIdProof upload failed:",
+                err.message || err
+            );
+        }
+    }
+
+    console.log("Government ID Proof URL:", governmentIdProofUrl);
+
     try {
         const patient = await Patient.create({
             fullName,
@@ -126,9 +166,10 @@ exports.createPatient = async (req, res) => {
             address,
             district,
             govIdType,
+            governmentIdProof: governmentIdProofUrl || "",
             emergencyContactName,
             emergencyContactPhone,
-            telemedicineConsent,
+            telemedicineConsent: true,
             clerkUserId,
         });
         console.log(patient);
@@ -136,7 +177,7 @@ exports.createPatient = async (req, res) => {
         const newPhone = phone.startsWith("+91") ? phone : "+91" + phone;
 
         const message = `Dear ${fullName}, your patient profile has been created successfully.`;
-        const result = await translate(message, { to:  "en" });
+        const result = await translate(message, { to: "en" });
 
         sendSms(newPhone, result.text).catch((err) => {
             console.error("Error sending SMS:", err);
@@ -177,7 +218,7 @@ exports.getAllPatientsWithLocation = async (req, res) => {
             "location.latitude": { $ne: null },
             "location.longitude": { $ne: null },
         }).select("fullName phone email location district state address");
-        
+
         res.json({
             success: true,
             data: patients,
@@ -489,11 +530,7 @@ exports.updateLocation = async (req, res) => {
         }
 
         // Validate latitude and longitude
-        if (
-            typeof latitude !== "number" ||
-            latitude < -90 ||
-            latitude > 90
-        ) {
+        if (typeof latitude !== "number" || latitude < -90 || latitude > 90) {
             return res.status(400).json({
                 success: false,
                 message: "Latitude must be a number between -90 and 90",

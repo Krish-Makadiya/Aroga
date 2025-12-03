@@ -12,7 +12,7 @@ export default function RoleRedirect() {
 	if (role === "patient") return <Navigate to="/patient/dashboard" replace />;
 	if (role === "doctor") return <Navigate to="/doctor/dashboard" replace />;
 	if (role === "pharmacy") return <Navigate to="/pharmacy/dashboard" replace />;
-	if (role === "admin") return <Navigate to="/dashboard/admin" replace />;
+	if (role === "admin") return <Navigate to="/admin/dashboard" replace />;
 	return <Navigate to="/onboarding" replace />;
 }
 

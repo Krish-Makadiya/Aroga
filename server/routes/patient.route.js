@@ -2,10 +2,20 @@
 const express = require("express");
 const router = express.Router();
 const Patient = require("../schema/patient.schema");
+const multer = require("multer");
 const { createPatient, getAllPatients, getAllPatientsWithLocation, getPatientByClerkId, getPatientWithEvents, getMedicationReminders, addMedicationReminder, updateMedicationReminder, deleteMedicationReminder, setPreferredLanguage, updateLocation } = require("../controllers/patient.controller");
 
+const upload = multer({ storage: multer.memoryStorage() });
+
 // Create a new patient (inline validation)
-router.post("/create-patient", createPatient);
+// Accept governmentIdProof file via multer
+router.post(
+    "/create-patient",
+    upload.fields([
+        { name: 'governmentIdProof', maxCount: 1 },
+    ]),
+    createPatient
+);
 
 // Get all patients
 router.get("/all-patients", getAllPatients);

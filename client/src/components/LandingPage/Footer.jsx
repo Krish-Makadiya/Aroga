@@ -9,10 +9,10 @@ export default function Footer() {
                 <div className="flex flex-col items-center md:items-start gap-3">
                     <a href="/" className="flex items-center gap-2">
                         <img
-                            src={"https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"}
+                            src={"/aroga-logo.png"}
                             alt="Arogya Logo"
                             className="h-10 w-10"
-                        />
+                        />  
                         <span className="text-xl font-bold text-light-primary-text dark:text-dark-primary-text">
                             Arogya
                         </span>

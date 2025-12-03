@@ -76,7 +76,7 @@ const AppointmentsList = ({ appointments }) => {
     const paymentClickHandler = async (appointmentId, amount) => {
         try {
             const res = await axios.post(
-                `${import.meta.env.VITE_SERVER_URL}/payment/create-order`,
+                `${import.meta.env.VITE_SERVER_URL}/api/payment/create-order`,
                 { amount },
                 { headers: { "Content-Type": "application/json" } }
             );
@@ -87,7 +87,7 @@ const AppointmentsList = ({ appointments }) => {
                 currency: "INR",
                 name: "Arogya",
                 description: "Test Transaction",
-                image: "https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600",
+                image: "https://res.cloudinary.com/dcwoprlbv/image/upload/v1764779031/arogya-logo_oysqew.png",
                 order_id: res.data.data.id,
                 handler: (res) =>
                     savePaymentEntry({

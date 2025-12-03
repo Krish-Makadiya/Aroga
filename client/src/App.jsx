@@ -430,7 +430,7 @@ function App() {
                 />
 
                 <Route
-                    path="/dashboard/admin"
+                    path="/admin/dashboard" 
                     element={
                         <ProtectedRoute requiredRole="Admin">
                             <AdminDashboard tabs={adminTabs} />

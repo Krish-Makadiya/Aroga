@@ -90,7 +90,7 @@ function LandingPage() {
 
             <WhyChooseUsSection />
 
-            <PricingSection />
+            {/* <PricingSection /> */}
 
             <FAQSection />
 

@@ -21,6 +21,7 @@ export default function OnboardingForm() {
         district: "",
         phone: "",
         govIdType: "",
+        governmentIdProof: null,
         emergencyContactName: "",
         emergencyContactPhone: "",
         clerkUserId: user.id,
@@ -175,7 +176,7 @@ export default function OnboardingForm() {
                     );
                     formData.append(
                         "telemedicineConsent",
-                        backendBody.telemedicineConsent || true
+                        backendBody.telemedicineConsent === true ? true : false
                     );
 
                     response = await axios.post(backendUrl, formData, {
@@ -184,7 +185,30 @@ export default function OnboardingForm() {
                             Authorization: `Bearer ${token}`,
                         },
                     });
-                } else {
+                }
+                else if (role === "Patient") {
+                    const formData = new FormData();
+                    console.log("Preparing form data for patient:", backendBody);
+                    formData.append("fullName", backendBody.fullName);
+                    formData.append("dob", backendBody.dob);
+                    formData.append("gender", backendBody.gender);
+                    formData.append("phone", backendBody.phone);
+                    formData.append("address", backendBody.address);
+                    formData.append("district", backendBody.district);
+                    formData.append("govIdType", backendBody.govIdType);
+                    formData.append("governmentIdProof", backendBody.governmentIdProof);
+                    formData.append("emergencyContactName", backendBody.emergencyContactName);
+                    formData.append("emergencyContactPhone", backendBody.emergencyContactPhone);
+                    formData.append("telemedicineConsent", backendBody.telemedicineConsent || true);
+                    formData.append("clerkUserId", user?.id || "");
+                    response = await axios.post(backendUrl, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                }
+                else {
                     // Patient, Pharmacy, and Admin send JSON
                     console.log("Token:", token);
                     response = await axios.post(backendUrl, backendBody, {
@@ -636,6 +660,58 @@ export default function OnboardingForm() {
                                             receive medical consultations via
                                             video calls or other digital means.
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-span-full">
+                                <label
+                                    htmlFor="government-id-proof"
+                                    className="block text-sm/6 font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    Government ID Proof
+                                </label>
+                                <div className="mt-2">
+                                    <div className="flex justify-center rounded-lg border border-dashed border-light-secondary-text/25 dark:border-dark-secondary-text/25 px-6 py-10">
+                                        <div className="text-center">
+                                            <UserCircle
+                                                aria-hidden="true"
+                                                className="mx-auto size-12 text-light-secondary-text dark:text-dark-secondary-text"
+                                            />
+                                            <div className="mt-4 flex text-sm/6 text-light-secondary-text dark:text-dark-secondary-text">
+                                                <label
+                                                    htmlFor="government-id-proof"
+                                                    className="relative cursor-pointer rounded-md bg-transparent font-semibold text-light-primary dark:text-dark-primary focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-light-primary dark:focus-within:outline-dark-primary hover:text-light-primary-hover dark:hover:text-dark-primary-hover">
+                                                    <span>Upload ID Proof</span>
+                                                    <input
+                                                        id="government-id-proof"
+                                                        name="government-id-proof"
+                                                        type="file"
+                                                        accept=".pdf,.jpg,.jpeg,.png"
+                                                        onChange={(e) =>
+                                                            setPatient({
+                                                                ...patient,
+                                                                governmentIdProof:
+                                                                    e.target
+                                                                        .files[0],
+                                                            })
+                                                        }
+                                                        className="sr-only"
+                                                        required
+                                                    />
+                                                </label>
+                                                <p className="pl-1">
+                                                    or drag and drop
+                                                </p>
+                                            </div>
+                                            <p className="text-xs/5 text-light-secondary-text dark:text-dark-secondary-text">
+                                                PDF, JPG, PNG up to 10MB
+                                            </p>
+                                            {patient.governmentIdProof && (
+                                                <p className="mt-2 text-sm text-light-success dark:text-dark-success">
+                                                    Selected:{" "}
+                                                    {patient.governmentIdProof.name}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

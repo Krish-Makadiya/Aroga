@@ -72,13 +72,9 @@ const patientSchema = new mongoose.Schema(
             },
         },
 
-        govIdNumber: {
-            type: String,
-            required: [false, "Government ID number is required"],
-            trim: true,
-            uppercase: true,
-            unique: true,
-            maxlength: [20, "Government ID number cannot exceed 20 characters"],
+        governmentIdProof: {
+            type: String, // this will store the Cloudinary URL or filename
+            required: [true, "Government ID proof file is required"],
         },
 
         emergencyContactName: {

@@ -32,6 +32,8 @@ const EmergenciesContent = ({ doctors = [] }) => {
     const [selectedDate, setSelectedDate] = useState("");
     const { getToken } = useAuth();
 
+    console.log(doctors);
+
     // Fetch all emergencies and emergency appointments
     useEffect(() => {
         fetchEmergencies();

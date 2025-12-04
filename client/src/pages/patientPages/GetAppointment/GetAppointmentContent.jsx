@@ -133,7 +133,9 @@ const GetAppointmentContent = () => {
                 setLoading(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/verified-doctors`,
+                    `${
+                        import.meta.env.VITE_SERVER_URL
+                    }/api/doctor/verified-doctors`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
@@ -152,7 +154,7 @@ const GetAppointmentContent = () => {
             mounted = false;
         };
 
-    // No pre-click revalidation; rely on 5s refresh and conflict removal on booking
+        // No pre-click revalidation; rely on 5s refresh and conflict removal on booking
     }, [user, getToken]);
 
     const validateAppointmentDate = (date, time) => {
@@ -175,7 +177,10 @@ const GetAppointmentContent = () => {
         }
         const mins = d.getMinutes();
         if (mins % 20 !== 0) {
-            return { ok: false, msg: "Please select a 20-minute slot (:00, :20, :40)." };
+            return {
+                ok: false,
+                msg: "Please select a 20-minute slot (:00, :20, :40).",
+            };
         }
         return { ok: true, date: d, inputValue };
     };
@@ -195,83 +200,115 @@ const GetAppointmentContent = () => {
             return;
         }
 
-        try {
-            setIsBooking(true);
-            const prompt = buildDiagnosisPrompt(
-                userMetadata,
-                appointmentForm.symptoms
-            );
-            const summary = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/ai/generate-questions`,
-                {
-                    params: { prompt },
-                }
-            );
-            const aiSummary = summary.data.content;
-
-            const formData = new FormData();
-            formData.append("doctorId", selectedDoctor._id);
-            formData.append("patientId", user.id);
-            formData.append("scheduledAt", v.inputValue);
-            formData.append("amount", selectedDoctor.consultationFee ?? 0);
-            formData.append("appointmentType", appointmentForm.appointmentType);
-            formData.append(
-                "symptoms",
-                JSON.stringify(appointmentForm.symptoms)
-            );
-            formData.append("reports", appointmentForm.reports.trim());
-            formData.append("aiSummary", aiSummary);
-            formData.append("reportFile", appointmentForm.reportFile);
-
-            const token = await getToken();
-            const res = await axios.post(
-                `${import.meta.env.VITE_SERVER_URL}/api/appointment/create-appointment`,
-                formData,
-                token
-                    ? {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                    : undefined
-            );
-
-            toast.success("Appointment booked successfully!");
-            closeBookingModal();
-        } catch (e) {
-            console.log(e);
-            // If a time was selected, treat as a slot conflict: silently remove from UI and refresh slots
-            const msg = e.response?.data?.message || "Failed to create appointment.";
-            if (appointmentForm.time) {
+        await toast.promise(
+            (async () => {
                 try {
-                    const failedSlot = appointmentForm.time;
-                    setAvailableSlots((prev) => prev.filter((s) => s !== failedSlot));
-                    setAppointmentForm((prev) => ({ ...prev, time: "" }));
-                    const token2 = await getToken();
-                    const res2 = await axios.get(
-                        `${import.meta.env.VITE_SERVER_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    setIsBooking(true);
+                    const prompt = buildDiagnosisPrompt(
+                        userMetadata,
+                        appointmentForm.symptoms
+                    );
+                    const summary = await axios.get(
+                        `${
+                            import.meta.env.VITE_SERVER_URL
+                        }/api/ai/generate-questions`,
                         {
-                            params: { date: appointmentForm.date },
-                            headers: token2 ? { Authorization: `Bearer ${token2}` } : undefined,
+                            params: { prompt },
                         }
                     );
-                    setAvailableSlots(res2.data?.data || []);
-                } catch (_) {
-                    // no-op: keep optimistic removal
+                    const aiSummary = summary.data.content;
+
+                    const formData = new FormData();
+                    formData.append("doctorId", selectedDoctor._id);
+                    formData.append("patientId", user.id);
+                    formData.append("scheduledAt", v.inputValue);
+                    formData.append(
+                        "amount",
+                        selectedDoctor.consultationFee ?? 0
+                    );
+                    formData.append(
+                        "appointmentType",
+                        appointmentForm.appointmentType
+                    );
+                    formData.append(
+                        "symptoms",
+                        JSON.stringify(appointmentForm.symptoms)
+                    );
+                    formData.append("reports", appointmentForm.reports.trim());
+                    formData.append("aiSummary", aiSummary);
+                    formData.append("reportFile", appointmentForm.reportFile);
+
+                    const token = await getToken();
+                    const res = await axios.post(
+                        `${
+                            import.meta.env.VITE_SERVER_URL
+                        }/api/appointment/create-appointment`,
+                        formData,
+                        token
+                            ? {
+                                  headers: {
+                                      Authorization: `Bearer ${token}`,
+                                      "Content-Type": "multipart/form-data",
+                                  },
+                              }
+                            : undefined
+                    );
+                    closeBookingModal();
+                } catch (e) {
+                    console.log(e);
+                    // If a time was selected, treat as a slot conflict: silently remove from UI and refresh slots
+                    const msg =
+                        e.response?.data?.message ||
+                        "Failed to create appointment.";
+                    if (appointmentForm.time) {
+                        try {
+                            const failedSlot = appointmentForm.time;
+                            setAvailableSlots((prev) =>
+                                prev.filter((s) => s !== failedSlot)
+                            );
+                            setAppointmentForm((prev) => ({
+                                ...prev,
+                                time: "",
+                            }));
+                            const token2 = await getToken();
+                            const res2 = await axios.get(
+                                `${
+                                    import.meta.env.VITE_SERVER_URL
+                                }/api/doctor/${selectedDoctor._id}/slots`,
+                                {
+                                    params: { date: appointmentForm.date },
+                                    headers: token2
+                                        ? { Authorization: `Bearer ${token2}` }
+                                        : undefined,
+                                }
+                            );
+                            setAvailableSlots(res2.data?.data || []);
+                        } catch (_) {
+                            // ignore
+                        }
+                    } else {
+                        // Silent fail for other errors as well (no popup)
+                        console.warn(msg);
+                    }
+                } finally {
+                    setIsBooking(false);
                 }
-            } else {
-                // Silent fail for other errors as well (no popup)
-                console.warn(msg);
+            })(),
+            {
+                loading: "Booking your appointment...",
+                success: (data) =>
+                    `Appointment booked successfully!`,
+                error: () => `Failed to book appointment.`,
             }
-        } finally {
-            setIsBooking(false);
-        }
+        );
     };
 
     // Clear selected time if it's no longer in available slots (prevents selecting booked slot)
     useEffect(() => {
-        if (appointmentForm.time && !availableSlots.includes(appointmentForm.time)) {
+        if (
+            appointmentForm.time &&
+            !availableSlots.includes(appointmentForm.time)
+        ) {
             setAppointmentForm((prev) => ({ ...prev, time: "" }));
         }
     }, [availableSlots]);
@@ -303,10 +340,14 @@ const GetAppointmentContent = () => {
                 setLoadingSlots(true);
                 const token = await getToken();
                 const res = await axios.get(
-                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${
+                        selectedDoctor._id
+                    }/slots`,
                     {
                         params: { date: value },
-                        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                        headers: token
+                            ? { Authorization: `Bearer ${token}` }
+                            : undefined,
                     }
                 );
                 setAvailableSlots(res.data?.data || []);
@@ -324,16 +365,21 @@ const GetAppointmentContent = () => {
 
     // Auto-refresh slots periodically while booking modal is open to remove booked slots from UI
     useEffect(() => {
-        if (!bookingModalOpen || !selectedDoctor || !appointmentForm.date) return;
+        if (!bookingModalOpen || !selectedDoctor || !appointmentForm.date)
+            return;
         let cancelled = false;
         const tick = async () => {
             try {
                 const token = await getToken();
                 const res = await axios.get(
-                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${selectedDoctor._id}/slots`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/doctor/${
+                        selectedDoctor._id
+                    }/slots`,
                     {
                         params: { date: appointmentForm.date },
-                        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                        headers: token
+                            ? { Authorization: `Bearer ${token}` }
+                            : undefined,
                     }
                 );
                 if (!cancelled) setAvailableSlots(res.data?.data || []);
@@ -375,9 +421,7 @@ const GetAppointmentContent = () => {
     };
 
     if (loading) {
-        return (
-            <Loader/>
-        );
+        return <Loader />;
     }
 
     if (error) {
@@ -553,7 +597,9 @@ const GetAppointmentContent = () => {
                                     </p>
                                     <div className="mt-2 min-h-[44px]">
                                         {loadingSlots ? (
-                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">Loading slots...</div>
+                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                                Loading slots...
+                                            </div>
                                         ) : appointmentForm.date ? (
                                             availableSlots.length > 0 ? (
                                                 <div className="flex flex-wrap gap-2">
@@ -561,22 +607,39 @@ const GetAppointmentContent = () => {
                                                         <button
                                                             key={s}
                                                             disabled={isBooking}
-                                                            onClick={() => !isBooking && setAppointmentForm((p) => ({ ...p, time: s }))}
+                                                            onClick={() =>
+                                                                !isBooking &&
+                                                                setAppointmentForm(
+                                                                    (p) => ({
+                                                                        ...p,
+                                                                        time: s,
+                                                                    })
+                                                                )
+                                                            }
                                                             className={`px-3 py-2 rounded-md text-sm border transition ${
-                                                                appointmentForm.time === s
+                                                                appointmentForm.time ===
+                                                                s
                                                                     ? "bg-light-primary text-white border-light-primary"
                                                                     : "bg-light-bg dark:bg-dark-surface text-light-primary-text dark:text-dark-primary-text border-light-secondary-text/20 dark:border-dark-secondary-text/20"
-                                                            } ${isBooking ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"}`}
-                                                        >
+                                                            } ${
+                                                                isBooking
+                                                                    ? "opacity-60 cursor-not-allowed"
+                                                                    : "hover:opacity-90"
+                                                            }`}>
                                                             {s}
                                                         </button>
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">No slots available for this date.</div>
+                                                <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                                    No slots available for this
+                                                    date.
+                                                </div>
                                             )
                                         ) : (
-                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">Select a date to see slots.</div>
+                                            <div className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                                Select a date to see slots.
+                                            </div>
                                         )}
                                     </div>
                                 </div>

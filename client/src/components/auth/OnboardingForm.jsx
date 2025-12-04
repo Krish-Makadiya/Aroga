@@ -3,6 +3,7 @@ import { Shield, Stethoscope, User, UserCircle, Building2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const ROLES = ["Patient", "Doctor", "Pharmacy", "Admin"];
 
@@ -178,17 +179,26 @@ export default function OnboardingForm() {
                         "telemedicineConsent",
                         backendBody.telemedicineConsent === true ? true : false
                     );
-
-                    response = await axios.post(backendUrl, formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                }
-                else if (role === "Patient") {
+                    try {
+                        response = await axios.post(backendUrl, formData, {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                                Authorization: `Bearer ${token}`,
+                            },
+                        });
+                        toast.success(
+                            "Doctor information submitted successfully"
+                        );
+                    } catch (error) {
+                        toast.error("Error submitting form");
+                        console.error("Error submitting form:", error);
+                    }
+                } else if (role === "Patient") {
                     const formData = new FormData();
-                    console.log("Preparing form data for patient:", backendBody);
+                    console.log(
+                        "Preparing form data for patient:",
+                        backendBody
+                    );
                     formData.append("fullName", backendBody.fullName);
                     formData.append("dob", backendBody.dob);
                     formData.append("gender", backendBody.gender);
@@ -196,27 +206,52 @@ export default function OnboardingForm() {
                     formData.append("address", backendBody.address);
                     formData.append("district", backendBody.district);
                     formData.append("govIdType", backendBody.govIdType);
-                    formData.append("governmentIdProof", backendBody.governmentIdProof);
-                    formData.append("emergencyContactName", backendBody.emergencyContactName);
-                    formData.append("emergencyContactPhone", backendBody.emergencyContactPhone);
-                    formData.append("telemedicineConsent", backendBody.telemedicineConsent || true);
+                    formData.append(
+                        "governmentIdProof",
+                        backendBody.governmentIdProof
+                    );
+                    formData.append(
+                        "emergencyContactName",
+                        backendBody.emergencyContactName
+                    );
+                    formData.append(
+                        "emergencyContactPhone",
+                        backendBody.emergencyContactPhone
+                    );
+                    formData.append(
+                        "telemedicineConsent",
+                        backendBody.telemedicineConsent || true
+                    );
                     formData.append("clerkUserId", user?.id || "");
-                    response = await axios.post(backendUrl, formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                }
-                else {
-                    // Patient, Pharmacy, and Admin send JSON
+
+                    try {
+                        response = await axios.post(backendUrl, formData, {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                                Authorization: `Bearer ${token}`,
+                            },
+                        });
+                        toast.success(
+                            "Patient information submitted successfully"
+                        );
+                    } catch (error) {
+                        toast.error("Error submitting form");
+                        console.error(error);
+                    }
+                } else {
                     console.log("Token:", token);
-                    response = await axios.post(backendUrl, backendBody, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
+                    try {
+                        response = await axios.post(backendUrl, backendBody, {
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                            },
+                        });
+                        toast.success("Information submitted successfully");
+                    } catch (error) {
+                        toast.error("Error submitting form");
+                        console.error(error);
+                    }
                 }
 
                 console.log("Backend response:", response.data);
@@ -708,7 +743,11 @@ export default function OnboardingForm() {
                                             {patient.governmentIdProof && (
                                                 <p className="mt-2 text-sm text-light-success dark:text-dark-success">
                                                     Selected:{" "}
-                                                    {patient.governmentIdProof.name}
+                                                    {
+                                                        patient
+                                                            .governmentIdProof
+                                                            .name
+                                                    }
                                                 </p>
                                             )}
                                         </div>

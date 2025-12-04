@@ -230,6 +230,8 @@ const PatientDashboardContent = () => {
         }
     };
 
+    console.log(userData)
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-light-background to-light-background-secondary dark:from-dark-background dark:to-dark-background-secondary">
             <div className="max-w-8xl mx-auto md:px-0 px-3">
@@ -250,8 +252,7 @@ const PatientDashboardContent = () => {
                             <div className="">
                                 <div className="flex flex-col">
                                     <h1 className="md:text-4xl text-xl font-bold">
-                                        {getGreeting()}, {user.firstName}{" "}
-                                        {user.lastName}!
+                                        {getGreeting()}, {userData.fullName}
                                     </h1>
                                     <p className="text-light-secondary-text md:text-lg text-sm">
                                         Here's your health overview today

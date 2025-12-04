@@ -40,8 +40,7 @@ const PharmacyDashboardContent = (props) => {
     const routerLocation = useLocation();
     const searchParams = new URLSearchParams(routerLocation.search);
 
-    const view =
-        props?.viewOverride || searchParams.get("view") || "overview";
+    const view = props?.viewOverride || searchParams.get("view") || "overview";
 
     useEffect(() => {
         fetchPharmacyData();
@@ -53,7 +52,9 @@ const PharmacyDashboardContent = (props) => {
             setLoading(true);
             const token = await getToken();
             const response = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/pharmacy/get-pharmacy/${user.id}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/pharmacy/get-pharmacy/${
+                    user.id
+                }`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -72,7 +73,9 @@ const PharmacyDashboardContent = (props) => {
 
                 try {
                     const locationRes = await axios.get(
-                        `${import.meta.env.VITE_SERVER_URL}/api/pharmacyLocation/${pharmacy._id}/location`,
+                        `${
+                            import.meta.env.VITE_SERVER_URL
+                        }/api/pharmacyLocation/${pharmacy._id}/location`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
 
@@ -96,7 +99,7 @@ const PharmacyDashboardContent = (props) => {
                             });
                         }
                     }
-                } catch { }
+                } catch {}
 
                 console.log("Fetched pharmacy data:", pharmacy);
             }
@@ -149,8 +152,7 @@ const PharmacyDashboardContent = (props) => {
             <div className="w-full mx-auto py-6">
                 <button
                     onClick={() => navigate("/pharmacy/dashboard")}
-                    className="mb-4 px-4 py-2 rounded-md bg-blue-600 text-white"
-                >
+                    className="mb-4 px-4 py-2 rounded-md bg-blue-600 text-white">
                     Back
                 </button>
 
@@ -168,8 +170,7 @@ const PharmacyDashboardContent = (props) => {
             <div className="w-full mx-auto py-6">
                 <button
                     onClick={() => navigate("/pharmacy/dashboard")}
-                    className="mb-4 px-4 py-2 rounded-md bg-blue-600 text-white"
-                >
+                    className="mb-4 px-4 py-2 rounded-md bg-blue-600 text-white">
                     Back
                 </button>
 
@@ -184,8 +185,7 @@ const PharmacyDashboardContent = (props) => {
             <div className="w-full mx-auto py-6">
                 <button
                     onClick={() => navigate("/pharmacy/dashboard")}
-                    className="mb-4 px-4 py-2 rounded-md bg-blue-600 text-white"
-                >
+                    className="mb-4 px-4 py-2 rounded-md bg-blue-600 text-white">
                     Back
                 </button>
 
@@ -204,8 +204,7 @@ const PharmacyDashboardContent = (props) => {
                     </h1>
                     <button
                         onClick={() => navigate("/pharmacy/dashboard")}
-                        className="px-4 py-2 rounded-md bg-blue-600 text-white"
-                    >
+                        className="px-4 py-2 rounded-md bg-blue-600 text-white">
                         Back
                     </button>
                 </div>
@@ -218,23 +217,17 @@ const PharmacyDashboardContent = (props) => {
                         address={locationData.address}
                         height="500px"
                         clickable={true}
-                        onLocationChange={() => { }}
+                        onLocationChange={() => {}}
                     />
                 </div>
             </div>
         );
 
-    // ------------------------------
-    //       DEFAULT DASHBOARD VIEW
-    // ------------------------------
-
     return (
-        <div className="w-full mx-auto space-y-6">
-
+        <div className="w-full h-screen mx-auto space-y-6">
             {/* HEADER SECTION */}
             <div className="rounded-3xl p-6 bg-light-surface dark:bg-dark-bg shadow-md">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
                     {/* LEFT: Greeting + Icon */}
                     <div className="flex items-center gap-4">
                         <div className="w-24 h-24 bg-light-primary dark:bg-dark-primary rounded-full flex items-center justify-center">
@@ -263,10 +256,12 @@ const PharmacyDashboardContent = (props) => {
                     </div>
 
                     {/* RIGHT: Stats */}
-                    <div className="flex items-center gap-4 justify-center lg:justify-end">
+                    <div className="flex gap-4 lg:justify-end">
                         <div className="bg-light-bg dark:bg-dark-surface p-4 rounded-xl text-center">
                             <Star className="w-7 h-7 mx-auto text-yellow-500" />
-                            <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">Rating</p>
+                            <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                Rating
+                            </p>
                             <h2 className="text-2xl font-bold text-light-primary-text dark:text-dark-primary-text">
                                 {pharmacyData.rating?.average || "0.0"}
                             </h2>
@@ -274,7 +269,9 @@ const PharmacyDashboardContent = (props) => {
 
                         <div className="bg-light-bg dark:bg-dark-surface p-4 rounded-xl text-center">
                             <Package className="w-7 h-7 mx-auto text-light-primary dark:text-dark-primary" />
-                            <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">Services</p>
+                            <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
+                                Services
+                            </p>
                             <h2 className="text-2xl font-bold text-light-primary-text dark:text-dark-primary-text">
                                 {pharmacyData.services?.length || 0}
                             </h2>
@@ -285,105 +282,109 @@ const PharmacyDashboardContent = (props) => {
 
             {/* GRID: INFO CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
                 {/* Pharmacy Information Card */}
-                <div className="w-full rounded-2xl bg-light-surface dark:bg-dark-bg p-6 shadow-md">
+                <div className="w-full rounded-2xl p-6 shadow-md bg-light-surface dark:bg-dark-bg">
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-light-primary-text dark:text-dark-primary-text">
                         <Building2 className="w-5 h-5 text-light-primary dark:text-dark-primary" />
                         Pharmacy Information
                     </h2>
 
                     <div className="space-y-2 text-sm text-light-primary-text dark:text-dark-primary-text">
-                        <p><strong className="text-light-primary-text dark:text-dark-primary-text">Name:</strong> {pharmacyData.pharmacyName}</p>
-                        <p><strong className="text-light-primary-text dark:text-dark-primary-text">Owner:</strong> {pharmacyData.ownerName}</p>
-                        <p><strong className="text-light-primary-text dark:text-dark-primary-text">Email:</strong> {pharmacyData.email}</p>
-                        <p><strong className="text-light-primary-text dark:text-dark-primary-text">Phone:</strong> {pharmacyData.phone}</p>
-                        <p><strong className="text-light-primary-text dark:text-dark-primary-text">Address:</strong> {pharmacyData.address}</p>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="mt-6">
-                        <h3 className="font-bold mb-3 flex items-center gap-2 text-light-primary-text dark:text-dark-primary-text">
-                            <Plus className="w-5 h-5 text-light-primary dark:text-dark-primary" />
-                            Quick Actions
-                        </h3>
-
-                        <div className="space-y-2">
-                            {[
-                                {
-                                    label: "Manage Inventory",
-                                    view: "inventory",
-                                    color: "bg-blue-500",
-                                    icon: ShoppingBag,
-                                },
-                                {
-                                    label: "Create Bill",
-                                    view: "create-bill",
-                                    color: "bg-green-500",
-                                    icon: FileTextIcon,
-                                },
-                                {
-                                    label: "Billing History",
-                                    view: "bills",
-                                    color: "bg-purple-500",
-                                    icon: FileTextIcon,
-                                },
-                                {
-                                    label: "Manage Location",
-                                    view: "location",
-                                    color: "bg-orange-500",
-                                    icon: Package,
-                                },
-                            ].map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() =>
-                                        navigate(
-                                            `/pharmacy/${item.view === "inventory"
-                                                ? "manage-inventory"
-                                                : item.view === "create-bill"
-                                                    ? "create-bill"
-                                                    : item.view === "bills"
-                                                        ? "billing-history"
-                                                        : "my-location"
-                                            }`
-                                        )
-                                    }
-                                    className="w-full flex items-center gap-3 bg-light-background dark:bg-dark-background p-3 rounded-xl hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition"
-                                >
-                                    <div
-                                        className={`w-8 h-8 ${item.color} text-white rounded-lg flex items-center justify-center`}
-                                    >
-                                        <item.icon className="w-4 h-4" />
-                                    </div>
-
-                                    <span className="font-medium text-light-primary-text dark:text-dark-primary-text">
-                                        {item.label}
-                                    </span>
-
-                                    <ChevronRight className="ml-auto w-4 h-4 text-light-primary-text dark:text-dark-primary-text" />
-                                </button>
-                            ))}
-                        </div>
+                        <p>
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Name:
+                            </strong>{" "}
+                            {pharmacyData.pharmacyName}
+                        </p>
+                        <p>
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Owner:
+                            </strong>{" "}
+                            {pharmacyData.ownerName}
+                        </p>
+                        <p>
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Email:
+                            </strong>{" "}
+                            {pharmacyData.email}
+                        </p>
+                        <p>
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Phone:
+                            </strong>{" "}
+                            {pharmacyData.phone}
+                        </p>
+                        <p>
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Address:
+                            </strong>{" "}
+                            {pharmacyData.address}
+                        </p>
                     </div>
                 </div>
+                <div className="w-full rounded-2xl p-6 shadow-md bg-light-surface dark:bg-dark-bg">
+                    {/* Quick Actions */}
+                    <h3 className="font-bold mb-3 flex items-center gap-2 text-light-primary-text dark:text-dark-primary-text">
+                        <Plus className="w-5 h-5 text-light-primary dark:text-dark-primary" />
+                        Quick Actions
+                    </h3>
 
-                {/* Notifications Card */}
-                <div className="w-full rounded-2xl bg-light-surface dark:bg-dark-bg p-6 shadow-md">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-light-primary-text dark:text-dark-primary-text">
-                        <Bell className="w-5 h-5 text-light-primary dark:text-dark-primary" />
-                        Notifications
-                    </h2>
+                    <div className="space-y-2">
+                        {[
+                            {
+                                label: "Manage Inventory",
+                                view: "inventory",
+                                color: "bg-blue-500",
+                                icon: ShoppingBag,
+                            },
+                            {
+                                label: "Create Bill",
+                                view: "create-bill",
+                                color: "bg-green-500",
+                                icon: FileTextIcon,
+                            },
+                            {
+                                label: "Billing History",
+                                view: "bills",
+                                color: "bg-purple-500",
+                                icon: FileTextIcon,
+                            },
+                            {
+                                label: "Manage Location",
+                                view: "location",
+                                color: "bg-orange-500",
+                                icon: Package,
+                            },
+                        ].map((item, index) => (
+                            <button
+                                key={index}
+                                onClick={() =>
+                                    navigate(
+                                        `/pharmacy/${
+                                            item.view === "inventory"
+                                                ? "manage-inventory"
+                                                : item.view === "create-bill"
+                                                ? "create-bill"
+                                                : item.view === "bills"
+                                                ? "billing-history"
+                                                : "my-location"
+                                        }`
+                                    )
+                                }
+                                className="w-full flex items-center gap-3 bg-light-background dark:bg-dark-background p-3 rounded-xl hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition">
+                                <div
+                                    className={`w-8 h-8 ${item.color} text-white rounded-lg flex items-center justify-center`}>
+                                    <item.icon className="w-4 h-4" />
+                                </div>
 
-                    {pharmacyData.verificationStatus === "pending" ? (
-                        <div className="p-3 rounded-xl bg-yellow-100 dark:bg-yellow-900/20 text-sm text-light-primary-text dark:text-dark-primary-text">
-                            Your pharmacy verification is pending.
-                        </div>
-                    ) : (
-                        <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
-                            No new notifications.
-                        </p>
-                    )}
+                                <span className="font-medium text-light-primary-text dark:text-dark-primary-text">
+                                    {item.label}
+                                </span>
+
+                                <ChevronRight className="ml-auto w-4 h-4 text-light-primary-text dark:text-dark-primary-text" />
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Business Details */}
@@ -395,18 +396,25 @@ const PharmacyDashboardContent = (props) => {
 
                     <div className="space-y-2 text-sm text-light-primary-text dark:text-dark-primary-text">
                         <p>
-                            <strong className="text-light-primary-text dark:text-dark-primary-text">Registration:</strong>{" "}
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Registration:
+                            </strong>{" "}
                             {pharmacyData.registrationType}
                         </p>
 
                         {pharmacyData.gstNumber && (
                             <p>
-                                <strong className="text-light-primary-text dark:text-dark-primary-text">GST:</strong> {pharmacyData.gstNumber}
+                                <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                    GST:
+                                </strong>{" "}
+                                {pharmacyData.gstNumber}
                             </p>
                         )}
 
                         <p className="flex items-center gap-2">
-                            <strong className="text-light-primary-text dark:text-dark-primary-text">Status:</strong>{" "}
+                            <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                Status:
+                            </strong>{" "}
                             <span className="px-3 py-1 text-xs rounded-full bg-gray-800 text-gray-200">
                                 {pharmacyData.verificationStatus}
                             </span>
@@ -414,13 +422,14 @@ const PharmacyDashboardContent = (props) => {
 
                         {pharmacyData.description && (
                             <p>
-                                <strong className="text-light-primary-text dark:text-dark-primary-text">Description:</strong>{" "}
+                                <strong className="text-light-primary-text dark:text-dark-primary-text">
+                                    Description:
+                                </strong>{" "}
                                 {pharmacyData.description}
                             </p>
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     );

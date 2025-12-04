@@ -9,7 +9,7 @@ import CompletedAppointments from "./CompletedAppointments";
 
 const MyAppointments = ({ tabs }) => {
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState("upcoming-appointments");
+    const [activeTab, setActiveTab] = useState("new-appointments");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 

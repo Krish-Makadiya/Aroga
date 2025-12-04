@@ -24,6 +24,11 @@ import {
     Globe,
     Edit,
     Bell,
+    GitGraph,
+    GitBranchPlus,
+    IndianRupee,
+    CalendarClock,
+    File,
 } from "lucide-react";
 import Loader from "../../../components/main/Loader";
 
@@ -610,9 +615,9 @@ const DocContent = () => {
 
                             <div className="space-y-4">
                                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4">
-                                    <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-3">
-                                        �� Start Earning in 3 Steps
-                                    </h3>
+                                    <div className="font-semibold flex gap-2 items-center text-blue-800 dark:text-blue-200 mb-3">
+                                        <GitBranchPlus/> <span>Start Earning in 3 Steps</span>
+                                    </div>
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2 text-sm">
                                             <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -621,7 +626,7 @@ const DocContent = () => {
                                                 </span>
                                             </div>
                                             <span className="text-blue-700 dark:text-blue-300">
-                                                Upload documents
+                                                Add Account Details
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-2 text-sm">
@@ -649,9 +654,9 @@ const DocContent = () => {
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                                        <DollarSign className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                                        <IndianRupee className="w-5 h-5 text-green-600 mx-auto mb-1" />
                                         <p className="text-sm font-bold text-green-800 dark:text-green-200">
-                                            ₹500-2000
+                                            ₹50-1000
                                         </p>
                                         <p className="text-xs text-green-600 dark:text-green-400">
                                             per consultation
@@ -685,21 +690,21 @@ const DocContent = () => {
                                         Verification
                                     </h2>
                                     <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
-                                        Takes 48 hours to verify
+                                        Takes 24 hours to verify
                                     </p>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
-                                    <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-3">
-                                        ⏰ What happens next?
-                                    </h3>
+                                    <div className="font-semibold flex gap-2 items-center text-yellow-800 dark:text-yellow-200 mb-3">
+                                        <CalendarClock/> <span>What happens next?</span>
+                                    </div>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                                             <span className="text-yellow-700 dark:text-yellow-300">
-                                                Upload your documents
+                                                Add your Details
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -719,13 +724,12 @@ const DocContent = () => {
                                 </div>
 
                                 <div className="bg-gray-50 dark:bg-gray-900/20 rounded-lg p-3">
-                                    <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 text-sm">
-                                        📄 You'll need:
+                                    <h4 className="font-semibold flex gap-2 items-center text-gray-800 dark:text-gray-200 mb-2 text-sm">
+                                        <File/> <span>You'll need:</span>
                                     </h4>
                                     <ul className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
-                                        <li>• Medical License</li>
-                                        <li>• Government ID</li>
-                                        <li>• Passport photo</li>
+                                        <li>- Personal Details</li>
+                                        <li>- Bank Details for payments</li>
                                     </ul>
                                 </div>
 

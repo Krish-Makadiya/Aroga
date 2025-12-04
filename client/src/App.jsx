@@ -162,12 +162,6 @@ const pharmacyTabs = [
         icon: MapPin, // map/location icon
         path: "/pharmacy/my-location",
     },
-    {
-        id: 6,
-        name: "Settings",
-        icon: Settings2, // settings icon
-        path: "/pharmacy/settings",
-    },
 ];
 
 const adminTabs = [
@@ -413,17 +407,6 @@ function App() {
                             <PharmacyDashboard
                                 tabs={pharmacyTabs}
                                 view="location"
-                            />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/pharmacy/settings"
-                    element={
-                        <ProtectedRoute requiredRole="Pharmacy">
-                            <PharmacyDashboard
-                                tabs={pharmacyTabs}
-                                view="settings"
                             />
                         </ProtectedRoute>
                     }
